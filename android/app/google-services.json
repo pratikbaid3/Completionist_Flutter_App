@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "709384994858",
+    "firebase_url": "https://playpod-d37bd.firebaseio.com",
+    "project_id": "playpod-d37bd",
+    "storage_bucket": "playpod-d37bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709384994858:android:a250be6760fea3b0a2c353",
+        "android_client_info": {
+          "package_name": "co.turingcreatives.game_trophy_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "709384994858-gtq9vi97epi36f0nhbelu227cn0ao7mn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHp2zYAH1ZiDW-MonhVkSz8Q4bZnTIUxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709384994858-gtq9vi97epi36f0nhbelu227cn0ao7mn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
