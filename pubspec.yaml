@@ -37,9 +37,10 @@ dependencies:
   lite_rolling_switch: ^0.1.1
   liquid_progress_indicator: ^0.3.2
 
-  #BLOC
-  flutter_bloc: ^6.0.5
-  equatable: ^1.2.5
+  #Hidden Drawer
+  hidden_drawer_menu: ^2.0.1
+  #Expandable Card
+  expansion_tile_card: ^1.1.0
 
   #HTML
   flutter_html: ^1.1.1
@@ -47,6 +48,11 @@ dependencies:
 
   #WebView
   webview_flutter: ^1.0.7
+
+  #Provider
+
+  #JSONSerializable
+  json_serializable: ^3.5.1
 
 
   # The following adds the Cupertino Icons font to your application.
