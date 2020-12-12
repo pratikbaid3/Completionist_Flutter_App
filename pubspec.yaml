@@ -43,6 +43,10 @@ dependencies:
 
   #HTML
   flutter_html: ^1.1.1
+  flutter_widget_from_html: ^0.5.1+5
+
+  #WebView
+  webview_flutter: ^1.0.7
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -70,6 +74,7 @@ flutter:
     - images/
     - assets/anim.flr
     - assets/trophiesDataLink.db
+    - assets/anim2.flr
 
   fonts:
     - family: Rammetto

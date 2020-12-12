@@ -38,10 +38,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     return Scaffold(
       body: Center(
-        child: FlareActor("assets/anim.flr",
+        child: FlareActor("assets/anim2.flr",
             alignment: Alignment.center,
-            fit: BoxFit.contain,
-            animation: "idle"),
+            fit: BoxFit.scaleDown,
+            animation: "Alarm"),
       ),
     );
   }
