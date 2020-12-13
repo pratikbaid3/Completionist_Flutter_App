@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_trophy_manager/Pages/all_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Utilities/reusable_elements.dart';
@@ -27,6 +29,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
           case 0:
             screenCurrent = Dashboard();
             break;
+          case 1:
+            screenCurrent = AllGamesPage();
+            break;
         }
 
         return Scaffold(
@@ -43,10 +48,10 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             centerTitle: true,
             backgroundColor: secondaryColor,
             elevation: 1,
-            title: Image(
-              height: 35,
-              image: AssetImage('images/icons/hustle_logo.png'),
-            ),
+            // title: Image(
+            //   height: 35,
+            //   image: AssetImage('images/icons/hustle_logo.png'),
+            // ),
             actions: [
               IconButton(
                 icon: Icon(
@@ -55,13 +60,13 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
                 ),
                 onPressed: () {},
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
+              // IconButton(
+              //   icon: Icon(
+              //     Icons.search,
+              //     color: Colors.white,
+              //   ),
+              //   onPressed: () {},
+              // ),
             ],
           ),
           body: screenCurrent,
@@ -98,24 +103,24 @@ class _MenuState extends State<Menu> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            ListTile(
-              onTap: () {
-                controller.position = 0;
-                controller.toggle();
-              },
-              leading: Image(
-                width: wp * 0.25,
-                height: wp * 0.25,
-                image: AssetImage(
-                  'images/icons/hustle_logo.png',
-                ),
-              ),
-              title: Text(
-                "",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
-              ),
-            ),
+            // ListTile(
+            //   onTap: () {
+            //     controller.position = 0;
+            //     controller.toggle();
+            //   },
+            //   leading: Image(
+            //     width: wp * 0.25,
+            //     height: wp * 0.25,
+            //     image: AssetImage(
+            //       'images/icons/hustle_logo.png',
+            //     ),
+            //   ),
+            //   title: Text(
+            //     "",
+            //     style:
+            //         TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+            //   ),
+            // ),
             SizedBox(
               height: hp * 0.05,
             ),
@@ -127,19 +132,19 @@ class _MenuState extends State<Menu> {
                 },
                 title: 'Dashboard'),
             NavDrawerListTile(
-                icon: Icons.dynamic_feed_outlined,
+                icon: FontAwesomeIcons.playstation,
                 onTap: () {
                   controller.position = 1;
                   controller.toggle();
                 },
-                title: 'Feed'),
+                title: 'PS4 Games'),
             NavDrawerListTile(
-                icon: Icons.star,
+                icon: FontAwesomeIcons.xbox,
                 onTap: () {
                   controller.position = 1;
                   controller.toggle();
                 },
-                title: 'Starred'),
+                title: 'Xbox Games'),
             NavDrawerListTile(
                 icon: Icons.archive_outlined,
                 onTap: () {
