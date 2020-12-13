@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
+import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:provider/provider.dart';
 
@@ -154,7 +153,9 @@ class _AllGamesPageState extends State<AllGamesPage> {
                             elevation: 8.0,
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).pushNamed(guidePageRoute);
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: secondaryColor,

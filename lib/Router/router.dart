@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
+import 'package:game_trophy_manager/Pages/guide_page.dart';
 import 'package:game_trophy_manager/Pages/nav_drawer.dart';
 import 'package:game_trophy_manager/Pages/splash_page.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
@@ -25,6 +26,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           child: NavDrawerPage(),
         ),
       );
+      break;
+    case guidePageRoute:
+      return MaterialPageRoute(builder: (context) => GuidePage());
       break;
   }
 }

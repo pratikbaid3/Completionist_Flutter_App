@@ -26,10 +26,10 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
       screenSelectedBuilder: (position, controller) {
         Widget screenCurrent;
         switch (position) {
-          case 1:
+          case 0:
             screenCurrent = Dashboard();
             break;
-          case 0:
+          case 1:
             screenCurrent = AllGamesPage();
             break;
         }
