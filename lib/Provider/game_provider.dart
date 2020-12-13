@@ -14,7 +14,6 @@ class GameProvider extends ChangeNotifier {
       List<dynamic> data = response.data['result']['games'];
       List<GameModel> tempGames =
           data.map((data) => GameModel.fromJson(data)).toList();
-      print(response);
       if (page == 1) {
         games.clear();
       }

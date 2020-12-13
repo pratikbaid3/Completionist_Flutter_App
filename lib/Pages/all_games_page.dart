@@ -19,6 +19,7 @@ class _AllGamesPageState extends State<AllGamesPage> {
   bool isSearchIcon = true;
   int currentPage;
   int nextPage;
+  String searchKeyword = '';
 
   @override
   void initState() {
@@ -29,14 +30,13 @@ class _AllGamesPageState extends State<AllGamesPage> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        print('Pratik');
         int itemCount =
             Provider.of<GameProvider>(context, listen: false).games.length;
         if (itemCount == 30 * currentPage) {
-          Provider.of<GameProvider>(context, listen: false)
-              .getGame(page: nextPage);
-          currentPage += 1;
-          nextPage += 1;
+          setState(() {
+            currentPage += 1;
+            nextPage += 1;
+          });
         }
       }
     });
@@ -64,6 +64,9 @@ class _AllGamesPageState extends State<AllGamesPage> {
                             onPressed: () {
                               FocusScope.of(context).unfocus();
                               setState(() {
+                                searchKeyword = searchController.text;
+                                currentPage = 1;
+                                nextPage = currentPage + 1;
                                 isSearchIcon = false;
                               });
                               //TODO Execute search
@@ -78,7 +81,10 @@ class _AllGamesPageState extends State<AllGamesPage> {
                               FocusScope.of(context).unfocus();
                               setState(() {
                                 isSearchIcon = true;
+                                currentPage = 1;
+                                nextPage = currentPage + 1;
                                 searchController.text = '';
+                                searchKeyword = searchController.text;
                               });
                               //TODO Execute search
                             },
@@ -117,7 +123,8 @@ class _AllGamesPageState extends State<AllGamesPage> {
                 ),
                 Expanded(
                   child: FutureBuilder(
-                    future: Provider.of<GameProvider>(context).getGame(),
+                    future: Provider.of<GameProvider>(context)
+                        .getGame(page: currentPage, search: searchKeyword),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (Provider.of<GameProvider>(context).games.length ==
                           0) {
