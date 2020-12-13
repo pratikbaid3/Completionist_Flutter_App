@@ -54,6 +54,8 @@ dependencies:
   dio: ^3.0.10
   #SpinKit
   flutter_spinkit: "^4.1.2"
+  #Cached Network Image
+  cached_network_image: ^2.4.1
 
 
   # The following adds the Cupertino Icons font to your application.
