@@ -13,14 +13,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    toDashboard();
+  }
+
+  void toDashboard() {
+    new Future.delayed(const Duration(seconds: 4), () {
+      Navigator.of(context).popAndPushNamed(homePageRoute);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    new Future.delayed(const Duration(seconds: 4), () {
-      Navigator.of(context).popAndPushNamed(homePageRoute);
-    });
-
     return Scaffold(
       backgroundColor: primaryColor,
       body: Center(

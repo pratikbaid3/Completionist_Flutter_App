@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:slimy_card/slimy_card.dart';
 
 final Color accentColor = Color(0xff393e46);
 final Color backgroundColor = Color(0xff222831);
@@ -144,94 +143,6 @@ class _kReusablePasswordTextFieldState
           ),
         )
       ],
-    );
-  }
-}
-
-//Slimey Card view instide the carousal slider
-class kSlimyReusableCard extends StatefulWidget {
-  kSlimyReusableCard(
-      {@required this.imageLink,
-      @required this.completionPercentage,
-      @required this.goToTrophyPage});
-  String imageLink;
-  double completionPercentage;
-  Function goToTrophyPage;
-
-  @override
-  kSlimyReusableCardState createState() => kSlimyReusableCardState();
-}
-
-class kSlimyReusableCardState extends State<kSlimyReusableCard> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 40, left: 2, right: 2),
-      child: SlimyCard(
-        color: accentColor,
-        width: 350,
-        topCardHeight: 250,
-        bottomCardHeight: 100,
-        borderRadius: 10,
-        topCardWidget: Padding(
-          padding: EdgeInsets.all(8),
-          child: GestureDetector(
-            onTap: widget.goToTrophyPage,
-            child: NeuCard(
-              curveType: CurveType.flat,
-              bevel: 10,
-              decoration: NeumorphicDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: accentColor,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Image(
-                  image: NetworkImage(
-                    widget.imageLink,
-                  ),
-                ),
-              ),
-            ),
-            /**NeuCard(
-              curveType: CurveType.flat,
-              bevel: 12,
-              decoration: NeumorphicDecoration(
-                color: accentColor,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(12),
-                child: Hero(
-                  tag: 'hero',
-                  child: Card(
-                    child: Image(
-                      image: NetworkImage(widget.imageLink),
-                    ),
-                  ),
-                ),
-              ),
-            ),**/
-          ),
-        ),
-        bottomCardWidget: Card(
-          child: SizedBox(
-            height: 40,
-            child: LiquidLinearProgressIndicator(
-              value: widget.completionPercentage, // Defaults to 0.5.
-              valueColor: AlwaysStoppedAnimation(Color(
-                  0xff67D7A1)), // Defaults to the current Theme's accentColor.
-              backgroundColor:
-                  backgroundColor, // Defaults to the current Theme's backgroundColor.
-              borderRadius: 4.0,
-              direction: Axis
-                  .horizontal, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
-              center: Text(
-                  "${((widget.completionPercentage * 100).round()).toString()}%"),
-            ),
-          ),
-        ),
-        slimeEnabled: true,
-      ),
     );
   }
 }

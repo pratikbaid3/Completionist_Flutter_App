@@ -162,6 +162,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.10"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.10"
   expansion_tile_card:
     dependency: "direct main"
     description:
@@ -223,6 +230,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  flutter_keyboard_visibility:
+    dependency: "direct main"
+    description:
+      name: flutter_keyboard_visibility
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.2"
   flutter_layout_grid:
     dependency: transitive
     description:
@@ -230,6 +244,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.2"
+  flutter_spinkit:
+    dependency: "direct main"
+    description:
+      name: flutter_spinkit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.2+1"
   flutter_svg:
     dependency: transitive
     description:
@@ -261,20 +282,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.1+4"
-  fluttertoast:
-    dependency: "direct main"
-    description:
-      name: fluttertoast
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.1"
   font_awesome_flutter:
     dependency: "direct main"
     description:
       name: font_awesome_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.8.1"
+    version: "8.10.1"
   glob:
     dependency: transitive
     description:
@@ -345,13 +359,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.5.1"
-  line_awesome_icons:
-    dependency: "direct main"
-    description:
-      name: line_awesome_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.4+2"
   liquid_progress_indicator:
     dependency: "direct main"
     description:
@@ -366,13 +373,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
-  loading_indicator:
-    dependency: "direct main"
-    description:
-      name: loading_indicator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.0"
   logging:
     dependency: transitive
     description:
@@ -401,6 +401,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0-nullsafety.3"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   neumorphic:
     dependency: "direct main"
     description:
@@ -512,7 +519,7 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   process:
     dependency: transitive
     description:
@@ -520,6 +527,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.13"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.3.2+3"
   pub_semver:
     dependency: transitive
     description:
@@ -595,13 +609,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  slimy_card:
-    dependency: "direct main"
-    description:
-      name: slimy_card
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   source_gen:
     dependency: transitive
     description:
