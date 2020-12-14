@@ -141,7 +141,7 @@ class _AllGamesPageState extends State<AllGamesPage> {
                         controller: _scrollController,
                         primary: false,
                         shrinkWrap: true,
-                        padding: EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(top: 10, left: 2, right: 2),
                         itemCount:
                             Provider.of<GameProvider>(context).games.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -150,7 +150,7 @@ class _AllGamesPageState extends State<AllGamesPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            elevation: 8.0,
+                            elevation: 0,
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
                               onTap: () {
