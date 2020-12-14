@@ -9,7 +9,7 @@ class GameProvider extends ChangeNotifier {
     try {
       Response response;
       Dio dio = new Dio();
-      response = await dio.get(baseUrl + getAllPs4Games,
+      response = await dio.get(baseUrl + gamesUrl,
           queryParameters: {"page": page, "count": count, "search": search});
       List<dynamic> data = response.data['result']['games'];
       List<GameModel> tempGames =
