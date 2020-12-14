@@ -154,7 +154,12 @@ class _AllGamesPageState extends State<AllGamesPage> {
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).pushNamed(guidePageRoute);
+                                Navigator.of(context).pushNamed(guidePageRoute,
+                                    arguments: Provider.of<GameProvider>(
+                                            context,
+                                            listen: false)
+                                        .games[index]
+                                        .gameName);
                               },
                               child: Container(
                                 decoration: BoxDecoration(

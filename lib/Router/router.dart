@@ -4,10 +4,12 @@ import 'package:game_trophy_manager/Pages/guide_page.dart';
 import 'package:game_trophy_manager/Pages/nav_drawer.dart';
 import 'package:game_trophy_manager/Pages/splash_page.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
+import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:provider/provider.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
+  final args = settings.arguments;
   switch (settings.name) {
     case splashScreenRoute:
       return MaterialPageRoute(builder: (context) => SplashScreen());
@@ -28,7 +30,17 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
       break;
     case guidePageRoute:
-      return MaterialPageRoute(builder: (context) => GuidePage());
+      return MaterialPageRoute(
+          builder: (context) => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider<GuideProvider>(
+                    create: (context) => GuideProvider(),
+                  )
+                ],
+                child: GuidePage(
+                  game: args,
+                ),
+              ));
       break;
   }
 }
