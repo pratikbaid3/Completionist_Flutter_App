@@ -9,13 +9,19 @@ class GuideProvider extends ChangeNotifier {
     try {
       Response response;
       Dio dio = new Dio();
-      print('--GET GUIDE--');
-      print(baseUrl + guideUrl + gameName);
-      response = await dio.get(baseUrl + guideUrl + gameName);
-      List<dynamic> data = response.data['result']['games']['guide'];
-      guide = data.map((data) => GuideModel.fromJson(data)).toList();
+      if (guide.length == 0) {
+        print('--GET GUIDE--');
+        print(baseUrl + guideUrl + gameName);
+        response = await dio.get(baseUrl + guideUrl + gameName);
+        List<dynamic> data = response.data['result']['games']['guide'];
+        guide = data.map((data) => GuideModel.fromJson(data)).toList();
+      }
     } catch (e) {
       print(e);
     }
+  }
+
+  void clearGuideList() {
+    guide.clear();
   }
 }

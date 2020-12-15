@@ -23,6 +23,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           providers: [
             ChangeNotifierProvider<GameProvider>(
               create: (context) => GameProvider(),
+            ),
+            ChangeNotifierProvider<GuideProvider>(
+              create: (context) => GuideProvider(),
             )
           ],
           child: NavDrawerPage(),

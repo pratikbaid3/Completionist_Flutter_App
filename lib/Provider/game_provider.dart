@@ -7,6 +7,8 @@ class GameProvider extends ChangeNotifier {
   List<GameModel> games = new List<GameModel>();
   Future getGame({int page = 1, int count = 30, String search = ''}) async {
     try {
+      print('--GET GAMES--');
+      print(baseUrl + gamesUrl);
       Response response;
       Dio dio = new Dio();
       response = await dio.get(baseUrl + gamesUrl,
