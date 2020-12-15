@@ -25,6 +25,7 @@ class GuidePage extends StatefulWidget {
 
 class _GuidePageState extends State<GuidePage> {
   bool isExpanded = false;
+  int isGameAdded = 0;
   @override
   Widget build(BuildContext context) {
     double hp = MediaQuery.of(context).size.height;
@@ -39,17 +40,6 @@ class _GuidePageState extends State<GuidePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Text(
-                widget.game.gameName,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.cabin(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
               Padding(
                 padding:
                     EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
@@ -70,6 +60,36 @@ class _GuidePageState extends State<GuidePage> {
                     ),
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              NeuSwitch<int>(
+                thumbColor: secondaryColor,
+                backgroundColor: primaryColor,
+                onValueChanged: (val) {
+                  setState(() {
+                    isGameAdded = val;
+                  });
+                },
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
+                groupValue: isGameAdded,
+                children: {
+                  0: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
+                  1: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                  ),
+                },
               ),
               FutureBuilder(
                 future: Provider.of<GuideProvider>(context)
