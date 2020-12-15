@@ -99,30 +99,24 @@ class _MenuState extends State<Menu> {
         width: double.maxFinite,
         height: double.maxFinite,
         color: primaryAccentColor,
-        padding: const EdgeInsets.only(top: 50.0, left: 5),
+        padding: const EdgeInsets.only(top: 30.0, left: 5),
         child: ListView(
           shrinkWrap: true,
           children: [
-            // ListTile(
-            //   onTap: () {
-            //     controller.position = 0;
-            //     controller.toggle();
-            //   },
-            //   leading: Image(
-            //     width: wp * 0.25,
-            //     height: wp * 0.25,
-            //     image: AssetImage(
-            //       'images/icons/hustle_logo.png',
-            //     ),
-            //   ),
-            //   title: Text(
-            //     "",
-            //     style:
-            //         TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
-            //   ),
-            // ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image(
+                  width: wp * 0.4,
+                  height: wp * 0.4,
+                  image: AssetImage(
+                    'images/drawer_image.png',
+                  ),
+                ),
+              ],
+            ),
             SizedBox(
-              height: hp * 0.05,
+              height: hp * 0.01,
             ),
             NavDrawerListTile(
                 icon: Icons.dashboard,
@@ -131,6 +125,13 @@ class _MenuState extends State<Menu> {
                   controller.toggle();
                 },
                 title: 'Dashboard'),
+            NavDrawerListTile(
+                icon: FontAwesomeIcons.gamepad,
+                onTap: () {
+                  controller.toggle();
+                  controller.position = 2;
+                },
+                title: 'My Games'),
             NavDrawerListTile(
                 icon: FontAwesomeIcons.playstation,
                 onTap: () {
@@ -146,38 +147,18 @@ class _MenuState extends State<Menu> {
                 },
                 title: 'Xbox Games'),
             NavDrawerListTile(
-                icon: Icons.archive_outlined,
+                icon: Icons.star,
                 onTap: () {
                   controller.position = 1;
                   controller.toggle();
                 },
-                title: 'Archived'),
+                title: 'Starred'),
             NavDrawerListTile(
-                icon: Icons.check,
-                onTap: () {
-                  controller.position = 1;
-                  controller.toggle();
-                },
-                title: 'Resolved'),
-            NavDrawerListTile(
-                icon: Icons.apps,
-                onTap: () {
-                  controller.toggle();
-                  controller.position = 2;
-                },
-                title: 'My Apps'),
-            NavDrawerListTile(
-                icon: Icons.support_agent_sharp,
+                icon: Icons.info,
                 onTap: () {
                   controller.toggle();
                 },
-                title: 'Support'),
-            NavDrawerListTile(
-                icon: Icons.logout,
-                onTap: () {
-                  controller.toggle();
-                },
-                title: 'Logout'),
+                title: 'About'),
           ],
         ),
       ),
