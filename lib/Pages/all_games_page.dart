@@ -4,8 +4,10 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
+import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class AllGamesPage extends StatefulWidget {
@@ -55,6 +57,14 @@ class _AllGamesPageState extends State<AllGamesPage> {
             child: Column(
               children: [
                 TextField(
+                  onSubmitted: (value) {
+                    setState(() {
+                      searchKeyword = searchController.text;
+                      currentPage = 1;
+                      nextPage = currentPage + 1;
+                      isSearchIcon = false;
+                    });
+                  },
                   cursorColor: primaryAccentColor,
                   controller: searchController,
                   decoration: InputDecoration(
@@ -68,7 +78,6 @@ class _AllGamesPageState extends State<AllGamesPage> {
                                 nextPage = currentPage + 1;
                                 isSearchIcon = false;
                               });
-                              //TODO Execute search
                             },
                             icon: Icon(
                               Icons.search,
@@ -154,12 +163,17 @@ class _AllGamesPageState extends State<AllGamesPage> {
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).pushNamed(guidePageRoute,
-                                    arguments: Provider.of<GameProvider>(
-                                            context,
-                                            listen: false)
-                                        .games[index]
-                                        .gameName);
+                                Navigator.of(context)
+                                    .pushNamed(guidePageRoute,
+                                        arguments: Provider.of<GameProvider>(
+                                                context,
+                                                listen: false)
+                                            .games[index])
+                                    .then((value) {
+                                  Provider.of<GuideProvider>(context,
+                                          listen: false)
+                                      .clearGuideList();
+                                });
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -208,9 +222,9 @@ class _AllGamesPageState extends State<AllGamesPage> {
                                         Row(
                                           children: <Widget>[
                                             Icon(
-                                              FontAwesomeIcons.trophy,
+                                              LineAwesomeIcons.trophy,
                                               color: goldenColor,
-                                              size: 12,
+                                              size: 25,
                                             ),
                                             Text(
                                               "  3",
@@ -227,9 +241,9 @@ class _AllGamesPageState extends State<AllGamesPage> {
                                         Row(
                                           children: <Widget>[
                                             Icon(
-                                              FontAwesomeIcons.trophy,
+                                              LineAwesomeIcons.trophy,
                                               color: silverColor,
-                                              size: 12,
+                                              size: 25,
                                             ),
                                             Text(
                                               "  3",
@@ -246,9 +260,9 @@ class _AllGamesPageState extends State<AllGamesPage> {
                                         Row(
                                           children: <Widget>[
                                             Icon(
-                                              FontAwesomeIcons.trophy,
+                                              LineAwesomeIcons.trophy,
                                               color: bronzeColor,
-                                              size: 12,
+                                              size: 25,
                                             ),
                                             Text(
                                               "  3",

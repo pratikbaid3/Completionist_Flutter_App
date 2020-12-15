@@ -1,18 +1,23 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:flare_flutter/cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/app_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class GuidePage extends StatefulWidget {
-  String game;
+  GameModel game;
   GuidePage({@required this.game});
   @override
   _GuidePageState createState() => _GuidePageState();
@@ -31,12 +36,44 @@ class _GuidePageState extends State<GuidePage> {
       body: Padding(
         padding:
             EdgeInsets.symmetric(horizontal: wp * 0.03, vertical: hp * 0.03),
-        child: Column(
-          children: [
-            Expanded(
-              child: FutureBuilder(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text(
+                widget.game.gameName,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cabin(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
+                child: NeuCard(
+                  curveType: CurveType.flat,
+                  bevel: 6,
+                  decoration: NeumorphicDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: primaryColor,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Hero(
+                      tag: '${widget.game.gameName}',
+                      child: CachedNetworkImage(
+                        imageUrl: widget.game.gameImageUrl,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              FutureBuilder(
                 future: Provider.of<GuideProvider>(context)
-                    .getGuide(gameName: widget.game),
+                    .getGuide(gameName: widget.game.gameName),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (Provider.of<GuideProvider>(context).guide.length == 0) {
                     return Container(
@@ -71,8 +108,8 @@ class _GuidePageState extends State<GuidePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Icon(
-                              FontAwesomeIcons.trophy,
-                              size: 15,
+                              LineAwesomeIcons.trophy,
+                              size: 30,
                               color: (Provider.of<GuideProvider>(context)
                                           .guide[index]
                                           .trophyType ==
@@ -156,8 +193,8 @@ class _GuidePageState extends State<GuidePage> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
