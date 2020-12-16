@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:game_trophy_manager/Widgets/line_chart.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Dashboard extends StatefulWidget {
@@ -36,7 +37,7 @@ class _DashboardState extends State<Dashboard> {
                       decoration: BoxDecoration(color: primaryColor),
                       child: NeuCard(
                         curveType: CurveType.flat,
-                        bevel: 7,
+                        bevel: 6,
                         decoration: NeumorphicDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: primaryColor,
@@ -55,7 +56,27 @@ class _DashboardState extends State<Dashboard> {
                   },
                 );
               }).toList(),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 20,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  NeuCard(
+                    curveType: CurveType.flat,
+                    bevel: 4,
+                    decoration: NeumorphicDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: primaryColor,
+                    ),
+                    child: LineChartSample2(),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
