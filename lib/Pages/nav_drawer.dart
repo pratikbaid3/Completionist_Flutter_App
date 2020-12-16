@@ -96,9 +96,15 @@ class _MenuState extends State<Menu> {
     double wp = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [primaryAccentColor, secondaryAccentColor],
+          ),
+        ),
         width: double.maxFinite,
         height: double.maxFinite,
-        color: primaryAccentColor,
         padding: const EdgeInsets.only(top: 30.0, left: 5),
         child: ListView(
           shrinkWrap: true,
@@ -106,13 +112,13 @@ class _MenuState extends State<Menu> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image(
-                  width: wp * 0.4,
-                  height: wp * 0.4,
-                  image: AssetImage(
-                    'images/drawer_image.png',
-                  ),
-                ),
+                // Image(
+                //   width: wp * 0.4,
+                //   height: wp * 0.4,
+                //   image: AssetImage(
+                //     'images/drawer_image.png',
+                //   ),
+                // ),
               ],
             ),
             SizedBox(
