@@ -19,31 +19,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case homePageRoute:
       return MaterialPageRoute(
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider<GameProvider>(
-              create: (context) => GameProvider(),
-            ),
-            ChangeNotifierProvider<GuideProvider>(
-              create: (context) => GuideProvider(),
-            )
-          ],
-          child: NavDrawerPage(),
-        ),
+        builder: (context) => NavDrawerPage(),
       );
       break;
     case guidePageRoute:
       return MaterialPageRoute(
-          builder: (context) => MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<GuideProvider>(
-                    create: (context) => GuideProvider(),
-                  )
-                ],
-                child: GuidePage(
-                  game: args,
-                ),
-              ));
+        builder: (context) => GuidePage(game: args),
+      );
       break;
   }
 }

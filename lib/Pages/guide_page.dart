@@ -6,8 +6,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/app_bar.dart';
+import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
@@ -65,9 +67,23 @@ class _GuidePageState extends State<GuidePage> {
                 thumbColor: secondaryColor,
                 backgroundColor: primaryColor,
                 onValueChanged: (val) {
+                  if (isGameAdded == 1) {
+                    //Remove the game
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .removeGameFromDb(widget.game);
+                    snackBar(context, 'Removed',
+                        "${widget.game.gameName} has been added", wp);
+                  } else {
+                    //Add the game
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .addGameToDb(widget.game);
+                    snackBar(context, 'Added',
+                        "${widget.game.gameName} has been removed", wp);
+                  }
                   setState(() {
-                    isGameAdded = val;
+                    isGameAdded = (isGameAdded == 0) ? 1 : 0;
                   });
+                  print(isGameAdded);
                 },
                 padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
                 groupValue: isGameAdded,
@@ -109,6 +125,9 @@ class _GuidePageState extends State<GuidePage> {
                     padding: EdgeInsets.only(top: 10, left: 2, right: 2),
                     itemCount: Provider.of<GuideProvider>(context).guide.length,
                     itemBuilder: (BuildContext context, int index) {
+                      String trophyName = Provider.of<GuideProvider>(context)
+                          .guide[index]
+                          .trophyName;
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Slidable(
@@ -215,6 +234,10 @@ class _GuidePageState extends State<GuidePage> {
                               caption: 'Complete',
                               color: primaryAccentColor,
                               icon: Icons.check,
+                              onTap: () {
+                                snackBar(context, 'Completed',
+                                    "${trophyName} has been added", wp);
+                              },
                             ),
                           ],
                           secondaryActions: <Widget>[
@@ -222,6 +245,10 @@ class _GuidePageState extends State<GuidePage> {
                               caption: 'Star',
                               color: Colors.yellow,
                               icon: Icons.star,
+                              onTap: () {
+                                snackBar(context, 'Starred',
+                                    "${trophyName} has been starred", wp);
+                              },
                             ),
                           ],
                         ),
