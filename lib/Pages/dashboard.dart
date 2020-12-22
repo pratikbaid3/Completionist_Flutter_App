@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/line_chart.dart';
 import 'package:neumorphic/neumorphic.dart';
+import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -27,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
               autoPlay: true,
               enlargeCenterPage: true,
               pauseAutoPlayOnTouch: Duration(seconds: 2),
-              items: [1, 2, 3, 4, 5].map((i) {
+              items: Provider.of<InternalDbProvider>(context).myGames.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
                     return Container(
@@ -46,8 +48,7 @@ class _DashboardState extends State<Dashboard> {
                           child: Padding(
                             padding: EdgeInsets.all(15),
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  'https://img.playstationtrophies.org/images/game/10533/cover.jpg',
+                              imageUrl: i.gameImageUrl,
                             ),
                           ),
                         ),
@@ -65,15 +66,7 @@ class _DashboardState extends State<Dashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  NeuCard(
-                    curveType: CurveType.flat,
-                    bevel: 4,
-                    decoration: NeumorphicDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: primaryColor,
-                    ),
-                    child: LineChartSample2(),
-                  ),
+                  LineChartSample2(),
                 ],
               ),
             ),

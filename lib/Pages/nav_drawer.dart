@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Pages/all_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:game_trophy_manager/Utilities/reusable_elements.dart';
 import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
@@ -112,13 +111,13 @@ class _MenuState extends State<Menu> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Image(
-                //   width: wp * 0.4,
-                //   height: wp * 0.4,
-                //   image: AssetImage(
-                //     'images/drawer_image.png',
-                //   ),
-                // ),
+                Image(
+                  width: wp * 0.4,
+                  height: wp * 0.4,
+                  image: AssetImage(
+                    'images/drawer_image.png',
+                  ),
+                ),
               ],
             ),
             SizedBox(
