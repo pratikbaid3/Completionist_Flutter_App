@@ -64,7 +64,12 @@ class InternalDbProvider extends ChangeNotifier {
       var dbClient = await db;
       var result = await dbClient.rawDelete(
           'DELETE FROM $myGamesTable WHERE $gameNameColumn = "${game.gameName}"');
-      myGames.remove(game);
+      myGames.removeWhere((element) {
+        if (element.gameName == gameName) {
+          return true;
+        }
+        return false;
+      });
       notifyListeners();
       print(result);
     } catch (e) {
