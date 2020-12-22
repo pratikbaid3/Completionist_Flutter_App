@@ -5,6 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/game_provider.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -25,6 +26,26 @@ class GuidePage extends StatefulWidget {
 class _GuidePageState extends State<GuidePage> {
   bool isExpanded = false;
   int isGameAdded = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initializeGameState();
+  }
+
+  Future initializeGameState() async {
+    List<GameModel> myGames =
+        Provider.of<InternalDbProvider>(context, listen: false).myGames;
+    for (GameModel g in myGames) {
+      if (g.gameName == widget.game.gameName) {
+        setState(() {
+          isGameAdded = 1;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double hp = MediaQuery.of(context).size.height;
