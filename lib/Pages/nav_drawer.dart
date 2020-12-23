@@ -7,6 +7,8 @@ import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
 
+import 'my_games_page.dart';
+
 class NavDrawerPage extends StatefulWidget {
   @override
   _NavDrawerPageState createState() => _NavDrawerPageState();
@@ -30,6 +32,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             break;
           case 1:
             screenCurrent = AllGamesPage();
+            break;
+          case 2:
+            screenCurrent = MyGamesPage();
             break;
         }
 
