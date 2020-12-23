@@ -68,6 +68,8 @@ dependencies:
   fl_chart: ^0.12.1
   #Snackbar
   flushbar: ^1.10.4
+  #SVG
+  flutter_svg: ^0.19.1
 
 
   # The following adds the Cupertino Icons font to your application.

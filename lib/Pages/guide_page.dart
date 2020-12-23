@@ -65,7 +65,7 @@ class _GuidePageState extends State<GuidePage> {
                     EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
                 child: NeuCard(
                   curveType: CurveType.flat,
-                  bevel: 6,
+                  bevel: 4,
                   decoration: NeumorphicDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: primaryColor,

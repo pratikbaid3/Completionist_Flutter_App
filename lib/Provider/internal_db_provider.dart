@@ -15,6 +15,7 @@ class InternalDbProvider extends ChangeNotifier {
   final String trophyTypeColumn = 'TrophyType';
   final String trophyDescriptionColumn = 'TrophyDescription';
   final String trophyGuideColumn = 'TrophyGuide';
+  final String dateTimeColumn = 'DateTime';
 
   List<GameModel> myGames = new List<GameModel>();
 
@@ -36,19 +37,20 @@ class InternalDbProvider extends ChangeNotifier {
 
   void _onCreate(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT)');
+        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME)');
     await db.execute(
-        'CREATE TABLE $myTrophyTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT)');
+        'CREATE TABLE $myTrophyTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$dateTimeColumn DATETIME)');
   }
 
   void addGameToDb(GameModel game) async {
     try {
       String gameName = game.gameName;
       String gameImgUrl = game.gameImageUrl;
+      DateTime now = DateTime.tryParse(DateTime.now().toString());
       var dbClient = await db; //This calls the getter function
       var result = await dbClient.rawInsert(
-          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn) '
-          'VALUES("$gameName","$gameImgUrl")');
+          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn) '
+          'VALUES("$gameName","$gameImgUrl","$now")');
       myGames.add(game);
       notifyListeners();
       print(result);
