@@ -36,24 +36,6 @@ class _LineChartSample2State extends State<LineChartSample2> {
             ),
           ),
         ),
-        // SizedBox(
-        //   width: 60,
-        //   height: 34,
-        //   child: FlatButton(
-        //     onPressed: () {
-        //       setState(() {
-        //         showAvg = !showAvg;
-        //       });
-        //     },
-        //     child: Text(
-        //       'Trop',
-        //       style: TextStyle(
-        //           fontSize: 12,
-        //           color:
-        //               showAvg ? Colors.white.withOpacity(0.5) : Colors.white),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
@@ -88,11 +70,11 @@ class _LineChartSample2State extends State<LineChartSample2> {
           getTitles: (value) {
             switch (value.toInt()) {
               case 2:
-                return 'MAR';
+                return 'OCT';
               case 5:
-                return 'JUN';
+                return 'NOV';
               case 8:
-                return 'SEP';
+                return 'DEC';
             }
             return '';
           },
@@ -121,8 +103,12 @@ class _LineChartSample2State extends State<LineChartSample2> {
         ),
       ),
       borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1)),
+        show: true,
+        border: Border.all(
+          color: const Color(0xff37434d),
+          width: 1,
+        ),
+      ),
       minX: 0,
       maxX: 11,
       minY: 0,

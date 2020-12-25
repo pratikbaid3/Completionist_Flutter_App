@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
-import 'package:game_trophy_manager/Provider/game_provider.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -256,6 +256,15 @@ class _GuidePageState extends State<GuidePage> {
                               color: primaryAccentColor,
                               icon: Icons.check,
                               onTap: () {
+                                GuideModel guide = Provider.of<GuideProvider>(
+                                        context,
+                                        listen: false)
+                                    .guide[index];
+                                guide.gameName = widget.game.gameName;
+                                guide.gameImgUrl = widget.game.gameImageUrl;
+                                Provider.of<InternalDbProvider>(context,
+                                        listen: false)
+                                    .addTrophyToComplete(guide);
                                 snackBar(context, 'Completed',
                                     "${trophyName} has been added", wp);
                               },

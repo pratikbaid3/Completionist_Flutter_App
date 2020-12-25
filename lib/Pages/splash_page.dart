@@ -20,6 +20,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void initializeData() {
     Provider.of<InternalDbProvider>(context, listen: false).getAllGamesFromDb();
+    Provider.of<InternalDbProvider>(context, listen: false)
+        .getAllTrophiesFromDb();
   }
 
   void toDashboard() {
