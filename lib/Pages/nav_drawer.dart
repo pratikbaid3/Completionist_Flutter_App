@@ -148,14 +148,21 @@ class _MenuState extends State<Menu> {
                   controller.position = 1;
                   controller.toggle();
                 },
-                title: 'PS4 Games'),
+                title: 'PS4'),
             NavDrawerListTile(
                 icon: FontAwesomeIcons.xbox,
                 onTap: () {
                   controller.position = 1;
                   controller.toggle();
                 },
-                title: 'Xbox Games'),
+                title: 'Xbox'),
+            NavDrawerListTile(
+                icon: Icons.check,
+                onTap: () {
+                  controller.position = 1;
+                  controller.toggle();
+                },
+                title: 'Completed'),
             NavDrawerListTile(
                 icon: Icons.star,
                 onTap: () {

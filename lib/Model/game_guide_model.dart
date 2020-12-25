@@ -4,12 +4,20 @@ class GuideModel {
   String trophyType;
   String trophyDescription;
   String trophyGuide;
+  String gameName;
+  String gameImgUrl;
+  bool isCompleted;
+  bool isStarred;
   GuideModel({
     this.trophyDescription,
     this.trophyGuide,
     this.trophyImage,
     this.trophyName,
     this.trophyType,
+    this.gameImgUrl,
+    this.gameName,
+    this.isCompleted = false,
+    this.isStarred = false,
   });
 
   GuideModel.fromJson(Map<String, dynamic> json) {

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -15,9 +16,11 @@ class InternalDbProvider extends ChangeNotifier {
   final String trophyTypeColumn = 'TrophyType';
   final String trophyDescriptionColumn = 'TrophyDescription';
   final String trophyGuideColumn = 'TrophyGuide';
+  final String trophyActionColumn = 'TrophyAction'; //Starred or Completed
   final String dateTimeColumn = 'DateTime';
 
   List<GameModel> myGames = new List<GameModel>();
+  List<GuideModel> myTrophy = new List<GuideModel>();
 
   Future<Database> get db async {
     if (_db != null) {
@@ -39,7 +42,7 @@ class InternalDbProvider extends ChangeNotifier {
     await db.execute(
         'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME)');
     await db.execute(
-        'CREATE TABLE $myTrophyTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$dateTimeColumn DATETIME)');
+        'CREATE TABLE $myTrophyTable($gameNameColumn TEXT, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$trophyActionColumn TEXT,$dateTimeColumn DATETIME)');
   }
 
   void addGameToDb(GameModel game) async {
@@ -90,6 +93,72 @@ class InternalDbProvider extends ChangeNotifier {
               gameImageUrl: i['$gameImgUrlColumn']);
           myGames.add(game);
           print(i['$gameNameColumn']);
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void addTrophyToComplete(GuideModel guide) async {
+    try {
+      String gameName = guide.gameName;
+      String gameImgUrl = guide.gameImgUrl;
+      String trophyName = guide.trophyName;
+      String trophyImgUrl = guide.trophyImage;
+      String trophyType = guide.trophyType;
+      String trophyDescription = guide.trophyDescription;
+      String trophyGuide = guide.trophyGuide;
+      DateTime now = DateTime.tryParse(DateTime.now().toString());
+      var dbClient = await db; //This calls the getter function
+      var result = await dbClient.rawInsert(
+          'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
+          'VALUES("$gameName","$gameImgUrl","$trophyName","$trophyImgUrl","$trophyType","$trophyDescription","$trophyGuide","COMPLETED","$now")');
+      myTrophy.add(guide);
+      notifyListeners();
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void addTrophyToStarred(GameModel game) async {
+    try {
+      String gameName = game.gameName;
+      String gameImgUrl = game.gameImageUrl;
+      DateTime now = DateTime.tryParse(DateTime.now().toString());
+      var dbClient = await db; //This calls the getter function
+      var result = await dbClient.rawInsert(
+          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn) '
+          'VALUES("$gameName","$gameImgUrl","$now")');
+      myGames.add(game);
+      notifyListeners();
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getAllTrophiesFromDb() async {
+    try {
+      var dbClient = await db;
+      List<Map> result =
+          await dbClient.rawQuery('SELECT * FROM $myTrophyTable');
+      if (result.length > 0) {
+        for (var i in result) {
+          GuideModel guide = new GuideModel(
+              trophyDescription: i['$trophyDescriptionColumn'],
+              trophyGuide: i['$trophyGuideColumn'],
+              trophyImage: i['$trophyImageUrlColumn'],
+              trophyName: i['$trophyNameColumn'],
+              trophyType: i['$trophyTypeColumn'],
+              gameImgUrl: i['$gameImgUrlColumn'],
+              gameName: i['$gameNameColumn'],
+              isCompleted: i['$trophyActionColumn'] == 'COMPLETED',
+              isStarred: i['$trophyActionColumn'] == 'STARRED');
+          myTrophy.add(guide);
+          print(i['$trophyNameColumn']);
         }
         notifyListeners();
       }
