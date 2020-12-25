@@ -183,9 +183,14 @@ class _DashboardState extends State<Dashboard> {
                     shrinkWrap: true,
                     padding: EdgeInsets.only(
                         top: 10, left: wp * 0.03, right: wp * 0.03),
-                    itemCount: Provider.of<InternalDbProvider>(context)
-                        .myTrophy
-                        .length,
+                    itemCount: (Provider.of<InternalDbProvider>(context)
+                                .myTrophy
+                                .length >
+                            5)
+                        ? 5
+                        : Provider.of<InternalDbProvider>(context)
+                            .myTrophy
+                            .length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
