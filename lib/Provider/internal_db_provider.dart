@@ -143,8 +143,8 @@ class InternalDbProvider extends ChangeNotifier {
   void getAllTrophiesFromDb() async {
     try {
       var dbClient = await db;
-      List<Map> result =
-          await dbClient.rawQuery('SELECT * FROM $myTrophyTable');
+      List<Map> result = await dbClient.rawQuery(
+          'SELECT * FROM $myTrophyTable ORDER BY $dateTimeColumn DESC');
       if (result.length > 0) {
         for (var i in result) {
           GuideModel guide = new GuideModel(
