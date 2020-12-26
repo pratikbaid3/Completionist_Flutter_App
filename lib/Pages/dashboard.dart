@@ -295,9 +295,11 @@ class _DashboardState extends State<Dashboard> {
                 : Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Center(
-                      child: SvgPicture.asset(
-                        'images/coming_soon.svg',
-                        width: wp * 0.4,
+                      child: Image(
+                        width: wp * 0.35,
+                        image: AssetImage(
+                          'images/no_data_2.png',
+                        ),
                       ),
                     ),
                   ),
@@ -441,9 +443,11 @@ class _DashboardState extends State<Dashboard> {
                 : Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Center(
-                      child: SvgPicture.asset(
-                        'images/coming_soon.svg',
-                        width: wp * 0.4,
+                      child: Image(
+                        width: wp * 0.45,
+                        image: AssetImage(
+                          'images/no_data_1.png',
+                        ),
                       ),
                     ),
                   ),

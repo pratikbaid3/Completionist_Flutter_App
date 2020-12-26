@@ -165,9 +165,11 @@ class _MyCompletedTrophyPageState extends State<MyCompletedTrophyPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        'images/no_data.svg',
-                        width: wp * 0.7,
+                      Image(
+                        width: wp * 0.6,
+                        image: AssetImage(
+                          'images/no_data_2.png',
+                        ),
                       ),
                     ],
                   ),
