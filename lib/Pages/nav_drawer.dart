@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Pages/all_ps4_games_page.dart';
+import 'package:game_trophy_manager/Pages/all_xbox_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
@@ -8,6 +9,7 @@ import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
+import 'package:share/share.dart';
 
 import 'my_games_page.dart';
 
@@ -38,6 +40,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
           case 2:
             screenCurrent = AllPS4GamesPage();
             break;
+          case 3:
+            screenCurrent = AllXboxGamesPage();
+            break;
           case 4:
             screenCurrent = MyCompletedTrophyPage();
             break;
@@ -66,7 +71,11 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
                   Icons.share,
                   color: Colors.white,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Share.share(
+                      'Download for FREE and start gaming https://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
+                      subject: 'Completionist: PS4 & Xbox game guide');
+                },
               ),
             ],
           ),
@@ -149,7 +158,7 @@ class _MenuState extends State<Menu> {
             NavDrawerListTile(
                 icon: FontAwesomeIcons.xbox,
                 onTap: () {
-                  controller.position = 1;
+                  controller.position = 3;
                   controller.toggle();
                 },
                 title: 'Xbox'),

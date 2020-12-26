@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:share/share.dart';
 
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
@@ -20,10 +21,14 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           icon: Icon(
-            Icons.notifications_none,
+            Icons.share,
             color: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Share.share(
+                'Download for FREE and start gaming https://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
+                subject: 'Completionist: PS4 & Xbox game guide');
+          },
         ),
       ],
     );
