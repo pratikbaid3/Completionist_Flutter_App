@@ -146,9 +146,25 @@ class _GuidePageState extends State<GuidePage> {
                     padding: EdgeInsets.only(top: 10, left: 2, right: 2),
                     itemCount: Provider.of<GuideProvider>(context).guide.length,
                     itemBuilder: (BuildContext context, int index) {
+                      bool isCompleted = false;
+                      bool isStarred = false;
                       String trophyName = Provider.of<GuideProvider>(context)
                           .guide[index]
                           .trophyName;
+                      for (GuideModel guide
+                          in Provider.of<InternalDbProvider>(context)
+                              .myCompletedTrophy) {
+                        if (guide.trophyName == trophyName) {
+                          isCompleted = true;
+                        }
+                      }
+                      for (GuideModel guide
+                          in Provider.of<InternalDbProvider>(context)
+                              .myStarredTrophy) {
+                        if (guide.trophyName == trophyName) {
+                          isStarred = true;
+                        }
+                      }
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Slidable(
@@ -251,35 +267,98 @@ class _GuidePageState extends State<GuidePage> {
                             ],
                           ),
                           actions: <Widget>[
-                            IconSlideAction(
-                              caption: 'Complete',
-                              color: primaryAccentColor,
-                              icon: Icons.check,
-                              onTap: () {
-                                GuideModel guide = Provider.of<GuideProvider>(
-                                        context,
-                                        listen: false)
-                                    .guide[index];
-                                guide.gameName = widget.game.gameName;
-                                guide.gameImgUrl = widget.game.gameImageUrl;
-                                Provider.of<InternalDbProvider>(context,
-                                        listen: false)
-                                    .addTrophyToComplete(guide);
-                                snackBar(context, 'Completed',
-                                    "${trophyName} has been added", wp);
-                              },
-                            ),
+                            (!isCompleted)
+                                ? IconSlideAction(
+                                    caption: 'Complete',
+                                    color: primaryAccentColor,
+                                    icon: Icons.check,
+                                    onTap: () {
+                                      GuideModel guide =
+                                          Provider.of<GuideProvider>(context,
+                                                  listen: false)
+                                              .guide[index];
+                                      guide.gameName = widget.game.gameName;
+                                      guide.gameImgUrl =
+                                          widget.game.gameImageUrl;
+                                      Provider.of<InternalDbProvider>(context,
+                                              listen: false)
+                                          .addTrophyToComplete(guide);
+                                      setState(() {
+                                        isCompleted = true;
+                                      });
+                                      snackBar(context, 'Completed',
+                                          "${trophyName} has been added", wp);
+                                    },
+                                  )
+                                : IconSlideAction(
+                                    caption: 'Un-Complete',
+                                    color: Colors.red,
+                                    icon: Icons.check,
+                                    onTap: () {
+                                      GuideModel guide =
+                                          Provider.of<GuideProvider>(context,
+                                                  listen: false)
+                                              .guide[index];
+                                      guide.gameName = widget.game.gameName;
+                                      guide.gameImgUrl =
+                                          widget.game.gameImageUrl;
+                                      Provider.of<InternalDbProvider>(context,
+                                              listen: false)
+                                          .removeTrophyFromComplete(guide);
+                                      setState(() {
+                                        isCompleted = false;
+                                      });
+                                      snackBar(context, 'Un-Completed',
+                                          "${trophyName} has been added", wp);
+                                    },
+                                  ),
                           ],
                           secondaryActions: <Widget>[
-                            IconSlideAction(
-                              caption: 'Star',
-                              color: Colors.yellow,
-                              icon: Icons.star,
-                              onTap: () {
-                                snackBar(context, 'Starred',
-                                    "${trophyName} has been starred", wp);
-                              },
-                            ),
+                            (!isStarred)
+                                ? IconSlideAction(
+                                    caption: 'Star',
+                                    color: Colors.yellow,
+                                    icon: Icons.star,
+                                    onTap: () {
+                                      GuideModel guide =
+                                          Provider.of<GuideProvider>(context,
+                                                  listen: false)
+                                              .guide[index];
+                                      guide.gameName = widget.game.gameName;
+                                      guide.gameImgUrl =
+                                          widget.game.gameImageUrl;
+                                      Provider.of<InternalDbProvider>(context,
+                                              listen: false)
+                                          .addTrophyToStarred(guide);
+                                      setState(() {
+                                        isStarred = true;
+                                      });
+                                      snackBar(context, 'Starred',
+                                          "${trophyName} has been starred", wp);
+                                    },
+                                  )
+                                : IconSlideAction(
+                                    caption: 'Un-Star',
+                                    color: Colors.red,
+                                    icon: Icons.star,
+                                    onTap: () {
+                                      GuideModel guide =
+                                          Provider.of<GuideProvider>(context,
+                                                  listen: false)
+                                              .guide[index];
+                                      guide.gameName = widget.game.gameName;
+                                      guide.gameImgUrl =
+                                          widget.game.gameImageUrl;
+                                      Provider.of<InternalDbProvider>(context,
+                                              listen: false)
+                                          .removeTrophyFromStarred(guide);
+                                      setState(() {
+                                        isStarred = false;
+                                      });
+                                      snackBar(context, 'Un-Starred',
+                                          "${trophyName} has been starred", wp);
+                                    },
+                                  ),
                           ],
                         ),
                       );

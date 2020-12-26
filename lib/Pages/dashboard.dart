@@ -47,13 +47,11 @@ class _DashboardState extends State<Dashboard> {
                         builder: (BuildContext context) {
                           return GestureDetector(
                             onTap: () {
+                              Provider.of<GuideProvider>(context, listen: false)
+                                  .clearGuideList();
                               Navigator.of(context)
                                   .pushNamed(guidePageRoute, arguments: i)
-                                  .then((value) {
-                                Provider.of<GuideProvider>(context,
-                                        listen: false)
-                                    .clearGuideList();
-                              });
+                                  .then((value) {});
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -160,7 +158,7 @@ class _DashboardState extends State<Dashboard> {
               child: Row(
                 children: [
                   Text(
-                    'Recent ',
+                    'Recently ',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -168,7 +166,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   Text(
-                    'Activity',
+                    'Completed',
                     style: TextStyle(
                         color: Colors.white70,
                         fontWeight: FontWeight.w600,
@@ -177,19 +175,22 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
             ),
-            (Provider.of<InternalDbProvider>(context).myTrophy.length != 0)
+            (Provider.of<InternalDbProvider>(context)
+                        .myCompletedTrophy
+                        .length !=
+                    0)
                 ? ListView.builder(
                     primary: false,
                     shrinkWrap: true,
                     padding: EdgeInsets.only(
                         top: 10, left: wp * 0.03, right: wp * 0.03),
                     itemCount: (Provider.of<InternalDbProvider>(context)
-                                .myTrophy
+                                .myCompletedTrophy
                                 .length >
                             5)
                         ? 5
                         : Provider.of<InternalDbProvider>(context)
-                            .myTrophy
+                            .myCompletedTrophy
                             .length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
@@ -211,12 +212,12 @@ class _DashboardState extends State<Dashboard> {
                                 LineAwesomeIcons.trophy,
                                 size: 30,
                                 color: (Provider.of<InternalDbProvider>(context)
-                                            .myTrophy[index]
+                                            .myCompletedTrophy[index]
                                             .trophyType ==
                                         'BRONZE')
                                     ? bronzeColor
                                     : ((Provider.of<InternalDbProvider>(context)
-                                                .myTrophy[index]
+                                                .myCompletedTrophy[index]
                                                 .trophyType ==
                                             'SILVER')
                                         ? silverColor
@@ -246,7 +247,7 @@ class _DashboardState extends State<Dashboard> {
                                 child: CachedNetworkImage(
                                   imageUrl:
                                       Provider.of<InternalDbProvider>(context)
-                                          .myTrophy[index]
+                                          .myCompletedTrophy[index]
                                           .trophyImage,
                                   placeholder: (context, url) =>
                                       new CircularProgressIndicator(
@@ -256,7 +257,7 @@ class _DashboardState extends State<Dashboard> {
                                       new Icon(Icons.error),
                                 )),
                             title: Text(
-                              '${Provider.of<InternalDbProvider>(context).myTrophy[index].trophyName}',
+                              '${Provider.of<InternalDbProvider>(context).myCompletedTrophy[index].trophyName}',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
@@ -265,7 +266,7 @@ class _DashboardState extends State<Dashboard> {
                               padding: EdgeInsets.only(top: 8.0),
                               child: Text(
                                 Provider.of<InternalDbProvider>(context)
-                                    .myTrophy[index]
+                                    .myCompletedTrophy[index]
                                     .trophyDescription,
                                 style: TextStyle(
                                   color: Colors.white60,
@@ -279,7 +280,153 @@ class _DashboardState extends State<Dashboard> {
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               child: HtmlWidget(
-                                '''${Provider.of<InternalDbProvider>(context).myTrophy[index].trophyGuide}''',
+                                '''${Provider.of<InternalDbProvider>(context).myCompletedTrophy[index].trophyGuide}''',
+                                textStyle: TextStyle(fontSize: 15),
+                                webView: true,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 20),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'images/coming_soon.svg',
+                        width: wp * 0.4,
+                      ),
+                    ),
+                  ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+              child: Row(
+                children: [
+                  Text(
+                    'Recently ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: wp * 0.055,
+                    ),
+                  ),
+                  Text(
+                    'Starred',
+                    style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w600,
+                        fontSize: wp * 0.055),
+                  ),
+                ],
+              ),
+            ),
+            (Provider.of<InternalDbProvider>(context).myStarredTrophy.length !=
+                    0)
+                ? ListView.builder(
+                    primary: false,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(
+                        top: 10, left: wp * 0.03, right: wp * 0.03),
+                    itemCount: (Provider.of<InternalDbProvider>(context)
+                                .myStarredTrophy
+                                .length >
+                            5)
+                        ? 5
+                        : Provider.of<InternalDbProvider>(context)
+                            .myStarredTrophy
+                            .length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: ExpansionTileCard(
+                          initialElevation: 0,
+                          elevation: 0,
+                          baseColor: secondaryColor,
+                          expandedColor: secondaryColor,
+                          onExpansionChanged: (value) {
+                            setState(() {
+                              isExpanded = value;
+                            });
+                          },
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(
+                                LineAwesomeIcons.trophy,
+                                size: 30,
+                                color: (Provider.of<InternalDbProvider>(context)
+                                            .myStarredTrophy[index]
+                                            .trophyType ==
+                                        'BRONZE')
+                                    ? bronzeColor
+                                    : ((Provider.of<InternalDbProvider>(context)
+                                                .myStarredTrophy[index]
+                                                .trophyType ==
+                                            'SILVER')
+                                        ? silverColor
+                                        : goldenColor),
+                              ),
+                              (!isExpanded)
+                                  ? Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.white,
+                                    )
+                                  : Icon(
+                                      Icons.keyboard_arrow_up_rounded,
+                                      color: Colors.white,
+                                    ),
+                            ],
+                          ),
+                          title: ListTile(
+                            contentPadding:
+                                EdgeInsets.symmetric(vertical: 13.0),
+                            leading: Container(
+                                padding: EdgeInsets.only(right: 12.0),
+                                decoration: new BoxDecoration(
+                                    border: new Border(
+                                        right: new BorderSide(
+                                            width: 1.0,
+                                            color: Colors.white24))),
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      Provider.of<InternalDbProvider>(context)
+                                          .myStarredTrophy[index]
+                                          .trophyImage,
+                                  placeholder: (context, url) =>
+                                      new CircularProgressIndicator(
+                                    backgroundColor: primaryAccentColor,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      new Icon(Icons.error),
+                                )),
+                            title: Text(
+                              '${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyName}',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                Provider.of<InternalDbProvider>(context)
+                                    .myStarredTrophy[index]
+                                    .trophyDescription,
+                                style: TextStyle(
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ),
+                          ),
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(0),
+                              ),
+                              child: HtmlWidget(
+                                '''${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyGuide}''',
                                 textStyle: TextStyle(fontSize: 15),
                                 webView: true,
                               ),

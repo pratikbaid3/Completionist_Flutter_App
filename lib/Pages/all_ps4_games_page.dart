@@ -10,12 +10,12 @@ import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class AllGamesPage extends StatefulWidget {
+class AllPS4GamesPage extends StatefulWidget {
   @override
-  _AllGamesPageState createState() => _AllGamesPageState();
+  _AllPS4GamesPageState createState() => _AllPS4GamesPageState();
 }
 
-class _AllGamesPageState extends State<AllGamesPage> {
+class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   TextEditingController searchController = new TextEditingController();
   bool isSearchIcon = true;
   int currentPage;

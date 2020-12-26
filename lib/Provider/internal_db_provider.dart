@@ -20,7 +20,8 @@ class InternalDbProvider extends ChangeNotifier {
   final String dateTimeColumn = 'DateTime';
 
   List<GameModel> myGames = new List<GameModel>();
-  List<GuideModel> myTrophy = new List<GuideModel>();
+  List<GuideModel> myCompletedTrophy = new List<GuideModel>();
+  List<GuideModel> myStarredTrophy = new List<GuideModel>();
 
   Future<Database> get db async {
     if (_db != null) {
@@ -64,7 +65,6 @@ class InternalDbProvider extends ChangeNotifier {
 
   void removeGameFromDb(GameModel game) async {
     try {
-      print(game.gameName);
       String gameName = game.gameName;
       var dbClient = await db;
       var result = await dbClient.rawDelete(
@@ -92,7 +92,6 @@ class InternalDbProvider extends ChangeNotifier {
               gameName: i['$gameNameColumn'],
               gameImageUrl: i['$gameImgUrlColumn']);
           myGames.add(game);
-          print(i['$gameNameColumn']);
         }
         notifyListeners();
       }
@@ -115,7 +114,7 @@ class InternalDbProvider extends ChangeNotifier {
       var result = await dbClient.rawInsert(
           'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
           'VALUES("$gameName","$gameImgUrl","$trophyName","$trophyImgUrl","$trophyType","$trophyDescription","$trophyGuide","COMPLETED","$now")');
-      myTrophy.add(guide);
+      myCompletedTrophy.add(guide);
       notifyListeners();
       print(result);
     } catch (e) {
@@ -123,16 +122,59 @@ class InternalDbProvider extends ChangeNotifier {
     }
   }
 
-  void addTrophyToStarred(GameModel game) async {
+  void addTrophyToStarred(GuideModel guide) async {
     try {
-      String gameName = game.gameName;
-      String gameImgUrl = game.gameImageUrl;
+      String gameName = guide.gameName;
+      String gameImgUrl = guide.gameImgUrl;
+      String trophyName = guide.trophyName;
+      String trophyImgUrl = guide.trophyImage;
+      String trophyType = guide.trophyType;
+      String trophyDescription = guide.trophyDescription;
+      String trophyGuide = guide.trophyGuide;
       DateTime now = DateTime.tryParse(DateTime.now().toString());
       var dbClient = await db; //This calls the getter function
       var result = await dbClient.rawInsert(
-          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn) '
-          'VALUES("$gameName","$gameImgUrl","$now")');
-      myGames.add(game);
+          'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
+          'VALUES("$gameName","$gameImgUrl","$trophyName","$trophyImgUrl","$trophyType","$trophyDescription","$trophyGuide","STARRED","$now")');
+      myStarredTrophy.add(guide);
+      notifyListeners();
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void removeTrophyFromComplete(GuideModel guide) async {
+    try {
+      String trophyName = guide.trophyName;
+      var dbClient = await db; //This calls the getter function
+      var result = await dbClient.rawDelete(
+          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = "${guide.trophyName}" AND $trophyActionColumn = "COMPLETED"');
+      myCompletedTrophy.removeWhere((element) {
+        if (element.trophyName == trophyName) {
+          return true;
+        }
+        return false;
+      });
+      notifyListeners();
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void removeTrophyFromStarred(GuideModel guide) async {
+    try {
+      String trophyName = guide.trophyName;
+      var dbClient = await db; //This calls the getter function
+      var result = await dbClient.rawDelete(
+          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = "${guide.trophyName}" AND $trophyActionColumn = "STARRED"');
+      myStarredTrophy.removeWhere((element) {
+        if (element.trophyName == trophyName) {
+          return true;
+        }
+        return false;
+      });
       notifyListeners();
       print(result);
     } catch (e) {
@@ -157,8 +199,11 @@ class InternalDbProvider extends ChangeNotifier {
               gameName: i['$gameNameColumn'],
               isCompleted: i['$trophyActionColumn'] == 'COMPLETED',
               isStarred: i['$trophyActionColumn'] == 'STARRED');
-          myTrophy.add(guide);
-          print(i['$trophyNameColumn']);
+          if (guide.isCompleted) {
+            myCompletedTrophy.add(guide);
+          } else {
+            myStarredTrophy.add(guide);
+          }
         }
         notifyListeners();
       }

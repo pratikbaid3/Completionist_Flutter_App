@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_trophy_manager/Pages/all_games_page.dart';
+import 'package:game_trophy_manager/Pages/all_ps4_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
+import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
+import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
@@ -31,10 +33,16 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             screenCurrent = Dashboard();
             break;
           case 1:
-            screenCurrent = AllGamesPage();
+            screenCurrent = MyGamesPage();
             break;
           case 2:
-            screenCurrent = MyGamesPage();
+            screenCurrent = AllPS4GamesPage();
+            break;
+          case 4:
+            screenCurrent = MyCompletedTrophyPage();
+            break;
+          case 5:
+            screenCurrent = MyStarredTrophyPage();
             break;
         }
 
@@ -52,25 +60,14 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             centerTitle: true,
             backgroundColor: secondaryColor,
             elevation: 1,
-            // title: Image(
-            //   height: 35,
-            //   image: AssetImage('images/icons/hustle_logo.png'),
-            // ),
             actions: [
               IconButton(
                 icon: Icon(
-                  Icons.notifications_none,
+                  Icons.share,
                   color: Colors.white,
                 ),
                 onPressed: () {},
               ),
-              // IconButton(
-              //   icon: Icon(
-              //     Icons.search,
-              //     color: Colors.white,
-              //   ),
-              //   onPressed: () {},
-              // ),
             ],
           ),
           body: screenCurrent,
@@ -139,13 +136,13 @@ class _MenuState extends State<Menu> {
                 icon: FontAwesomeIcons.gamepad,
                 onTap: () {
                   controller.toggle();
-                  controller.position = 2;
+                  controller.position = 1;
                 },
                 title: 'My Games'),
             NavDrawerListTile(
                 icon: FontAwesomeIcons.playstation,
                 onTap: () {
-                  controller.position = 1;
+                  controller.position = 2;
                   controller.toggle();
                 },
                 title: 'PS4'),
@@ -159,14 +156,14 @@ class _MenuState extends State<Menu> {
             NavDrawerListTile(
                 icon: Icons.check,
                 onTap: () {
-                  controller.position = 1;
+                  controller.position = 4;
                   controller.toggle();
                 },
                 title: 'Completed'),
             NavDrawerListTile(
                 icon: Icons.star,
                 onTap: () {
-                  controller.position = 1;
+                  controller.position = 5;
                   controller.toggle();
                 },
                 title: 'Starred'),
