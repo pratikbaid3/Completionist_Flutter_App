@@ -220,9 +220,11 @@ class _MyGamesPageState extends State<MyGamesPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        'images/no_data.svg',
+                      Image(
                         width: wp * 0.7,
+                        image: AssetImage(
+                          'images/no_data_1.png',
+                        ),
                       ),
                     ],
                   ),
