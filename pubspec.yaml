@@ -70,7 +70,8 @@ dependencies:
   flushbar: ^1.10.4
   #SVG
   flutter_svg: ^0.19.1
-
+  #Share
+  share: ^0.6.5+4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -96,7 +97,6 @@ flutter:
   assets:
     - images/
     - assets/anim.flr
-    - assets/trophiesDataLink.db
     - assets/anim2.flr
 
   fonts:
