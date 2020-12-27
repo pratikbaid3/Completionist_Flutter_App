@@ -26,7 +26,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           onPressed: () {
             Share.share(
-                'Download for FREE and start gaming https://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
+                'Completionist: PS4 & Xbox game guide\n Download for FREE and start gaming \nhttps://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
                 subject: 'Completionist: PS4 & Xbox game guide');
           },
         ),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -20,6 +23,57 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
+    testDevices: <String>[],
+    keywords: <String>[
+      'games',
+      'gaming',
+      'time',
+      'video game',
+      'playstation',
+      'xbox',
+      'nintendo'
+    ],
+    childDirected: false,
+  );
+  InterstitialAd _interstitialAd;
+  InterstitialAd createInterstitialAd() {
+    String appId = InterstitialAd.testAdUnitId;
+    if (Platform.isAndroid) {
+      appId = 'ca-app-pub-9881507895831818/3788269832';
+    }
+    if (Platform.isIOS) {
+      appId = 'ca-app-pub-9881507895831818/8973131997';
+    }
+    return new InterstitialAd(
+        adUnitId: appId,
+        targetingInfo: targetInfo,
+        listener: (MobileAdEvent event) {
+          print("Interstitial Event :$event");
+        });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    String appId = FirebaseAdMob.testAppId;
+    if (Platform.isAndroid) {
+      appId = 'ca-app-pub-9881507895831818~1753117528';
+    }
+    if (Platform.isIOS) {
+      appId = 'ca-app-pub-9881507895831818~3014228304';
+    }
+    FirebaseAdMob.instance.initialize(appId: appId);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   List<Widget> recentGames = [];
   bool isExpanded = false;
   @override
@@ -51,7 +105,11 @@ class _DashboardState extends State<Dashboard> {
                                   .clearGuideList();
                               Navigator.of(context)
                                   .pushNamed(guidePageRoute, arguments: i)
-                                  .then((value) {});
+                                  .then((value) {
+                                createInterstitialAd()
+                                  ..load()
+                                  ..show();
+                              });
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
