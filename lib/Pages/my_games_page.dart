@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,10 +21,55 @@ class _MyGamesPageState extends State<MyGamesPage> {
   TextEditingController searchController = new TextEditingController();
   String searchKeyword = '';
 
+  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
+    testDevices: <String>[],
+    keywords: <String>[
+      'games',
+      'gaming',
+      'time',
+      'video game',
+      'playstation',
+      'xbox',
+      'nintendo'
+    ],
+    childDirected: false,
+  );
+  InterstitialAd _interstitialAd;
+  InterstitialAd createInterstitialAd() {
+    String appId = InterstitialAd.testAdUnitId;
+    if (Platform.isAndroid) {
+      appId = 'ca-app-pub-9881507895831818/3788269832';
+    }
+    if (Platform.isIOS) {
+      appId = 'ca-app-pub-9881507895831818/8973131997';
+    }
+    return new InterstitialAd(
+        adUnitId: appId,
+        targetingInfo: targetInfo,
+        listener: (MobileAdEvent event) {
+          print("Interstitial Event :$event");
+        });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    String appId = FirebaseAdMob.testAppId;
+    if (Platform.isAndroid) {
+      appId = 'ca-app-pub-9881507895831818~1753117528';
+    }
+    if (Platform.isIOS) {
+      appId = 'ca-app-pub-9881507895831818~3014228304';
+    }
+    FirebaseAdMob.instance.initialize(appId: appId);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -91,6 +139,9 @@ class _MyGamesPageState extends State<MyGamesPage> {
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
                               onTap: () {
+                                Provider.of<GuideProvider>(context,
+                                        listen: false)
+                                    .clearGuideList();
                                 Navigator.of(context)
                                     .pushNamed(guidePageRoute,
                                         arguments:
@@ -99,9 +150,9 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                                     listen: false)
                                                 .myGames[index])
                                     .then((value) {
-                                  Provider.of<GuideProvider>(context,
-                                          listen: false)
-                                      .clearGuideList();
+                                  createInterstitialAd()
+                                    ..load()
+                                    ..show();
                                 });
                               },
                               child: Container(

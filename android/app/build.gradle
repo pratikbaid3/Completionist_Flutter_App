@@ -44,8 +44,8 @@ android {
         applicationId "co.turingcreatives.game_trophy_manager"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode '5'.toInteger()
-        versionName '4.0.1'
+        versionCode '6'.toInteger()
+        versionName '5.0.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -72,8 +72,9 @@ flutter {
 }
 
 dependencies {
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    implementation 'com.google.firebase:firebase-analytics:17.2.2'
+    implementation 'com.google.firebase:firebase-analytics'
 }
