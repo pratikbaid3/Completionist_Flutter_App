@@ -278,7 +278,11 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              ' ' +
+                                                  Provider.of<GameProvider>(
+                                                          context)
+                                                      .games[index]
+                                                      .gold,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
@@ -297,7 +301,11 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              ' ' +
+                                                  Provider.of<GameProvider>(
+                                                          context)
+                                                      .games[index]
+                                                      .silver,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
@@ -316,7 +324,11 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              ' ' +
+                                                  Provider.of<GameProvider>(
+                                                          context)
+                                                      .games[index]
+                                                      .bronze,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,

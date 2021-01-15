@@ -29,10 +29,18 @@
             {
               "client_id": "139921408064-9bsse28obhb51m80seo3tdl84aua1t7d.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "139921408064-nbnphpq76fitqf3b4sbt0c3ds4vsdp9h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "co.turingcreatives.gameTrophyManager"
+              }
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-9881507895831818~1753117528"
     }
   ],
   "configuration_version": "1"

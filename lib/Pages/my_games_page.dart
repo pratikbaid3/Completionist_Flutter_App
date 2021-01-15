@@ -209,7 +209,10 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              Provider.of<InternalDbProvider>(
+                                                      context)
+                                                  .myGames[index]
+                                                  .gold,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
@@ -228,7 +231,10 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              Provider.of<InternalDbProvider>(
+                                                      context)
+                                                  .myGames[index]
+                                                  .silver,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
@@ -247,7 +253,10 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                               size: 25,
                                             ),
                                             Text(
-                                              "  3",
+                                              Provider.of<InternalDbProvider>(
+                                                      context)
+                                                  .myGames[index]
+                                                  .bronze,
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
