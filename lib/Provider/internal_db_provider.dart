@@ -18,6 +18,9 @@ class InternalDbProvider extends ChangeNotifier {
   final String trophyGuideColumn = 'TrophyGuide';
   final String trophyActionColumn = 'TrophyAction'; //Starred or Completed
   final String dateTimeColumn = 'DateTime';
+  final String goldColumn = 'GOLD';
+  final String silverColumn = 'SILVER';
+  final String bronzeColumn = 'BRONZE';
 
   List<GameModel> myGames = new List<GameModel>();
   List<GuideModel> myCompletedTrophy = new List<GuideModel>();
@@ -41,7 +44,7 @@ class InternalDbProvider extends ChangeNotifier {
 
   void _onCreate(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME)');
+        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME,$goldColumn TEXT, $silverColumn TEXT, $bronzeColumn TEXT)');
     await db.execute(
         'CREATE TABLE $myTrophyTable($gameNameColumn TEXT, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$trophyActionColumn TEXT,$dateTimeColumn DATETIME)');
   }
@@ -51,10 +54,13 @@ class InternalDbProvider extends ChangeNotifier {
       String gameName = game.gameName;
       String gameImgUrl = game.gameImageUrl;
       DateTime now = DateTime.tryParse(DateTime.now().toString());
+      String gold = game.gold;
+      String silver = game.silver;
+      String bronze = game.bronze;
       var dbClient = await db; //This calls the getter function
       var result = await dbClient.rawInsert(
-          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn) '
-          'VALUES("$gameName","$gameImgUrl","$now")');
+          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn,$goldColumn,$silverColumn,$bronzeColumn) '
+          'VALUES("$gameName","$gameImgUrl","$now","$gold","$silver","$bronze")');
       myGames.add(game);
       notifyListeners();
       print(result);
@@ -90,7 +96,10 @@ class InternalDbProvider extends ChangeNotifier {
         for (var i in result) {
           GameModel game = new GameModel(
               gameName: i['$gameNameColumn'],
-              gameImageUrl: i['$gameImgUrlColumn']);
+              gameImageUrl: i['$gameImgUrlColumn'],
+              gold: i['$goldColumn'] != null ? i['$goldColumn'] : '3',
+              bronze: i['$bronzeColumn'] != null ? i['$bronzeColumn'] : '3',
+              silver: i['$silverColumn'] != null ? i['$silverColumn'] : '3');
           myGames.add(game);
         }
         notifyListeners();
