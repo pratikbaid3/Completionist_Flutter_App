@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:game_trophy_manager/Provider/graph_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router.dart' as router;
 import 'package:game_trophy_manager/Router/router_constant.dart';
@@ -27,7 +28,11 @@ class MyApp extends StatelessWidget {
             create: (context) => GuideProvider(),
           ),
           ChangeNotifierProvider<InternalDbProvider>(
-              create: (context) => InternalDbProvider())
+            create: (context) => InternalDbProvider(),
+          ),
+          ChangeNotifierProvider<GraphProvider>(
+            create: (context) => GraphProvider(),
+          ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

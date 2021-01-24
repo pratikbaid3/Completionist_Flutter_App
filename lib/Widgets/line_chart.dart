@@ -1,6 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:game_trophy_manager/Provider/game_provider.dart';
+import 'package:game_trophy_manager/Provider/graph_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:provider/provider.dart';
 
 class LineChartSample2 extends StatefulWidget {
   @override
@@ -69,12 +72,30 @@ class _LineChartSample2State extends State<LineChartSample2> {
               fontSize: 16),
           getTitles: (value) {
             switch (value.toInt()) {
+              // case 0:
+              //   return 'J';
+              // case 1:
+              //   return 'F';
               case 2:
-                return 'OCT';
+                return 'JAN';
+              // case 3:
+              //   return 'A';
+              // case 4:
+              //   return 'M';
+              // case 5:
+              //   return 'J';
               case 5:
-                return 'NOV';
+                return 'FEB';
+              // case 7:
+              //   return 'A';
+              // case 8:
+              //   return 'S';
+              // case 9:
+              //   return 'O';
               case 8:
-                return 'DEC';
+                return 'MAR';
+              // case 11:
+              //   return 'D';
             }
             return '';
           },
@@ -89,12 +110,30 @@ class _LineChartSample2State extends State<LineChartSample2> {
           ),
           getTitles: (value) {
             switch (value.toInt()) {
-              case 1:
-                return '5';
-              case 3:
-                return '10';
-              case 5:
-                return '20';
+              case 0:
+                return (Provider.of<GraphProvider>(context, listen: false)
+                            .yAxis *
+                        0)
+                    .toInt()
+                    .toString();
+              case 2:
+                return (Provider.of<GraphProvider>(context, listen: false)
+                            .yAxis *
+                        2)
+                    .toInt()
+                    .toString();
+              case 4:
+                return (Provider.of<GraphProvider>(context, listen: false)
+                            .yAxis *
+                        4)
+                    .toInt()
+                    .toString();
+              case 6:
+                return (Provider.of<GraphProvider>(context, listen: false)
+                            .yAxis *
+                        6)
+                    .toInt()
+                    .toString();
             }
             return '';
           },
@@ -116,13 +155,56 @@ class _LineChartSample2State extends State<LineChartSample2> {
       lineBarsData: [
         LineChartBarData(
           spots: [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
+            FlSpot(0.1, 0),
+            FlSpot(
+                2,
+                (Provider.of<GraphProvider>(context).jan) /
+                    Provider.of<GraphProvider>(context).yAxis),
+            FlSpot(
+                5,
+                (Provider.of<GraphProvider>(context).feb) /
+                    Provider.of<GraphProvider>(context).yAxis),
+            FlSpot(
+                8,
+                (Provider.of<GraphProvider>(context).march) /
+                    Provider.of<GraphProvider>(context).yAxis),
+            FlSpot(10.9, 0),
+            // FlSpot(
+            //     3,
+            //     Provider.of<GraphProvider>(context).april *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     4,
+            //     Provider.of<GraphProvider>(context).may *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     5,
+            //     Provider.of<GraphProvider>(context).june *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     6,
+            //     Provider.of<GraphProvider>(context).july *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     7,
+            //     Provider.of<GraphProvider>(context).aug *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     8,
+            //     Provider.of<GraphProvider>(context).sept *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     9,
+            //     Provider.of<GraphProvider>(context).oct *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     10,
+            //     Provider.of<GraphProvider>(context).nov *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
+            // FlSpot(
+            //     11,
+            //     Provider.of<GraphProvider>(context).dec *
+            //         Provider.of<GraphProvider>(context, listen: false).yAxis),
           ],
           isCurved: true,
           colors: gradientColors,

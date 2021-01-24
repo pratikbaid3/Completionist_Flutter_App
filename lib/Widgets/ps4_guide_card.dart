@@ -105,7 +105,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Provider.of<GuideProvider>(context)
+                    Provider.of<GuideProvider>(context, listen: false)
                         .guide[widget.index]
                         .trophyDescription,
                     textAlign: TextAlign.start,
@@ -123,7 +123,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                 borderRadius: BorderRadius.circular(0),
               ),
               child: HtmlWidget(
-                '''${Provider.of<GuideProvider>(context).guide[widget.index].trophyGuide}''',
+                '''${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyGuide}''',
                 textStyle: TextStyle(fontSize: 15),
                 webView: true,
               ),
@@ -151,7 +151,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Completed',
-                        "${Provider.of<GuideProvider>(context).guide[widget.index].trophyName} has been completed",
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been completed",
                         wp);
                   },
                 )
@@ -173,7 +173,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Un-Completed',
-                        "${Provider.of<GuideProvider>(context).guide[widget.index].trophyName} has been un-completed",
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-completed",
                         wp);
                   },
                 ),
@@ -198,7 +198,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Starred',
-                        "${Provider.of<GuideProvider>(context).guide[widget.index].trophyName} has been starred",
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been starred",
                         wp);
                   },
                 )
@@ -220,7 +220,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Un-Starred',
-                        "${Provider.of<GuideProvider>(context).guide[widget.index].trophyName} has been un-starred",
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-starred",
                         wp);
                   },
                 ),

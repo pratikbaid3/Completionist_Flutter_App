@@ -49,7 +49,7 @@ class InternalDbProvider extends ChangeNotifier {
         'CREATE TABLE $myTrophyTable($gameNameColumn TEXT, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$trophyActionColumn TEXT,$dateTimeColumn DATETIME)');
   }
 
-  void addGameToDb(GameModel game) async {
+  void addGameToDb(GameModel game, BuildContext context) async {
     try {
       String gameName = game.gameName;
       String gameImgUrl = game.gameImageUrl;
@@ -69,7 +69,7 @@ class InternalDbProvider extends ChangeNotifier {
     }
   }
 
-  void removeGameFromDb(GameModel game) async {
+  void removeGameFromDb(GameModel game, BuildContext context) async {
     try {
       String gameName = game.gameName;
       var dbClient = await db;

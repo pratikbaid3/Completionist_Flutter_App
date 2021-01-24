@@ -5,6 +5,19 @@ import 'package:game_trophy_manager/Utilities/api.dart';
 
 class GameProvider extends ChangeNotifier {
   List<GameModel> games = new List<GameModel>();
+  double jan = 0;
+  double feb = 0;
+  double march = 0;
+  double april = 0;
+  double may = 0;
+  double june = 0;
+  double july = 0;
+  double aug = 0;
+  double sept = 0;
+  double oct = 0;
+  double nov = 0;
+  double dec = 0;
+
   Future getGame({int page = 1, int count = 30, String search = ''}) async {
     try {
       print('--GET GAMES--');

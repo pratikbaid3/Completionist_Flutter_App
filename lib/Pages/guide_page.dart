@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/graph_provider.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -92,13 +93,13 @@ class _GuidePageState extends State<GuidePage> {
                   if (isGameAdded == 1) {
                     //Remove the game
                     Provider.of<InternalDbProvider>(context, listen: false)
-                        .removeGameFromDb(widget.game);
+                        .removeGameFromDb(widget.game, context);
                     snackBar(context, 'Removed',
                         "${widget.game.gameName} has been removed", wp);
                   } else {
                     //Add the game
                     Provider.of<InternalDbProvider>(context, listen: false)
-                        .addGameToDb(widget.game);
+                        .addGameToDb(widget.game, context);
                     snackBar(context, 'Added',
                         "${widget.game.gameName} has been added", wp);
                   }

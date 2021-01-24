@@ -5,7 +5,6 @@ class GameModel {
   String silver;
   String bronze;
   String platinum;
-  String videoLink;
 
   GameModel(
       {this.gameName,
@@ -13,8 +12,7 @@ class GameModel {
       this.bronze,
       this.gold,
       this.platinum,
-      this.silver,
-      this.videoLink});
+      this.silver});
 
   GameModel.fromJson(Map<String, dynamic> json) {
     gameName = json['game_name'];
@@ -23,7 +21,6 @@ class GameModel {
     silver = json['silver'];
     bronze = json['bronze'];
     platinum = json['platinum'];
-    videoLink = json['trophy_youtube_link'];
   }
 
   Map<String, dynamic> toJson() {
