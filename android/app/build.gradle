@@ -44,8 +44,8 @@ android {
         applicationId "co.turingcreatives.game_trophy_manager"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode '8'.toInteger()
-        versionName '5.0.2'
+        versionCode '9'.toInteger()
+        versionName '5.0.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
