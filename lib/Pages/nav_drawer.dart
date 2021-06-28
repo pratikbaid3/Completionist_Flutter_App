@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Pages/all_ps4_games_page.dart';
@@ -22,77 +21,14 @@ class NavDrawerPage extends StatefulWidget {
 }
 
 class _NavDrawerPageState extends State<NavDrawerPage> {
-  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
-    testDevices: <String>[],
-    keywords: <String>[
-      'games',
-      'gaming',
-      'time',
-      'video game',
-      'playstation',
-      'xbox',
-      'nintendo'
-    ],
-    childDirected: false,
-  );
-
-  BannerAd _bannerAd;
-  BannerAd createBannerAd() {
-    String appId = BannerAd.testAdUnitId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818/8126954189';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818/2136260901';
-    }
-    return new BannerAd(
-        adUnitId: appId,
-        size: AdSize.banner,
-        targetingInfo: targetInfo,
-        listener: (MobileAdEvent event) {
-          print("Banner Event :$event");
-        });
-  }
-
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    String appId = InterstitialAd.testAdUnitId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818/3788269832';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818/8973131997';
-    }
-    return new InterstitialAd(
-        adUnitId: appId,
-        targetingInfo: targetInfo,
-        listener: (MobileAdEvent event) {
-          print("Interstitial Event :$event");
-        });
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
-    String appId = FirebaseAdMob.testAppId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818~1753117528';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818~3014228304';
-    }
-    FirebaseAdMob.instance.initialize(appId: appId);
-    print('BANNER');
-    _bannerAd = createBannerAd()
-      ..load()
-      ..show();
     super.initState();
   }
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
-    _interstitialAd?.dispose();
     // TODO: implement dispose
     super.dispose();
   }
