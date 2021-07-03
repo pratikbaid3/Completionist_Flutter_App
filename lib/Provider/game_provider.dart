@@ -26,7 +26,7 @@ class GameProvider extends ChangeNotifier {
       Dio dio = new Dio();
       response = await dio.get(baseUrl + gamesUrl,
           queryParameters: {"page": page, "count": count, "search": search});
-      List<dynamic> data = response.data['result']['games'];
+      List<dynamic> data = response.data['results'];
       List<GameModel> tempGames =
           data.map((data) => GameModel.fromJson(data)).toList();
       if (page == 1) {

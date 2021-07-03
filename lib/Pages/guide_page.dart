@@ -123,30 +123,6 @@ class _GuidePageState extends State<GuidePage> {
               SizedBox(
                 height: 10,
               ),
-              // NeumorphicSwitch(
-              //   style: NeumorphicSwitchStyle(),
-              //   value: isGameAdded,
-              //   onChanged: (val) {
-              //     if (isGameAdded == true) {
-              //       //Remove the game
-              //       Provider.of<InternalDbProvider>(context, listen: false)
-              //           .removeGameFromDb(widget.game, context);
-              //       snackBar(context, 'Removed',
-              //           "${widget.game.gameName} has been removed", wp);
-              //     } else {
-              //       //Add the game
-              //       Provider.of<InternalDbProvider>(context, listen: false)
-              //           .addGameToDb(widget.game, context);
-              //       snackBar(context, 'Added',
-              //           "${widget.game.gameName} has been added", wp);
-              //     }
-              //     setState(() {
-              //       isGameAdded = (isGameAdded == false) ? true : false;
-              //     });
-              //     print(isGameAdded);
-              //   },
-              // ),
-
               FutureBuilder(
                 future: Provider.of<GuideProvider>(context)
                     .getGuide(gameName: widget.game.gameName),

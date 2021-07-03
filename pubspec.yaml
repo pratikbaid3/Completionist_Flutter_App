@@ -45,7 +45,7 @@ dependencies:
   google_fonts: ^2.1.0
   flutter_slidable: ^0.6.0
   flutter_widget_from_html: ^0.6.1
-  flushbar: ^1.10.4
+  another_flushbar: ^1.10.23
   flutter_svg: ^0.22.0
   share: ^0.6.5+4
 
