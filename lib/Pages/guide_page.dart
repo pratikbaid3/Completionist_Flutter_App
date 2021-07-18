@@ -1,33 +1,29 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
-import 'package:game_trophy_manager/Provider/graph_provider.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:game_trophy_manager/Widgets/app_bar.dart';
 import 'package:game_trophy_manager/Widgets/ps4_guide_card.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class GuidePage extends StatefulWidget {
   GameModel game;
+
   GuidePage({@required this.game});
+
   @override
   _GuidePageState createState() => _GuidePageState();
 }
 
 class _GuidePageState extends State<GuidePage> {
   bool isExpanded = false;
-  int isGameAdded = 0;
+  bool isGameAdded = false;
 
   @override
   void initState() {
@@ -42,7 +38,7 @@ class _GuidePageState extends State<GuidePage> {
     for (GameModel g in myGames) {
       if (g.gameName == widget.game.gameName) {
         setState(() {
-          isGameAdded = 1;
+          isGameAdded = true;
         });
       }
     }
@@ -53,8 +49,46 @@ class _GuidePageState extends State<GuidePage> {
     double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: BaseAppBar(
-        appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: secondaryColor,
+        elevation: 1,
+        actions: [
+          PopupMenuButton<String>(
+            color: primaryAccentColor,
+            icon: Icon(
+              Icons.more_vert,
+              color: Colors.white,
+            ),
+            onSelected: (value) {
+              if (value == 'Add Game') {
+                Provider.of<InternalDbProvider>(context, listen: false)
+                    .addGameToDb(widget.game, context);
+                snackBar(context, 'Added',
+                    "${widget.game.gameName} has been added", wp);
+              }
+              if (value == 'Remove Game') {
+                Provider.of<InternalDbProvider>(context, listen: false)
+                    .removeGameFromDb(widget.game, context);
+                snackBar(context, 'Removed',
+                    "${widget.game.gameName} has been removed", wp);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'Add Game', 'Remove Game'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(12.0),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding:
@@ -65,12 +99,15 @@ class _GuidePageState extends State<GuidePage> {
               Padding(
                 padding:
                     EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
-                child: NeuCard(
-                  curveType: CurveType.flat,
-                  bevel: 4,
-                  decoration: NeumorphicDecoration(
-                    borderRadius: BorderRadius.circular(8),
+                child: Neumorphic(
+                  style: NeumorphicStyle(
+                    surfaceIntensity: 0,
+                    depth: 6,
+                    lightSource: LightSource.topLeft,
                     color: primaryColor,
+                    shape: NeumorphicShape.flat,
+                    shadowDarkColor: Color(0xff232831),
+                    shadowLightColor: Color(0xff2B313C),
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(15),
@@ -85,47 +122,6 @@ class _GuidePageState extends State<GuidePage> {
               ),
               SizedBox(
                 height: 10,
-              ),
-              NeuSwitch<int>(
-                thumbColor: secondaryColor,
-                backgroundColor: primaryColor,
-                onValueChanged: (val) {
-                  if (isGameAdded == 1) {
-                    //Remove the game
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .removeGameFromDb(widget.game, context);
-                    snackBar(context, 'Removed',
-                        "${widget.game.gameName} has been removed", wp);
-                  } else {
-                    //Add the game
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .addGameToDb(widget.game, context);
-                    snackBar(context, 'Added',
-                        "${widget.game.gameName} has been added", wp);
-                  }
-                  setState(() {
-                    isGameAdded = (isGameAdded == 0) ? 1 : 0;
-                  });
-                  print(isGameAdded);
-                },
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
-                groupValue: isGameAdded,
-                children: {
-                  0: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
-                  1: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.green,
-                    ),
-                  ),
-                },
               ),
               FutureBuilder(
                 future: Provider.of<GuideProvider>(context)

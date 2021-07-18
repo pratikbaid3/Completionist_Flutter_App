@@ -16,7 +16,7 @@ class GameModel {
 
   GameModel.fromJson(Map<String, dynamic> json) {
     gameName = json['game_name'];
-    gameImageUrl = json['game_image_url'];
+    gameImageUrl = json['game_image_link'];
     gold = json['gold'];
     silver = json['silver'];
     bronze = json['bronze'];

@@ -4,7 +4,8 @@ import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 
 class GuideProvider extends ChangeNotifier {
-  List<GuideModel> guide = new List<GuideModel>();
+  List<GuideModel> guide = <GuideModel>[];
+
   Future getGuide({String gameName = ''}) async {
     try {
       Response response;
@@ -13,7 +14,7 @@ class GuideProvider extends ChangeNotifier {
         print('--GET GUIDE--');
         print(baseUrl + guideUrl + gameName);
         response = await dio.get(baseUrl + guideUrl + gameName);
-        List<dynamic> data = response.data['result']['games']['guide'];
+        List<dynamic> data = response.data['result'];
         guide = data.map((data) => GuideModel.fromJson(data)).toList();
       }
     } catch (e) {

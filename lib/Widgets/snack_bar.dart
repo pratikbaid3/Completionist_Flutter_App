@@ -1,4 +1,4 @@
-import 'package:flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 
@@ -17,7 +17,7 @@ Widget snackBar(
       )
     ],
     maxWidth: wp * 0.8,
-    borderRadius: 5,
+    borderRadius: BorderRadius.circular(5.0),
     backgroundGradient: LinearGradient(
         colors: [primaryAccentColor, secondaryAccentColor],
         begin: Alignment.topCenter,

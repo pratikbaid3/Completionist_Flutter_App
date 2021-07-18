@@ -1,16 +1,10 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_trophy_manager/Widgets/ps4_game_card.dart';
 import 'package:game_trophy_manager/Provider/game_provider.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
-import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class AllPS4GamesPage extends StatefulWidget {
@@ -25,39 +19,8 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   int nextPage;
   String searchKeyword = '';
 
-  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
-    testDevices: <String>[],
-    keywords: <String>[
-      'games',
-      'gaming',
-      'time',
-      'video game',
-      'playstation',
-      'xbox',
-      'nintendo'
-    ],
-    childDirected: false,
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    String appId = InterstitialAd.testAdUnitId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818/3788269832';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818/8973131997';
-    }
-    return new InterstitialAd(
-        adUnitId: appId,
-        targetingInfo: targetInfo,
-        listener: (MobileAdEvent event) {
-          print("Interstitial Event :$event");
-        });
-  }
-
   @override
   void dispose() {
-    _interstitialAd?.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -66,14 +29,6 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    String appId = FirebaseAdMob.testAppId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818~1753117528';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818~3014228304';
-    }
-    FirebaseAdMob.instance.initialize(appId: appId);
     currentPage = 1;
     nextPage = currentPage + 1;
     _scrollController.addListener(() {
@@ -202,146 +157,30 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                         itemCount:
                             Provider.of<GameProvider>(context).games.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            color: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 0,
-                            margin: new EdgeInsets.symmetric(vertical: 10.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Provider.of<GuideProvider>(context,
-                                        listen: false)
-                                    .clearGuideList();
-                                Navigator.of(context)
-                                    .pushNamed(guidePageRoute,
-                                        arguments: Provider.of<GameProvider>(
-                                                context,
-                                                listen: false)
-                                            .games[index])
-                                    .then((value) {
-                                  createInterstitialAd()
-                                    ..load()
-                                    ..show();
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: secondaryColor,
-                                  borderRadius: new BorderRadius.all(
-                                      const Radius.circular(10)),
+                          if (index ==
+                                  Provider.of<GameProvider>(context)
+                                          .games
+                                          .length -
+                                      1 &&
+                              Provider.of<GameProvider>(context).games.length ==
+                                  currentPage * 30) {
+                            return Column(
+                              children: [
+                                PS4GameCard(
+                                  index: index,
                                 ),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 13.0),
-                                  leading: Container(
-                                      padding: EdgeInsets.only(right: 12.0),
-                                      decoration: new BoxDecoration(
-                                          border: new Border(
-                                              right: new BorderSide(
-                                                  width: 1.0,
-                                                  color: Colors.white24))),
-                                      child: Hero(
-                                        tag:
-                                            '${Provider.of<GameProvider>(context).games[index].gameName}',
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              Provider.of<GameProvider>(context)
-                                                  .games[index]
-                                                  .gameImageUrl,
-                                          placeholder: (context, url) =>
-                                              new CircularProgressIndicator(
-                                            backgroundColor: primaryAccentColor,
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              new Icon(Icons.error),
-                                        ),
-                                      )),
-                                  title: Text(
-                                    '${Provider.of<GameProvider>(context).games[index].gameName}',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  trailing: Icon(Icons.keyboard_arrow_right,
-                                      color: Colors.white, size: 30.0),
-                                  subtitle: Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Row(
-                                      children: [
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: goldenColor,
-                                              size: 25,
-                                            ),
-                                            Text(
-                                              ' ' +
-                                                  Provider.of<GameProvider>(
-                                                          context)
-                                                      .games[index]
-                                                      .gold,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: silverColor,
-                                              size: 25,
-                                            ),
-                                            Text(
-                                              ' ' +
-                                                  Provider.of<GameProvider>(
-                                                          context)
-                                                      .games[index]
-                                                      .silver,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: bronzeColor,
-                                              size: 25,
-                                            ),
-                                            Text(
-                                              ' ' +
-                                                  Provider.of<GameProvider>(
-                                                          context)
-                                                      .games[index]
-                                                      .bronze,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                SizedBox(
+                                  height: 20,
                                 ),
-                              ),
-                            ),
+                                CupertinoActivityIndicator(),
+                                SizedBox(
+                                  height: 50,
+                                )
+                              ],
+                            );
+                          }
+                          return PS4GameCard(
+                            index: index,
                           );
                         },
                       );

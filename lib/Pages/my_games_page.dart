@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
@@ -21,53 +17,14 @@ class _MyGamesPageState extends State<MyGamesPage> {
   TextEditingController searchController = new TextEditingController();
   String searchKeyword = '';
 
-  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
-    testDevices: <String>[],
-    keywords: <String>[
-      'games',
-      'gaming',
-      'time',
-      'video game',
-      'playstation',
-      'xbox',
-      'nintendo'
-    ],
-    childDirected: false,
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    String appId = InterstitialAd.testAdUnitId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818/3788269832';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818/8973131997';
-    }
-    return new InterstitialAd(
-        adUnitId: appId,
-        targetingInfo: targetInfo,
-        listener: (MobileAdEvent event) {
-          print("Interstitial Event :$event");
-        });
-  }
-
   @override
   void initState() {
     // TODO: implement initState
-    String appId = FirebaseAdMob.testAppId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818~1753117528';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818~3014228304';
-    }
-    FirebaseAdMob.instance.initialize(appId: appId);
     super.initState();
   }
 
   @override
   void dispose() {
-    _interstitialAd?.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -84,43 +41,6 @@ class _MyGamesPageState extends State<MyGamesPage> {
           child: (Provider.of<InternalDbProvider>(context).myGames.length != 0)
               ? Column(
                   children: [
-                    // TextField(
-                    //   onSubmitted: (value) {},
-                    //   cursorColor: primaryAccentColor,
-                    //   controller: searchController,
-                    //   decoration: InputDecoration(
-                    //     suffixIcon: Icon(
-                    //       Icons.search,
-                    //       color: Colors.white54,
-                    //     ),
-                    //     focusedBorder: OutlineInputBorder(
-                    //       borderSide: BorderSide(
-                    //         color: primaryAccentColor,
-                    //         width: 1.5,
-                    //       ),
-                    //       borderRadius: BorderRadius.all(
-                    //         Radius.circular(8),
-                    //       ),
-                    //     ),
-                    //     enabledBorder: OutlineInputBorder(
-                    //       borderSide: BorderSide(
-                    //         color: primaryColor,
-                    //         width: 1.5,
-                    //       ),
-                    //       borderRadius: BorderRadius.all(
-                    //         Radius.circular(8),
-                    //       ),
-                    //     ),
-                    //     filled: true,
-                    //     fillColor: secondaryColor,
-                    //     hintText: "Search",
-                    //     contentPadding: EdgeInsets.only(
-                    //         left: 20, bottom: 20, top: 20, right: 20),
-                    //   ),
-                    // ),
-                    // SizedBox(
-                    //   height: hp * 0.02,
-                    // ),
                     Expanded(
                       child: ListView.builder(
                         primary: false,
@@ -149,11 +69,7 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                                     context,
                                                     listen: false)
                                                 .myGames[index])
-                                    .then((value) {
-                                  createInterstitialAd()
-                                    ..load()
-                                    ..show();
-                                });
+                                    .then((value) {});
                               },
                               child: Container(
                                 decoration: BoxDecoration(

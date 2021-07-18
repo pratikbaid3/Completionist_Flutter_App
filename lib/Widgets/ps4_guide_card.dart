@@ -17,6 +17,7 @@ class PS4GuideCard extends StatefulWidget {
   GameModel game;
   bool isCompleted;
   bool isStarred;
+
   PS4GuideCard(
       {@required this.index,
       @required this.game,
@@ -29,9 +30,9 @@ class PS4GuideCard extends StatefulWidget {
 
 class _PS4GuideCardState extends State<PS4GuideCard> {
   bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),

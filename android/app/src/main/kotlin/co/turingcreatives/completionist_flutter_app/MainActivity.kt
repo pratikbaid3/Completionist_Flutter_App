@@ -1,0 +1,6 @@
+package co.turingcreatives.completionist_flutter_app
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}

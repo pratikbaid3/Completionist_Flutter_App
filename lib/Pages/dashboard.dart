@@ -1,20 +1,15 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:game_trophy_manager/Widgets/line_chart.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
@@ -23,62 +18,23 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  static final MobileAdTargetingInfo targetInfo = MobileAdTargetingInfo(
-    testDevices: <String>[],
-    keywords: <String>[
-      'games',
-      'gaming',
-      'time',
-      'video game',
-      'playstation',
-      'xbox',
-      'nintendo'
-    ],
-    childDirected: false,
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    String appId = InterstitialAd.testAdUnitId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818/3788269832';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818/8973131997';
-    }
-    return new InterstitialAd(
-        adUnitId: appId,
-        targetingInfo: targetInfo,
-        listener: (MobileAdEvent event) {
-          print("Interstitial Event :$event");
-        });
-  }
-
   @override
   void initState() {
     // TODO: implement initState
-    String appId = FirebaseAdMob.testAppId;
-    if (Platform.isAndroid) {
-      appId = 'ca-app-pub-9881507895831818~1753117528';
-    }
-    if (Platform.isIOS) {
-      appId = 'ca-app-pub-9881507895831818~3014228304';
-    }
-    FirebaseAdMob.instance.initialize(appId: appId);
     super.initState();
   }
 
   @override
   void dispose() {
-    _interstitialAd?.dispose();
     // TODO: implement dispose
     super.dispose();
   }
 
   List<Widget> recentGames = [];
   bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
@@ -90,10 +46,12 @@ class _DashboardState extends State<Dashboard> {
             ),
             (Provider.of<InternalDbProvider>(context).myGames.length != 0)
                 ? CarouselSlider(
-                    viewportFraction: 0.48,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                    pauseAutoPlayOnTouch: Duration(seconds: 2),
+                    options: CarouselOptions(
+                      viewportFraction: 0.48,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      autoPlayInterval: Duration(seconds: 2),
+                    ),
                     items: Provider.of<InternalDbProvider>(context)
                         .myGames
                         .map((i) {
@@ -105,30 +63,27 @@ class _DashboardState extends State<Dashboard> {
                                   .clearGuideList();
                               Navigator.of(context)
                                   .pushNamed(guidePageRoute, arguments: i)
-                                  .then((value) {
-                                createInterstitialAd()
-                                  ..load()
-                                  ..show();
-                              });
+                                  .then((value) {});
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(color: primaryColor),
-                              child: NeuCard(
-                                curveType: CurveType.flat,
-                                bevel: 4,
-                                decoration: NeumorphicDecoration(
-                                  borderRadius: BorderRadius.circular(10),
+                              child: Neumorphic(
+                                style: NeumorphicStyle(
+                                  surfaceIntensity: 0,
+                                  depth: 6,
+                                  lightSource: LightSource.topLeft,
                                   color: primaryColor,
+                                  shape: NeumorphicShape.flat,
+                                  shadowDarkColor: Color(0xff232831),
+                                  shadowLightColor: Color(0xff2B313C),
                                 ),
-                                child: ClipRRect(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(15),
-                                    child: CachedNetworkImage(
-                                      imageUrl: i.gameImageUrl,
-                                    ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: CachedNetworkImage(
+                                    imageUrl: i.gameImageUrl,
                                   ),
                                 ),
                               ),
@@ -139,10 +94,12 @@ class _DashboardState extends State<Dashboard> {
                     }).toList(),
                   )
                 : CarouselSlider(
-                    viewportFraction: 0.48,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                    pauseAutoPlayOnTouch: Duration(seconds: 2),
+                    options: CarouselOptions(
+                      viewportFraction: 0.48,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      autoPlayInterval: Duration(seconds: 2),
+                    ),
                     items: [1, 2].map((i) {
                       return Builder(
                         builder: (BuildContext context) {
@@ -151,21 +108,26 @@ class _DashboardState extends State<Dashboard> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(color: primaryColor),
-                            child: NeuCard(
-                              width: 178,
-                              curveType: CurveType.flat,
-                              bevel: 4,
-                              decoration: NeumorphicDecoration(
-                                borderRadius: BorderRadius.circular(10),
+                            child: Neumorphic(
+                              style: NeumorphicStyle(
+                                surfaceIntensity: 0,
+                                depth: 6,
+                                lightSource: LightSource.topLeft,
                                 color: primaryColor,
+                                shape: NeumorphicShape.flat,
+                                shadowDarkColor: Color(0xff232831),
+                                shadowLightColor: Color(0xff2B313C),
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Icon(
-                                  (i == 1)
-                                      ? FontAwesomeIcons.playstation
-                                      : FontAwesomeIcons.xbox,
-                                  size: 70,
+                              child: Container(
+                                width: 178,
+                                child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Icon(
+                                    (i == 1)
+                                        ? FontAwesomeIcons.playstation
+                                        : FontAwesomeIcons.xbox,
+                                    size: 70,
+                                  ),
                                 ),
                               ),
                             ),
@@ -178,37 +140,13 @@ class _DashboardState extends State<Dashboard> {
               height: 30,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Achievement ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: wp * 0.055,
-                    ),
-                  ),
-                  Text(
-                    'Stats',
-                    style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w600,
-                        fontSize: wp * 0.055),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
                 horizontal: 5,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LineChartSample2(),
-                ],
+                children: [],
               ),
             ),
             Padding(
