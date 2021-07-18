@@ -12,8 +12,6 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
-    double wp = MediaQuery.of(context).size.width;
     return AppBar(
       centerTitle: true,
       backgroundColor: secondaryColor,

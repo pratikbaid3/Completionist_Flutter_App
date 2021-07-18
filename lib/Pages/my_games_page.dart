@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -71,8 +69,7 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                                     context,
                                                     listen: false)
                                                 .myGames[index])
-                                    .then((value) {
-                                });
+                                    .then((value) {});
                               },
                               child: Container(
                                 decoration: BoxDecoration(

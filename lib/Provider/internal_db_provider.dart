@@ -22,9 +22,9 @@ class InternalDbProvider extends ChangeNotifier {
   final String silverColumn = 'SILVER';
   final String bronzeColumn = 'BRONZE';
 
-  List<GameModel> myGames = new List<GameModel>();
-  List<GuideModel> myCompletedTrophy = new List<GuideModel>();
-  List<GuideModel> myStarredTrophy = new List<GuideModel>();
+  List<GameModel> myGames = <GameModel>[];
+  List<GuideModel> myCompletedTrophy = <GuideModel>[];
+  List<GuideModel> myStarredTrophy = <GuideModel>[];
 
   Future<Database> get db async {
     if (_db != null) {

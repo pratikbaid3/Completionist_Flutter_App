@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Pages/all_ps4_games_page.dart';
@@ -21,7 +19,6 @@ class NavDrawerPage extends StatefulWidget {
 }
 
 class _NavDrawerPageState extends State<NavDrawerPage> {
-
   @override
   void initState() {
     super.initState();
@@ -35,7 +32,6 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
 
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return SimpleHiddenDrawer(
       withShadow: true,

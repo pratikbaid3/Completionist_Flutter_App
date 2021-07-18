@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
@@ -37,7 +35,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(

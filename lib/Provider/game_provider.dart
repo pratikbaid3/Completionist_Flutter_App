@@ -4,7 +4,7 @@ import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 
 class GameProvider extends ChangeNotifier {
-  List<GameModel> games = new List<GameModel>();
+  List<GameModel> games = <GameModel>[];
 
   Future getGame({int page = 1, String search = ''}) async {
     try {

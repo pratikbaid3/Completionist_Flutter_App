@@ -1,14 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_trophy_manager/Provider/game_provider.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
-import 'package:game_trophy_manager/Router/router_constant.dart';
-import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 
 class AllXboxGamesPage extends StatefulWidget {
   @override
@@ -21,8 +13,6 @@ class _AllXboxGamesPageState extends State<AllXboxGamesPage> {
     // TODO: implement initState
     super.initState();
   }
-
-  ScrollController _scrollController = new ScrollController();
 
   @override
   Widget build(BuildContext context) {

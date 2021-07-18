@@ -4,7 +4,7 @@ import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 
 class GuideProvider extends ChangeNotifier {
-  List<GuideModel> guide = new List<GuideModel>();
+  List<GuideModel> guide = <GuideModel>[];
 
   Future getGuide({String gameName = ''}) async {
     try {
