@@ -848,12 +848,12 @@ packages:
     source: hosted
     version: "1.0.0"
   webview_flutter:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: webview_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.9"
+    version: "2.0.10"
   win32:
     dependency: transitive
     description:
