@@ -13,7 +13,7 @@ Want to get the most out of your PS4 and Xbox One games? Want to be incentivised
 1. Clone the repository from GitHub:
 
 ```bash
-git clone https://github.com/pratikbaid3/PSN_XBOX_TrophyManager
+git clone https://github.com/pratikbaid3/Completionist_Flutter_App
 ```
 
 2. Navigate to project's root directory:
