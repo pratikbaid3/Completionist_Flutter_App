@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:game_trophy_manager/Provider/graph_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -23,7 +22,6 @@ class _SplashScreenState extends State<SplashScreen> {
     Provider.of<InternalDbProvider>(context, listen: false).getAllGamesFromDb();
     Provider.of<InternalDbProvider>(context, listen: false)
         .getAllTrophiesFromDb();
-    Provider.of<GraphProvider>(context, listen: false).getAllTrophyDateFromDb();
   }
 
   void toDashboard() {
