@@ -12,16 +12,16 @@ import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class GuidePage extends StatefulWidget {
+class Ps4GuidePage extends StatefulWidget {
   GameModel game;
 
-  GuidePage({@required this.game});
+  Ps4GuidePage({@required this.game});
 
   @override
-  _GuidePageState createState() => _GuidePageState();
+  _Ps4GuidePageState createState() => _Ps4GuidePageState();
 }
 
-class _GuidePageState extends State<GuidePage> {
+class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isExpanded = false;
   bool isGameAdded = false;
 

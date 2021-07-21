@@ -10,6 +10,9 @@ class GameProvider extends ChangeNotifier {
     try {
       print('--GET GAMES--');
       print(baseUrl + gamesUrl);
+      if (page == 1) {
+        games.clear();
+      }
       Response response;
       Dio dio = new Dio();
       response = await dio.get(baseUrl + gamesUrl,
@@ -17,9 +20,6 @@ class GameProvider extends ChangeNotifier {
       List<dynamic> data = response.data['results'];
       List<GameModel> tempGames =
           data.map((data) => GameModel.fromJson(data)).toList();
-      if (page == 1) {
-        games.clear();
-      }
       for (GameModel i in tempGames) {
         games.add(i);
       }

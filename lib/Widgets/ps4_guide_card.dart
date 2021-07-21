@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/guide_provider.dart';
@@ -12,6 +13,7 @@ import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class PS4GuideCard extends StatefulWidget {
   int index;
   GameModel game;
@@ -36,9 +38,131 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
     double wp = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
-      child: Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: 0.25,
+      child: FocusedMenuHolder(
+        menuBoxDecoration: BoxDecoration(
+            color: (widget.isCompleted || widget.isStarred)
+                ? Colors.red
+                : Colors.white,
+            borderRadius: BorderRadius.circular(50)),
+        menuWidth: MediaQuery.of(context).size.width * 0.5,
+        menuItemExtent: 60,
+        onPressed: () {},
+        menuItems: [
+          (!widget.isStarred)
+              ? FocusedMenuItem(
+                  backgroundColor: Colors.white,
+                  title: Text(
+                    'Star',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                  trailingIcon: Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onPressed: () {
+                    GuideModel guide =
+                        Provider.of<GuideProvider>(context, listen: false)
+                            .guide[widget.index];
+                    guide.gameName = widget.game.gameName;
+                    guide.gameImgUrl = widget.game.gameImageUrl;
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .addTrophyToStarred(guide);
+                    setState(() {
+                      widget.isStarred = true;
+                    });
+                    snackBar(
+                        context,
+                        'Starred',
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been starred",
+                        wp);
+                  },
+                )
+              : FocusedMenuItem(
+                  backgroundColor: Colors.red,
+                  title: Text(
+                    'Un-Star',
+                  ),
+                  trailingIcon: Icon(
+                    Icons.star,
+                  ),
+                  onPressed: () {
+                    GuideModel guide =
+                        Provider.of<GuideProvider>(context, listen: false)
+                            .guide[widget.index];
+                    guide.gameName = widget.game.gameName;
+                    guide.gameImgUrl = widget.game.gameImageUrl;
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .removeTrophyFromStarred(guide);
+                    setState(() {
+                      widget.isStarred = false;
+                    });
+                    snackBar(
+                        context,
+                        'Un-Starred',
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-starred",
+                        wp);
+                  },
+                ),
+          (!widget.isCompleted)
+              ? FocusedMenuItem(
+                  backgroundColor: Colors.white,
+                  title: Text(
+                    'Complete',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                  trailingIcon: Icon(
+                    Icons.check,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    GuideModel guide =
+                        Provider.of<GuideProvider>(context, listen: false)
+                            .guide[widget.index];
+                    guide.gameName = widget.game.gameName;
+                    guide.gameImgUrl = widget.game.gameImageUrl;
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .addTrophyToComplete(guide);
+                    setState(() {
+                      widget.isCompleted = true;
+                    });
+                    snackBar(
+                        context,
+                        'Completed',
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been completed",
+                        wp);
+                  },
+                )
+              : FocusedMenuItem(
+                  backgroundColor: Colors.red,
+                  title: Text(
+                    'Un-Complete',
+                  ),
+                  trailingIcon: Icon(
+                    Icons.check,
+                  ),
+                  onPressed: () {
+                    GuideModel guide =
+                        Provider.of<GuideProvider>(context, listen: false)
+                            .guide[widget.index];
+                    guide.gameName = widget.game.gameName;
+                    guide.gameImgUrl = widget.game.gameImageUrl;
+                    Provider.of<InternalDbProvider>(context, listen: false)
+                        .removeTrophyFromComplete(guide);
+                    setState(() {
+                      widget.isCompleted = false;
+                    });
+                    snackBar(
+                        context,
+                        'Un-Completed',
+                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-completed",
+                        wp);
+                  },
+                ),
+        ],
         child: ExpansionTileCard(
           initialElevation: 0,
           elevation: 0,
@@ -132,100 +256,6 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
             )
           ],
         ),
-        actions: <Widget>[
-          (!widget.isCompleted)
-              ? IconSlideAction(
-                  caption: 'Complete',
-                  color: primaryAccentColor,
-                  icon: Icons.check,
-                  onTap: () {
-                    GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
-                            .guide[widget.index];
-                    guide.gameName = widget.game.gameName;
-                    guide.gameImgUrl = widget.game.gameImageUrl;
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .addTrophyToComplete(guide);
-                    setState(() {
-                      widget.isCompleted = true;
-                    });
-                    snackBar(
-                        context,
-                        'Completed',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been completed",
-                        wp);
-                  },
-                )
-              : IconSlideAction(
-                  caption: 'Un-Complete',
-                  color: Colors.red,
-                  icon: Icons.check,
-                  onTap: () {
-                    GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
-                            .guide[widget.index];
-                    guide.gameName = widget.game.gameName;
-                    guide.gameImgUrl = widget.game.gameImageUrl;
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .removeTrophyFromComplete(guide);
-                    setState(() {
-                      widget.isCompleted = false;
-                    });
-                    snackBar(
-                        context,
-                        'Un-Completed',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-completed",
-                        wp);
-                  },
-                ),
-        ],
-        secondaryActions: <Widget>[
-          (!widget.isStarred)
-              ? IconSlideAction(
-                  caption: 'Star',
-                  color: Colors.yellow,
-                  icon: Icons.star,
-                  onTap: () {
-                    GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
-                            .guide[widget.index];
-                    guide.gameName = widget.game.gameName;
-                    guide.gameImgUrl = widget.game.gameImageUrl;
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .addTrophyToStarred(guide);
-                    setState(() {
-                      widget.isStarred = true;
-                    });
-                    snackBar(
-                        context,
-                        'Starred',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been starred",
-                        wp);
-                  },
-                )
-              : IconSlideAction(
-                  caption: 'Un-Star',
-                  color: Colors.red,
-                  icon: Icons.star,
-                  onTap: () {
-                    GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
-                            .guide[widget.index];
-                    guide.gameName = widget.game.gameName;
-                    guide.gameImgUrl = widget.game.gameImageUrl;
-                    Provider.of<InternalDbProvider>(context, listen: false)
-                        .removeTrophyFromStarred(guide);
-                    setState(() {
-                      widget.isStarred = false;
-                    });
-                    snackBar(
-                        context,
-                        'Un-Starred',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-starred",
-                        wp);
-                  },
-                ),
-        ],
       ),
     );
   }
