@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Widgets/ps4_game_card.dart';
-import 'package:game_trophy_manager/Provider/game_provider.dart';
+import 'package:game_trophy_manager/Provider/ps4_game_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
 class AllPS4GamesPage extends StatefulWidget {
@@ -13,10 +14,10 @@ class AllPS4GamesPage extends StatefulWidget {
 }
 
 class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
+  final PagingController<int, GameModel> _pagingController =
+      PagingController(firstPageKey: 1);
   TextEditingController searchController = new TextEditingController();
   bool isSearchIcon = true;
-  int currentPage;
-  int nextPage;
   String searchKeyword = '';
 
   @override
@@ -29,24 +30,20 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentPage = 1;
-    nextPage = currentPage + 1;
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        int itemCount =
-            Provider.of<GameProvider>(context, listen: false).games.length;
-        if (itemCount == 30 * currentPage) {
-          setState(() {
-            currentPage += 1;
-            nextPage += 1;
-          });
-        }
-      }
+    _pagingController.addPageRequestListener((pageKey) {
+      Provider.of<PS4GameProvider>(context, listen: false).getGame(
+          pagingController: _pagingController,
+          pageKey: pageKey,
+          search: searchKeyword);
     });
   }
 
-  ScrollController _scrollController = new ScrollController();
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +60,8 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                   onSubmitted: (value) {
                     setState(() {
                       searchKeyword = searchController.text;
-                      currentPage = 1;
-                      nextPage = currentPage + 1;
                       isSearchIcon = false;
+                      _pagingController.refresh();
                     });
                   },
                   cursorColor: primaryAccentColor,
@@ -77,9 +73,8 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                               FocusScope.of(context).unfocus();
                               setState(() {
                                 searchKeyword = searchController.text;
-                                currentPage = 1;
-                                nextPage = currentPage + 1;
                                 isSearchIcon = false;
+                                _pagingController.refresh();
                               });
                             },
                             icon: Icon(
@@ -92,10 +87,9 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                               FocusScope.of(context).unfocus();
                               setState(() {
                                 isSearchIcon = true;
-                                currentPage = 1;
-                                nextPage = currentPage + 1;
                                 searchController.text = '';
                                 searchKeyword = searchController.text;
+                                _pagingController.refresh();
                               });
                               //TODO Execute search
                             },
@@ -133,58 +127,13 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                   height: hp * 0.02,
                 ),
                 Expanded(
-                  child: FutureBuilder(
-                    future: Provider.of<GameProvider>(context)
-                        .getGame(page: currentPage, search: searchKeyword),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (Provider.of<GameProvider>(context).games.length ==
-                          0) {
-                        return Container(
-                          height: hp * 0.6,
-                          child: Center(
-                            child: SpinKitFadingCircle(
-                              color: primaryAccentColor,
-                              size: 60.0,
-                            ),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        controller: _scrollController,
-                        primary: false,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(top: 10, left: 2, right: 2),
-                        itemCount:
-                            Provider.of<GameProvider>(context).games.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index ==
-                                  Provider.of<GameProvider>(context)
-                                          .games
-                                          .length -
-                                      1 &&
-                              Provider.of<GameProvider>(context).games.length ==
-                                  currentPage * 30) {
-                            return Column(
-                              children: [
-                                PS4GameCard(
-                                  index: index,
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                CupertinoActivityIndicator(),
-                                SizedBox(
-                                  height: 50,
-                                )
-                              ],
-                            );
-                          }
-                          return PS4GameCard(
-                            index: index,
-                          );
-                        },
-                      );
-                    },
+                  child: PagedListView<int, GameModel>(
+                    pagingController: _pagingController,
+                    builderDelegate: PagedChildBuilderDelegate<GameModel>(
+                      itemBuilder: (context, item, index) => PS4GameCard(
+                        game: item,
+                      ),
+                    ),
                   ),
                 ),
               ],

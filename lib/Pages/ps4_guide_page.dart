@@ -4,7 +4,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/ps4_guide_card.dart';
@@ -124,10 +124,11 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                 height: 10,
               ),
               FutureBuilder(
-                future: Provider.of<GuideProvider>(context)
+                future: Provider.of<PS4GuideProvider>(context)
                     .getGuide(gameName: widget.game.gameName),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (Provider.of<GuideProvider>(context).guide.length == 0) {
+                  if (Provider.of<PS4GuideProvider>(context).guide.length ==
+                      0) {
                     return Container(
                       height: hp * 0.6,
                       child: Center(
@@ -142,11 +143,12 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                     primary: false,
                     shrinkWrap: true,
                     padding: EdgeInsets.only(top: 10, left: 2, right: 2),
-                    itemCount: Provider.of<GuideProvider>(context).guide.length,
+                    itemCount:
+                        Provider.of<PS4GuideProvider>(context).guide.length,
                     itemBuilder: (BuildContext context, int index) {
                       bool isCompleted = false;
                       bool isStarred = false;
-                      String trophyName = Provider.of<GuideProvider>(context)
+                      String trophyName = Provider.of<PS4GuideProvider>(context)
                           .guide[index]
                           .trophyName;
                       for (GuideModel guide

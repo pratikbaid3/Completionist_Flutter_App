@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -59,7 +59,7 @@ class _MyGamesPageState extends State<MyGamesPage> {
                             margin: new EdgeInsets.symmetric(vertical: 10.0),
                             child: GestureDetector(
                               onTap: () {
-                                Provider.of<GuideProvider>(context,
+                                Provider.of<PS4GuideProvider>(context,
                                         listen: false)
                                     .clearGuideList();
                                 Navigator.of(context)

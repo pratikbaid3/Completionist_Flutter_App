@@ -24,8 +24,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => Ps4GuidePage(game: args),
       );
       break;
-    default:
-      return MaterialPageRoute(builder: (context) => NavDrawerPage());
-      break;
+    // default:
+    //   return MaterialPageRoute(builder: (context) => NavDrawerPage());
+    //   break;
   }
 }

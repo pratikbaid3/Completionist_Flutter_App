@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -59,7 +59,8 @@ class _DashboardState extends State<Dashboard> {
                         builder: (BuildContext context) {
                           return GestureDetector(
                             onTap: () {
-                              Provider.of<GuideProvider>(context, listen: false)
+                              Provider.of<PS4GuideProvider>(context,
+                                      listen: false)
                                   .clearGuideList();
                               Navigator.of(context)
                                   .pushNamed(guidePageRoute, arguments: i)

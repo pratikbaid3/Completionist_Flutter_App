@@ -6,7 +6,7 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
@@ -63,7 +63,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                   ),
                   onPressed: () {
                     GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
+                        Provider.of<PS4GuideProvider>(context, listen: false)
                             .guide[widget.index];
                     guide.gameName = widget.game.gameName;
                     guide.gameImgUrl = widget.game.gameImageUrl;
@@ -75,7 +75,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Starred',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been starred",
+                        "${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been starred",
                         wp);
                   },
                 )
@@ -89,7 +89,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                   ),
                   onPressed: () {
                     GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
+                        Provider.of<PS4GuideProvider>(context, listen: false)
                             .guide[widget.index];
                     guide.gameName = widget.game.gameName;
                     guide.gameImgUrl = widget.game.gameImageUrl;
@@ -101,7 +101,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Un-Starred',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-starred",
+                        "${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-starred",
                         wp);
                   },
                 ),
@@ -120,7 +120,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                   ),
                   onPressed: () {
                     GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
+                        Provider.of<PS4GuideProvider>(context, listen: false)
                             .guide[widget.index];
                     guide.gameName = widget.game.gameName;
                     guide.gameImgUrl = widget.game.gameImageUrl;
@@ -132,7 +132,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Completed',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been completed",
+                        "${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been completed",
                         wp);
                   },
                 )
@@ -146,7 +146,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                   ),
                   onPressed: () {
                     GuideModel guide =
-                        Provider.of<GuideProvider>(context, listen: false)
+                        Provider.of<PS4GuideProvider>(context, listen: false)
                             .guide[widget.index];
                     guide.gameName = widget.game.gameName;
                     guide.gameImgUrl = widget.game.gameImageUrl;
@@ -158,7 +158,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                     snackBar(
                         context,
                         'Un-Completed',
-                        "${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-completed",
+                        "${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyName} has been un-completed",
                         wp);
                   },
                 ),
@@ -179,12 +179,12 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               Icon(
                 LineAwesomeIcons.trophy,
                 size: 30,
-                color: (Provider.of<GuideProvider>(context)
+                color: (Provider.of<PS4GuideProvider>(context)
                             .guide[widget.index]
                             .trophyType ==
                         'BRONZE')
                     ? bronzeColor
-                    : ((Provider.of<GuideProvider>(context)
+                    : ((Provider.of<PS4GuideProvider>(context)
                                 .guide[widget.index]
                                 .trophyType ==
                             'SILVER')
@@ -211,7 +211,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                         right:
                             new BorderSide(width: 1.0, color: Colors.white24))),
                 child: CachedNetworkImage(
-                  imageUrl: Provider.of<GuideProvider>(context)
+                  imageUrl: Provider.of<PS4GuideProvider>(context)
                       .guide[widget.index]
                       .trophyImage,
                   placeholder: (context, url) => new CircularProgressIndicator(
@@ -220,7 +220,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                   errorWidget: (context, url, error) => new Icon(Icons.error),
                 )),
             title: Text(
-              '${Provider.of<GuideProvider>(context).guide[widget.index].trophyName}',
+              '${Provider.of<PS4GuideProvider>(context).guide[widget.index].trophyName}',
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
@@ -230,7 +230,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Provider.of<GuideProvider>(context, listen: false)
+                    Provider.of<PS4GuideProvider>(context, listen: false)
                         .guide[widget.index]
                         .trophyDescription,
                     textAlign: TextAlign.start,
@@ -248,7 +248,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                 borderRadius: BorderRadius.circular(0),
               ),
               child: HtmlWidget(
-                '''${Provider.of<GuideProvider>(context, listen: false).guide[widget.index].trophyGuide}''',
+                '''${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyGuide}''',
                 textStyle: TextStyle(fontSize: 15),
                 webView: true,
               ),
