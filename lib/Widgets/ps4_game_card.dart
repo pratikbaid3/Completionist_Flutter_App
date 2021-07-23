@@ -1,16 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:game_trophy_manager/Provider/game_provider.dart';
-import 'package:game_trophy_manager/Provider/guide_provider.dart';
+import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class PS4GameCard extends StatelessWidget {
-  int index;
+  GameModel game;
 
-  PS4GameCard({@required this.index});
+  PS4GameCard({@required this.game});
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +24,10 @@ class PS4GameCard extends StatelessWidget {
       margin: new EdgeInsets.symmetric(vertical: 10.0),
       child: GestureDetector(
         onTap: () {
-          Provider.of<GuideProvider>(context, listen: false).clearGuideList();
+          Provider.of<PS4GuideProvider>(context, listen: false)
+              .clearGuideList();
           Navigator.of(context)
-              .pushNamed(guidePageRoute,
-                  arguments: Provider.of<GameProvider>(context, listen: false)
-                      .games[index])
+              .pushNamed(guidePageRoute, arguments: game)
               .then((value) {});
         },
         child: Container(
@@ -45,12 +45,9 @@ class PS4GameCard extends StatelessWidget {
                         right:
                             new BorderSide(width: 1.0, color: Colors.white24))),
                 child: Hero(
-                  tag:
-                      '${Provider.of<GameProvider>(context).games[index].gameName}',
+                  tag: '${game.gameName}',
                   child: CachedNetworkImage(
-                    imageUrl: Provider.of<GameProvider>(context)
-                        .games[index]
-                        .gameImageUrl,
+                    imageUrl: game.gameImageUrl,
                     placeholder: (context, url) =>
                         new CircularProgressIndicator(
                       backgroundColor: primaryAccentColor,
@@ -59,7 +56,7 @@ class PS4GameCard extends StatelessWidget {
                   ),
                 )),
             title: Text(
-              '${Provider.of<GameProvider>(context).games[index].gameName}',
+              '${game.gameName}',
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
@@ -77,10 +74,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' +
-                            Provider.of<GameProvider>(context)
-                                .games[index]
-                                .gold,
+                        ' ' + game.gold,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -99,10 +93,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' +
-                            Provider.of<GameProvider>(context)
-                                .games[index]
-                                .silver,
+                        ' ' + game.silver,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -121,10 +112,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' +
-                            Provider.of<GameProvider>(context)
-                                .games[index]
-                                .bronze,
+                        ' ' + game.bronze,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

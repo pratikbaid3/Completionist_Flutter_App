@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
-import 'package:game_trophy_manager/Pages/guide_page.dart';
+import 'package:game_trophy_manager/Pages/ps4_guide_page.dart';
 import 'package:game_trophy_manager/Pages/nav_drawer.dart';
 import 'package:game_trophy_manager/Pages/splash_page.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
@@ -21,11 +21,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case guidePageRoute:
       return MaterialPageRoute(
-        builder: (context) => GuidePage(game: args),
+        builder: (context) => Ps4GuidePage(game: args),
       );
       break;
-    default:
-      return MaterialPageRoute(builder: (context) => Dashboard());
-      break;
+    // default:
+    //   return MaterialPageRoute(builder: (context) => NavDrawerPage());
+    //   break;
   }
 }
