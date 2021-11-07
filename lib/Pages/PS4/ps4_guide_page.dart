@@ -25,7 +25,7 @@ class Ps4GuidePage extends StatefulWidget {
 class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isExpanded = false;
   bool isGameAdded = false;
-  GameGuideFilterEnum filter = GameGuideFilterEnum.Completed;
+  GameGuideFilterEnum filter = GameGuideFilterEnum.All;
 
   @override
   void initState() {
