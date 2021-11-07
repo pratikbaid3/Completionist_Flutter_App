@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_trophy_manager/Pages/all_ps4_games_page.dart';
-import 'package:game_trophy_manager/Pages/all_xbox_games_page.dart';
+import 'package:game_trophy_manager/Pages/PS4/ps4_games_page.dart';
+import 'package:game_trophy_manager/Pages/Xbox/xbox_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:game_trophy_manager/Model/Enum/game_guide_filter_enum.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
@@ -24,6 +25,7 @@ class Ps4GuidePage extends StatefulWidget {
 class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isExpanded = false;
   bool isGameAdded = false;
+  GameGuideFilterEnum filter = GameGuideFilterEnum.Completed;
 
   @override
   void initState() {
@@ -123,6 +125,43 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
               SizedBox(
                 height: 10,
               ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    width: double.infinity,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: secondaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<GameGuideFilterEnum>(
+                        dropdownColor: primaryAccentColor,
+                        focusColor: primaryAccentColor,
+                        value: filter,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        iconEnabledColor: Colors.white,
+                        items: GameGuideFilterEnum.values
+                            .map((GameGuideFilterEnum filterType) {
+                          return DropdownMenuItem<GameGuideFilterEnum>(
+                              value: filterType,
+                              child: Text(filterType.toString().split('.')[1]));
+                        }).toList(),
+                        onChanged: (GameGuideFilterEnum value) {
+                          setState(() {
+                            filter = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               FutureBuilder(
                 future: Provider.of<PS4GuideProvider>(context)
                     .getGuide(gameName: widget.game.gameName),
@@ -151,6 +190,8 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                       String trophyName = Provider.of<PS4GuideProvider>(context)
                           .guide[index]
                           .trophyName;
+
+                      //Filter through internal DB to check which trophies are completed
                       for (GuideModel guide
                           in Provider.of<InternalDbProvider>(context)
                               .myCompletedTrophy) {
@@ -158,6 +199,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                           isCompleted = true;
                         }
                       }
+                      //Filter through internal DB to check which trophies are starred
                       for (GuideModel guide
                           in Provider.of<InternalDbProvider>(context)
                               .myStarredTrophy) {
@@ -165,12 +207,36 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                           isStarred = true;
                         }
                       }
-                      return PS4GuideCard(
-                        index: index,
-                        game: widget.game,
-                        isStarred: isStarred,
-                        isCompleted: isCompleted,
-                      );
+
+                      //Applying the filter from the dropdown
+                      if (filter == GameGuideFilterEnum.Completed &&
+                          isCompleted) {
+                        //If the filter is set to Completed and the trophy has been marked as completed
+                        return PS4GuideCard(
+                          index: index,
+                          game: widget.game,
+                          isStarred: isStarred,
+                          isCompleted: isCompleted,
+                        );
+                      } else if (filter == GameGuideFilterEnum.Incomplete &&
+                          !isCompleted) {
+                        //If the filter is set to Incomplete and the trophy has been marked as incomplete
+                        return PS4GuideCard(
+                          index: index,
+                          game: widget.game,
+                          isStarred: isStarred,
+                          isCompleted: isCompleted,
+                        );
+                      } else if (filter == GameGuideFilterEnum.All) {
+                        //If the filter is set to all
+                        return PS4GuideCard(
+                          index: index,
+                          game: widget.game,
+                          isStarred: isStarred,
+                          isCompleted: isCompleted,
+                        );
+                      }
+                      return Container();
                     },
                   );
                 },
