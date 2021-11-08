@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
-import 'package:game_trophy_manager/Pages/ps4_guide_page.dart';
+import 'package:game_trophy_manager/Pages/PS4/ps4_guide_page.dart';
 import 'package:game_trophy_manager/Pages/nav_drawer.dart';
 import 'package:game_trophy_manager/Pages/splash_page.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
