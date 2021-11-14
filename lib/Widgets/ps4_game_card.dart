@@ -1,17 +1,49 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class PS4GameCard extends StatelessWidget {
+class PS4GameCard extends StatefulWidget {
   GameModel game;
 
   PS4GameCard({@required this.game});
+
+  @override
+  State<PS4GameCard> createState() => _PS4GameCardState();
+}
+
+class _PS4GameCardState extends State<PS4GameCard> {
+  InterstitialAd interstitialAd;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final adState = Provider.of<AdStateProvider>(context);
+    adState.initialization.then((status) {
+      setState(() {
+        InterstitialAd.load(
+          adUnitId: adState.interstitialAdUnitId,
+          request: AdRequest(),
+          adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (InterstitialAd ad) {
+              interstitialAd = ad;
+            },
+            onAdFailedToLoad: (LoadAdError error) {
+              print('InterstitialAd failed to load: $error');
+            },
+          ),
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +59,10 @@ class PS4GameCard extends StatelessWidget {
           Provider.of<PS4GuideProvider>(context, listen: false)
               .clearGuideList();
           Navigator.of(context)
-              .pushNamed(guidePageRoute, arguments: game)
-              .then((value) {});
+              .pushNamed(guidePageRoute, arguments: widget.game)
+              .then((value) {
+            interstitialAd.show();
+          });
         },
         child: Container(
           decoration: BoxDecoration(
@@ -45,9 +79,9 @@ class PS4GameCard extends StatelessWidget {
                         right:
                             new BorderSide(width: 1.0, color: Colors.white24))),
                 child: Hero(
-                  tag: '${game.gameName}',
+                  tag: '${widget.game.gameName}',
                   child: CachedNetworkImage(
-                    imageUrl: game.gameImageUrl,
+                    imageUrl: widget.game.gameImageUrl,
                     placeholder: (context, url) =>
                         new CircularProgressIndicator(
                       backgroundColor: primaryAccentColor,
@@ -56,7 +90,7 @@ class PS4GameCard extends StatelessWidget {
                   ),
                 )),
             title: Text(
-              '${game.gameName}',
+              '${widget.game.gameName}',
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
@@ -74,7 +108,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' + game.gold,
+                        ' ' + widget.game.gold,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -93,7 +127,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' + game.silver,
+                        ' ' + widget.game.silver,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -112,7 +146,7 @@ class PS4GameCard extends StatelessWidget {
                         size: 25,
                       ),
                       Text(
-                        ' ' + game.bronze,
+                        ' ' + widget.game.bronze,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

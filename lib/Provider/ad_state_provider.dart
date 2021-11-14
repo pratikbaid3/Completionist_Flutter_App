@@ -19,6 +19,17 @@ class AdStateProvider {
           ? 'ca-app-pub-3940256099942544/2934735716'
           : 'ca-app-pub-9881507895831818/2136260901';
 
+  //Inline Banner
+  //Android: ca-app-pub-9881507895831818/7577570754
+  //iOS: ca-app-pub-9881507895831818/9796023068
+  String get inlineBannerAdUnitId => Platform.isAndroid
+      ? isTestEnv
+          ? 'ca-app-pub-3940256099942544/6300978111'
+          : 'ca-app-pub-9881507895831818/7577570754'
+      : isTestEnv
+          ? 'ca-app-pub-3940256099942544/2934735716'
+          : 'ca-app-pub-9881507895831818/9796023068';
+
   //Interstitial
   //Android: ca-app-pub-9881507895831818/3788269832
   //iOS: ca-app-pub-9881507895831818/8973131997

@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
 import 'package:game_trophy_manager/Widgets/ps4_game_card.dart';
 import 'package:game_trophy_manager/Provider/ps4_game_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
@@ -19,10 +21,14 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   TextEditingController searchController = new TextEditingController();
   bool isSearchIcon = true;
   String searchKeyword = '';
+  BannerAd bannerAd;
+  BannerAd inlineBannerAd;
 
   @override
   void dispose() {
     // TODO: implement dispose
+    bannerAd.dispose();
+    inlineBannerAd.dispose();
     super.dispose();
   }
 
@@ -41,8 +47,24 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
-
     super.didChangeDependencies();
+    final adState = Provider.of<AdStateProvider>(context);
+    adState.initialization.then((status) {
+      setState(() {
+        bannerAd = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          request: AdRequest(),
+          listener: BannerAdListener(),
+        )..load();
+        inlineBannerAd = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          request: AdRequest(),
+          listener: BannerAdListener(),
+        )..load();
+      });
+    });
   }
 
   @override
@@ -123,9 +145,21 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                         left: 20, bottom: 20, top: 20, right: 20),
                   ),
                 ),
-                SizedBox(
-                  height: hp * 0.02,
-                ),
+                (bannerAd != null)
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(width: double.infinity, height: 20),
+                          Container(
+                            alignment: Alignment.center,
+                            child: AdWidget(ad: bannerAd),
+                            width: bannerAd.size.width.toDouble(),
+                            height: bannerAd.size.height.toDouble(),
+                          ),
+                          Container(width: double.infinity, height: 10),
+                        ],
+                      )
+                    : Container(),
                 Expanded(
                   child: PagedListView<int, GameModel>(
                     pagingController: _pagingController,
