@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -18,15 +20,29 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  BannerAd bannerAd;
+
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final adState = Provider.of<AdStateProvider>(context);
+    adState.initialization.then((status) {
+      setState(() {
+        bannerAd = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          request: AdRequest(),
+          listener: BannerAdListener(),
+        )..load();
+      });
+    });
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    bannerAd.dispose();
     super.dispose();
   }
 
@@ -137,19 +153,21 @@ class _DashboardState extends State<Dashboard> {
                       );
                     }).toList(),
                   ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 5,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [],
-              ),
-            ),
+            (bannerAd != null)
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(width: double.infinity, height: 10),
+                      Container(
+                        alignment: Alignment.center,
+                        child: AdWidget(ad: bannerAd),
+                        width: bannerAd.size.width.toDouble(),
+                        height: bannerAd.size.height.toDouble(),
+                      ),
+                      Container(width: double.infinity, height: 10),
+                    ],
+                  )
+                : Container(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
               child: Row(

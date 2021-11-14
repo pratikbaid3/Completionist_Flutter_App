@@ -43,5 +43,14 @@
 		<false/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>GADApplicationIdentifier</key>
+        <string>ca-app-pub-9881507895831818~3014228304</string>
+        <key>SKAdNetworkItems</key>
+        <array>
+            <dict>
+                <key>SKAdNetworkIdentifier</key>
+                <string>cstr6suwn9.skadnetwork</string>
+            </dict>
+        </array>
 	</dict>
 </plist>
