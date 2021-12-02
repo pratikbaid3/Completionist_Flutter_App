@@ -5,10 +5,14 @@ import 'package:game_trophy_manager/Pages/Xbox/xbox_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
+import 'package:game_trophy_manager/Pages/Store/store_page.dart';
+import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
+import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
 import 'my_games_page.dart';
@@ -19,6 +23,18 @@ class NavDrawerPage extends StatefulWidget {
 }
 
 class _NavDrawerPageState extends State<NavDrawerPage> {
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    Provider.of<InAppPurchaseProvider>(context, listen: false)
+        .initializeInAppPurchase(context);
+    Future.delayed(const Duration(seconds: 1), () {
+      Provider.of<InAppPurchaseProvider>(context, listen: false)
+          .getPastPurchases();
+    });
+    super.didChangeDependencies();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +74,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             break;
           case 5:
             screenCurrent = MyStarredTrophyPage();
+            break;
+          case 6:
+            screenCurrent = StorePage();
             break;
         }
 
@@ -187,11 +206,17 @@ class _MenuState extends State<Menu> {
                 },
                 title: 'Starred'),
             NavDrawerListTile(
-                icon: Icons.info,
+                icon: Icons.shop,
                 onTap: () {
-                  controller.toggle();
+                  Navigator.of(context).pushNamed(storePageRoute);
                 },
-                title: 'About'),
+                title: 'Store'),
+            // NavDrawerListTile(
+            //     icon: Icons.info,
+            //     onTap: () {
+            //       controller.toggle();
+            //     },
+            //     title: 'About'),
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
+import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -26,23 +27,33 @@ class _PS4GameCardState extends State<PS4GameCard> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    final adState = Provider.of<AdStateProvider>(context);
-    adState.initialization.then((status) {
-      setState(() {
-        InterstitialAd.load(
-          adUnitId: adState.interstitialAdUnitId,
-          request: AdRequest(),
-          adLoadCallback: InterstitialAdLoadCallback(
-            onAdLoaded: (InterstitialAd ad) {
-              interstitialAd = ad;
-            },
-            onAdFailedToLoad: (LoadAdError error) {
-              print('InterstitialAd failed to load: $error');
-            },
-          ),
-        );
+    if (!Provider.of<InAppPurchaseProvider>(context)
+        .isPremiumVersionPurchased) {
+      final adState = Provider.of<AdStateProvider>(context);
+      adState.initialization.then((status) {
+        setState(() {
+          InterstitialAd.load(
+            adUnitId: adState.interstitialAdUnitId,
+            request: AdRequest(),
+            adLoadCallback: InterstitialAdLoadCallback(
+              onAdLoaded: (InterstitialAd ad) {
+                interstitialAd = ad;
+              },
+              onAdFailedToLoad: (LoadAdError error) {
+                print('InterstitialAd failed to load: $error');
+              },
+            ),
+          );
+        });
       });
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    interstitialAd.dispose();
+    super.dispose();
   }
 
   @override
@@ -61,7 +72,11 @@ class _PS4GameCardState extends State<PS4GameCard> {
           Navigator.of(context)
               .pushNamed(guidePageRoute, arguments: widget.game)
               .then((value) {
-            interstitialAd.show();
+            if (interstitialAd != null &&
+                !Provider.of<InAppPurchaseProvider>(context)
+                    .isPremiumVersionPurchased) {
+              interstitialAd.show();
+            }
           });
         },
         child: Container(

@@ -6,6 +6,7 @@ import 'package:game_trophy_manager/Model/Enum/game_guide_filter_enum.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
+import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -29,7 +30,6 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isGameAdded = false;
   GameGuideFilterEnum filter = GameGuideFilterEnum.All;
   BannerAd bannerAd;
-  BannerAd inlineBannerAd;
 
   @override
   void initState() {
@@ -55,29 +55,25 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     final adState = Provider.of<AdStateProvider>(context);
-    adState.initialization.then((status) {
-      setState(() {
-        bannerAd = BannerAd(
-          adUnitId: adState.bannerAdUnitId,
-          size: AdSize.banner,
-          request: AdRequest(),
-          listener: BannerAdListener(),
-        )..load();
-        inlineBannerAd = BannerAd(
-          adUnitId: adState.bannerAdUnitId,
-          size: AdSize.banner,
-          request: AdRequest(),
-          listener: BannerAdListener(),
-        )..load();
+    if (!Provider.of<InAppPurchaseProvider>(context)
+        .isPremiumVersionPurchased) {
+      adState.initialization.then((status) {
+        setState(() {
+          bannerAd = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: BannerAdListener(),
+          )..load();
+        });
       });
-    });
+    }
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     bannerAd.dispose();
-    inlineBannerAd.dispose();
     super.dispose();
   }
 
@@ -197,7 +193,9 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                   ),
                 ],
               ),
-              (bannerAd != null)
+              (bannerAd != null &&
+                      !Provider.of<InAppPurchaseProvider>(context)
+                          .isPremiumVersionPurchased)
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -279,34 +277,11 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                         );
                       } else if (filter == GameGuideFilterEnum.All) {
                         //If the filter is set to all
-                        return Column(
-                          children: [
-                            PS4GuideCard(
-                              index: index,
-                              game: widget.game,
-                              isStarred: isStarred,
-                              isCompleted: isCompleted,
-                            ),
-                            (inlineBannerAd != null && index == 4)
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                          width: double.infinity, height: 10),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        child: AdWidget(ad: inlineBannerAd),
-                                        width: inlineBannerAd.size.width
-                                            .toDouble(),
-                                        height: bannerAd.size.height.toDouble(),
-                                      ),
-                                      Container(
-                                          width: double.infinity, height: 10),
-                                    ],
-                                  )
-                                : Container(),
-                          ],
+                        return PS4GuideCard(
+                          index: index,
+                          game: widget.game,
+                          isStarred: isStarred,
+                          isCompleted: isCompleted,
                         );
                       }
                       return Container();

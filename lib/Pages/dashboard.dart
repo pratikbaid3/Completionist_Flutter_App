@@ -6,6 +6,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
+import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
@@ -27,17 +28,20 @@ class _DashboardState extends State<Dashboard> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    final adState = Provider.of<AdStateProvider>(context);
-    adState.initialization.then((status) {
-      setState(() {
-        bannerAd = BannerAd(
-          adUnitId: adState.bannerAdUnitId,
-          size: AdSize.banner,
-          request: AdRequest(),
-          listener: BannerAdListener(),
-        )..load();
+    if (!Provider.of<InAppPurchaseProvider>(context)
+        .isPremiumVersionPurchased) {
+      final adState = Provider.of<AdStateProvider>(context);
+      adState.initialization.then((status) {
+        setState(() {
+          bannerAd = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: BannerAdListener(),
+          )..load();
+        });
       });
-    });
+    }
   }
 
   @override
@@ -154,7 +158,9 @@ class _DashboardState extends State<Dashboard> {
                       );
                     }).toList(),
                   ),
-            (bannerAd != null)
+            (bannerAd != null &&
+                    !Provider.of<InAppPurchaseProvider>(context)
+                        .isPremiumVersionPurchased)
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
