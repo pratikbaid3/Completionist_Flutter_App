@@ -73,7 +73,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
               .pushNamed(guidePageRoute, arguments: widget.game)
               .then((value) {
             if (interstitialAd != null &&
-                !Provider.of<InAppPurchaseProvider>(context)
+                !Provider.of<InAppPurchaseProvider>(context, listen: false)
                     .isPremiumVersionPurchased) {
               interstitialAd.show();
             }
