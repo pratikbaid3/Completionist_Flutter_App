@@ -60,12 +60,6 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
             request: AdRequest(),
             listener: BannerAdListener(),
           )..load();
-          // inlineBannerAd = BannerAd(
-          //   adUnitId: adState.bannerAdUnitId,
-          //   size: AdSize.banner,
-          //   request: AdRequest(),
-          //   listener: BannerAdListener(),
-          // )..load();
         });
       });
     }
@@ -78,108 +72,109 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
     return KeyboardDismissOnTap(
       child: Scaffold(
         body: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: wp * 0.03, vertical: hp * 0.03),
-            child: Column(
-              children: [
-                TextField(
-                  onSubmitted: (value) {
-                    setState(() {
-                      searchKeyword = searchController.text;
-                      isSearchIcon = false;
-                      _pagingController.refresh();
-                    });
-                  },
-                  cursorColor: primaryAccentColor,
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    suffixIcon: (isSearchIcon)
-                        ? IconButton(
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              setState(() {
-                                searchKeyword = searchController.text;
-                                isSearchIcon = false;
-                                _pagingController.refresh();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.search,
-                              color: Colors.white54,
-                            ),
-                          )
-                        : IconButton(
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              setState(() {
-                                isSearchIcon = true;
-                                searchController.text = '';
-                                searchKeyword = searchController.text;
-                                _pagingController.refresh();
-                              });
-                              //TODO Execute search
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              color: Colors.white54,
-                            ),
+          padding:
+              EdgeInsets.symmetric(horizontal: wp * 0.03, vertical: hp * 0.03),
+          child: Column(
+            children: [
+              TextField(
+                onSubmitted: (value) {
+                  setState(() {
+                    searchKeyword = searchController.text;
+                    isSearchIcon = false;
+                    _pagingController.refresh();
+                  });
+                },
+                cursorColor: primaryAccentColor,
+                controller: searchController,
+                decoration: InputDecoration(
+                  suffixIcon: (isSearchIcon)
+                      ? IconButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              searchKeyword = searchController.text;
+                              isSearchIcon = false;
+                              _pagingController.refresh();
+                            });
+                          },
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.white54,
                           ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: primaryAccentColor,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: primaryColor,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: secondaryColor,
-                    hintText: "Search",
-                    contentPadding: EdgeInsets.only(
-                        left: 20, bottom: 20, top: 20, right: 20),
-                  ),
-                ),
-                (bannerAd != null &&
-                        !Provider.of<InAppPurchaseProvider>(context)
-                            .isPremiumVersionPurchased)
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(width: double.infinity, height: 20),
-                          Container(
-                            alignment: Alignment.center,
-                            child: AdWidget(ad: bannerAd),
-                            width: bannerAd.size.width.toDouble(),
-                            height: bannerAd.size.height.toDouble(),
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              isSearchIcon = true;
+                              searchController.text = '';
+                              searchKeyword = searchController.text;
+                              _pagingController.refresh();
+                            });
+                            //TODO Execute search
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.white54,
                           ),
-                          Container(width: double.infinity, height: 10),
-                        ],
-                      )
-                    : Container(
-                        height: 20,
-                      ),
-                Expanded(
-                  child: PagedListView<int, GameModel>(
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<GameModel>(
-                      itemBuilder: (context, item, index) => PS4GameCard(
-                        game: item,
-                      ),
+                        ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: primaryAccentColor,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
                     ),
                   ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: primaryColor,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: secondaryColor,
+                  hintText: "Search",
+                  contentPadding:
+                      EdgeInsets.only(left: 20, bottom: 20, top: 20, right: 20),
                 ),
-              ],
-            )),
+              ),
+              (bannerAd != null &&
+                      !Provider.of<InAppPurchaseProvider>(context)
+                          .isPremiumVersionPurchased)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(width: double.infinity, height: 20),
+                        Container(
+                          alignment: Alignment.center,
+                          child: AdWidget(ad: bannerAd),
+                          width: bannerAd.size.width.toDouble(),
+                          height: bannerAd.size.height.toDouble(),
+                        ),
+                        Container(width: double.infinity, height: 10),
+                      ],
+                    )
+                  : Container(
+                      height: 20,
+                    ),
+              Expanded(
+                child: PagedListView<int, GameModel>(
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<GameModel>(
+                    itemBuilder: (context, item, index) => PS4GameCard(
+                      game: item,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

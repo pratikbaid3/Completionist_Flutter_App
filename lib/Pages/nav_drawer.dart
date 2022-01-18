@@ -10,8 +10,10 @@ import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
+import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
@@ -80,36 +82,58 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
             break;
         }
 
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                controller.toggle();
-              },
-            ),
-            centerTitle: true,
-            backgroundColor: secondaryColor,
-            elevation: 1,
-            actions: [
-              IconButton(
+        return Consumer<InAppPurchaseProvider>(
+            builder: (context, model, child) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
                 icon: Icon(
-                  Icons.share,
+                  Icons.menu,
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  Share.share(
-                      'Completionist: PS4 & Xbox game guide\n Download for FREE and start gaming \nhttps://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
-                      subject: 'Completionist: PS4 & Xbox game guide');
+                  controller.toggle();
                 },
               ),
-            ],
-          ),
-          body: screenCurrent,
-        );
+              centerTitle: true,
+              backgroundColor: secondaryColor,
+              elevation: 1,
+              actions: [
+                FutureBuilder(
+                    future: model.getStoreProducts(context),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data.length != 0) {
+                        List<ProductDetails> products = snapshot.data;
+                        return IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.ad,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            if (model.storeItemList[products[0].id].status ==
+                                'Buy') {
+                              //The product is ready to be purchased
+                              model.makePurchase(products[0]);
+                            } else {
+                              //The product is either ending or already purchased
+                              snackBar(
+                                  context,
+                                  'Already ' +
+                                      model
+                                          .storeItemList[products[0].id].status,
+                                  "Cannot purchase again",
+                                  wp);
+                            }
+                          },
+                        );
+                      }
+                      return Container();
+                    })
+              ],
+            ),
+            body: screenCurrent,
+          );
+        });
       },
     );
   }
@@ -206,17 +230,19 @@ class _MenuState extends State<Menu> {
                 },
                 title: 'Starred'),
             NavDrawerListTile(
+                icon: Icons.share,
+                onTap: () {
+                  Share.share(
+                      'Completionist: PS4 & Xbox game guide\n Download for FREE and start gaming \nhttps://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
+                      subject: 'Completionist: PS4 & Xbox game guide');
+                },
+                title: 'Share'),
+            NavDrawerListTile(
                 icon: Icons.shop,
                 onTap: () {
                   Navigator.of(context).pushNamed(storePageRoute);
                 },
                 title: 'Store'),
-            // NavDrawerListTile(
-            //     icon: Icons.info,
-            //     onTap: () {
-            //       controller.toggle();
-            //     },
-            //     title: 'About'),
           ],
         ),
       ),
