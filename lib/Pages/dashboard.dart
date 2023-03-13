@@ -91,13 +91,12 @@ class _DashboardState extends State<Dashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 30,
-                  ),
+                  SizedBox(height: 20),
                   (Provider.of<InternalDbProvider>(context).myGames.length != 0)
                       ? CarouselSlider(
                           options: CarouselOptions(
-                            viewportFraction: 0.48,
+                            aspectRatio: 16 / 7,
+                            viewportFraction: 0.6,
                             autoPlay: true,
                             enlargeCenterPage: true,
                             autoPlayInterval: Duration(seconds: 2),
@@ -136,6 +135,7 @@ class _DashboardState extends State<Dashboard> {
                                         padding: EdgeInsets.all(15),
                                         child: CachedNetworkImage(
                                           imageUrl: i.gameImageUrl,
+                                          fit: BoxFit.contain,
                                         ),
                                       ),
                                     ),
