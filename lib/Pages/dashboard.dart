@@ -260,17 +260,16 @@ class _DashboardState extends State<Dashboard> {
                         )
                       : Center(
                           child: Showcase(
-                            radius: BorderRadius.circular(18),
-                            shapeBorder: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            showcaseBackgroundColor: Color(0xff1F97F2),
+                            targetBorderRadius: BorderRadius.circular(25),
+                            tooltipBackgroundColor: Color(0xff2096F3),
                             textColor: Colors.white,
                             key: initialGuideKey,
-                            title: 'Games',
+                            title: 'Find Games',
                             description:
                                 'Find your favourite games and add them to your library',
-                            contentPadding: EdgeInsets.all(12),
+                            titlePadding:
+                                EdgeInsets.only(left: 12, right: 12, top: 12),
+                            descriptionPadding: EdgeInsets.all(12),
                             child: Container(
                               margin: EdgeInsets.symmetric(
                                   vertical: 30, horizontal: 30),
@@ -440,7 +439,6 @@ class _DashboardState extends State<Dashboard> {
                                     child: HtmlWidget(
                                       '''${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyGuide}''',
                                       textStyle: TextStyle(fontSize: 15),
-                                      webView: true,
                                     ),
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 30, vertical: 20),

@@ -52,7 +52,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
   @override
   void dispose() {
     // TODO: implement dispose
-    interstitialAd.dispose();
+    if (interstitialAd != null) interstitialAd.dispose();
     super.dispose();
   }
 

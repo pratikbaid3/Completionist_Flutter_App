@@ -76,7 +76,7 @@ class _StoreItemTileState extends State<StoreItemTile> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     // model.changeSpinningState();
                     if (model.storeItemList[widget.product.id].status ==
@@ -93,10 +93,10 @@ class _StoreItemTileState extends State<StoreItemTile> {
                           wp);
                     }
                   },
-                  color: primaryAccentColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  // color: primaryAccentColor,
+                  // shape: RoundedRectangleBorder(
+                  //   borderRadius: BorderRadius.circular(8),
+                  // ),
                   child: Container(
                     child: Column(
                       children: [
