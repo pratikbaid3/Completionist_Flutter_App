@@ -21,6 +21,7 @@ class PS4GameProvider extends ChangeNotifier {
       Dio dio = new Dio();
       response = await dio.get(baseUrl + gamesUrl,
           queryParameters: {"page": pageKey, "search": search});
+      print(response.data);
       List<dynamic> data = response.data['results'];
       List<GameModel> newGames =
           data.map((data) => GameModel.fromJson(data)).toList();

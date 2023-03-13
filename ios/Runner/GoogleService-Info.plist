@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>139921408064-nbnphpq76fitqf3b4sbt0c3ds4vsdp9h.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.139921408064-nbnphpq76fitqf3b4sbt0c3ds4vsdp9h</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDgNGjR_BwqoxkRL9UE3rP0sLJz6LrURLk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>139921408064</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>co.turingcreatives.gameTrophyManager</string>
+	<key>PROJECT_ID</key>
+	<string>completionist-8c940</string>
+	<key>STORAGE_BUCKET</key>
+	<string>completionist-8c940.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:139921408064:ios:713dacf7ab4d5d3f20dfa5</string>
+	<key>ADMOB_APP_ID</key>
+	<string>ca-app-pub-9881507895831818~3014228304</string>
+</dict>
+</plist>

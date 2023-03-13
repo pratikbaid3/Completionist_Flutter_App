@@ -5,11 +5,14 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:game_trophy_manager/Model/Enum/game_guide_filter_enum.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
+import 'package:game_trophy_manager/Provider/ad_state_provider.dart';
+import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/ps4_guide_card.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -26,6 +29,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isExpanded = false;
   bool isGameAdded = false;
   GameGuideFilterEnum filter = GameGuideFilterEnum.All;
+  BannerAd bannerAd;
 
   @override
   void initState() {
@@ -44,6 +48,33 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
         });
       }
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final adState = Provider.of<AdStateProvider>(context);
+    if (!Provider.of<InAppPurchaseProvider>(context)
+        .isPremiumVersionPurchased) {
+      adState.initialization.then((status) {
+        setState(() {
+          bannerAd = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: BannerAdListener(),
+          )..load();
+        });
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    bannerAd.dispose();
+    super.dispose();
   }
 
   @override
@@ -162,6 +193,23 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                   ),
                 ],
               ),
+              (bannerAd != null &&
+                      !Provider.of<InAppPurchaseProvider>(context)
+                          .isPremiumVersionPurchased)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(width: double.infinity, height: 20),
+                        Container(
+                          alignment: Alignment.center,
+                          child: AdWidget(ad: bannerAd),
+                          width: bannerAd.size.width.toDouble(),
+                          height: bannerAd.size.height.toDouble(),
+                        ),
+                        Container(width: double.infinity, height: 10),
+                      ],
+                    )
+                  : Container(),
               FutureBuilder(
                 future: Provider.of<PS4GuideProvider>(context)
                     .getGuide(gameName: widget.game.gameName),
