@@ -96,6 +96,8 @@ class _PS4GameCardState extends State<PS4GameCard> {
                 child: Hero(
                   tag: '${widget.game.gameName}',
                   child: CachedNetworkImage(
+                    width: 80,
+                    height: 80,
                     imageUrl: widget.game.gameImageUrl,
                     placeholder: (context, url) =>
                         new CircularProgressIndicator(
@@ -120,7 +122,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
                       Icon(
                         LineAwesomeIcons.trophy,
                         color: goldenColor,
-                        size: 25,
+                        size: 20,
                       ),
                       Text(
                         ' ' + widget.game.gold,
@@ -139,7 +141,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
                       Icon(
                         LineAwesomeIcons.trophy,
                         color: silverColor,
-                        size: 25,
+                        size: 20,
                       ),
                       Text(
                         ' ' + widget.game.silver,
@@ -158,7 +160,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
                       Icon(
                         LineAwesomeIcons.trophy,
                         color: bronzeColor,
-                        size: 25,
+                        size: 20,
                       ),
                       Text(
                         ' ' + widget.game.bronze,
