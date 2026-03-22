@@ -9,15 +9,15 @@ import 'package:provider/provider.dart';
 
 class PS4GuideCardDashboard extends StatelessWidget {
   const PS4GuideCardDashboard(
-      {Key key,
-      @required this.isExpanded,
-      @required this.index,
-      @required this.onExpanded})
+      {Key? key,
+      required this.isExpanded,
+      required this.index,
+      required this.onExpanded})
       : super(key: key);
 
   final bool isExpanded;
   final int index;
-  final Function onExpanded;
+  final void Function(bool) onExpanded;
 
   @override
   Widget build(BuildContext context) {
@@ -62,19 +62,19 @@ class PS4GuideCardDashboard extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(vertical: 13.0),
           leading: Container(
               padding: EdgeInsets.only(right: 12.0),
-              decoration: new BoxDecoration(
-                border: new Border(
-                  right: new BorderSide(width: 1.0, color: Colors.white24),
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(width: 1.0, color: Colors.white24),
                 ),
               ),
               child: CachedNetworkImage(
                 imageUrl: Provider.of<InternalDbProvider>(context)
                     .myCompletedTrophy[index]
                     .trophyImage,
-                placeholder: (context, url) => new CircularProgressIndicator(
+                placeholder: (context, url) => CircularProgressIndicator(
                   backgroundColor: primaryAccentColor,
                 ),
-                errorWidget: (context, url, error) => new Icon(Icons.error),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               )),
           title: Text(
             '${Provider.of<InternalDbProvider>(context).myCompletedTrophy[index].trophyName}',
@@ -100,7 +100,6 @@ class PS4GuideCardDashboard extends StatelessWidget {
             child: HtmlWidget(
               '''${Provider.of<InternalDbProvider>(context).myCompletedTrophy[index].trophyGuide}''',
               textStyle: TextStyle(fontSize: 15),
-              webView: true,
             ),
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           )

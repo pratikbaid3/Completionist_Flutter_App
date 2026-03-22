@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class InternalDbProvider extends ChangeNotifier {
-  static Database _db;
+  static Database? _db;
   final String dbName = 'Games.db';
   final String myGamesTable = 'MyGames';
   final String myTrophyTable = 'MyTrophy';
@@ -28,10 +28,10 @@ class InternalDbProvider extends ChangeNotifier {
 
   Future<Database> get db async {
     if (_db != null) {
-      return _db;
+      return _db!;
     }
     _db = await initDb();
-    return _db;
+    return _db!;
   }
 
   initDb() async {
@@ -53,7 +53,7 @@ class InternalDbProvider extends ChangeNotifier {
     try {
       String gameName = game.gameName;
       String gameImgUrl = game.gameImageUrl;
-      DateTime now = DateTime.tryParse(DateTime.now().toString());
+      DateTime now = DateTime.now();
       String gold = game.gold;
       String silver = game.silver;
       String bronze = game.bronze;
@@ -94,7 +94,7 @@ class InternalDbProvider extends ChangeNotifier {
       List<Map> result = await dbClient.rawQuery('SELECT * FROM $myGamesTable');
       if (result.length > 0) {
         for (var i in result) {
-          GameModel game = new GameModel(
+          GameModel game = GameModel(
               gameName: i['$gameNameColumn'],
               gameImageUrl: i['$gameImgUrlColumn'],
               gold: i['$goldColumn'] != null ? i['$goldColumn'] : '3',
@@ -118,7 +118,7 @@ class InternalDbProvider extends ChangeNotifier {
       String trophyType = guide.trophyType;
       String trophyDescription = guide.trophyDescription;
       String trophyGuide = guide.trophyGuide;
-      DateTime now = DateTime.tryParse(DateTime.now().toString());
+      DateTime now = DateTime.now();
       var dbClient = await db; //This calls the getter function
       var result = await dbClient.rawInsert(
           'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
@@ -140,7 +140,7 @@ class InternalDbProvider extends ChangeNotifier {
       String trophyType = guide.trophyType;
       String trophyDescription = guide.trophyDescription;
       String trophyGuide = guide.trophyGuide;
-      DateTime now = DateTime.tryParse(DateTime.now().toString());
+      DateTime now = DateTime.now();
       var dbClient = await db; //This calls the getter function
       var result = await dbClient.rawInsert(
           'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
@@ -198,7 +198,7 @@ class InternalDbProvider extends ChangeNotifier {
           'SELECT * FROM $myTrophyTable ORDER BY $dateTimeColumn DESC');
       if (result.length > 0) {
         for (var i in result) {
-          GuideModel guide = new GuideModel(
+          GuideModel guide = GuideModel(
               trophyDescription: i['$trophyDescriptionColumn'],
               trophyGuide: i['$trophyGuideColumn'],
               trophyImage: i['$trophyImageUrlColumn'],

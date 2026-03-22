@@ -19,23 +19,19 @@ class AllPS4GamesPage extends StatefulWidget {
 class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
   final PagingController<int, GameModel> _pagingController =
       PagingController(firstPageKey: 1);
-  TextEditingController searchController = new TextEditingController();
+  TextEditingController searchController = TextEditingController();
   bool isSearchIcon = true;
   String searchKeyword = '';
-  BannerAd bannerAd;
-  // BannerAd inlineBannerAd;
+  BannerAd? bannerAd;
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    bannerAd.dispose();
-    // inlineBannerAd.dispose();
+    bannerAd?.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _pagingController.addPageRequestListener((pageKey) {
       Provider.of<PS4GameProvider>(context, listen: false).getGame(
@@ -47,7 +43,6 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     if (!Provider.of<InAppPurchaseProvider>(context)
         .isPremiumVersionPurchased) {
@@ -111,7 +106,6 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                               searchKeyword = searchController.text;
                               _pagingController.refresh();
                             });
-                            //TODO Execute search
                           },
                           icon: Icon(
                             Icons.close,
@@ -152,9 +146,9 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                         Container(width: double.infinity, height: 20),
                         Container(
                           alignment: Alignment.center,
-                          child: AdWidget(ad: bannerAd),
-                          width: bannerAd.size.width.toDouble(),
-                          height: bannerAd.size.height.toDouble(),
+                          child: AdWidget(ad: bannerAd!),
+                          width: bannerAd!.size.width.toDouble(),
+                          height: bannerAd!.size.height.toDouble(),
                         ),
                         Container(width: double.infinity, height: 10),
                       ],

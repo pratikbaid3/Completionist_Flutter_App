@@ -1,21 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.6.10'
-    repositories {
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
-        classpath 'com.google.gms:google-services:4.3.10'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -27,6 +13,22 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+subprojects {
+    project.plugins.whenPluginAdded { plugin ->
+        if (plugin.class.name == "com.android.build.gradle.LibraryPlugin") {
+            project.android {
+                if (namespace == null || namespace.isEmpty()) {
+                    def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
+                    if (manifestFile.exists()) {
+                        def manifest = new groovy.xml.XmlSlurper().parse(manifestFile)
+                        namespace = manifest.@package.toString()
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
 }

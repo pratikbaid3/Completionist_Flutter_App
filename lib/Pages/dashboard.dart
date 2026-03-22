@@ -24,13 +24,12 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  BuildContext myContext;
-  BannerAd bannerAd;
+  late BuildContext myContext;
+  BannerAd? bannerAd;
   GlobalKey initialGuideKey = GlobalKey();
 
   @override
   void initState() {
-    // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => Future.delayed(
         Duration(milliseconds: 200),
@@ -51,7 +50,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     if (!Provider.of<InAppPurchaseProvider>(context)
         .isPremiumVersionPurchased) {
@@ -71,8 +69,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    bannerAd.dispose();
+    bannerAd?.dispose();
     super.dispose();
   }
 
@@ -198,9 +195,9 @@ class _DashboardState extends State<Dashboard> {
                             Container(width: double.infinity, height: 10),
                             Container(
                               alignment: Alignment.center,
-                              child: AdWidget(ad: bannerAd),
-                              width: bannerAd.size.width.toDouble(),
-                              height: bannerAd.size.height.toDouble(),
+                              child: AdWidget(ad: bannerAd!),
+                              width: bannerAd!.size.width.toDouble(),
+                              height: bannerAd!.size.height.toDouble(),
                             ),
                             Container(width: double.infinity, height: 10),
                           ],
@@ -395,9 +392,9 @@ class _DashboardState extends State<Dashboard> {
                                       EdgeInsets.symmetric(vertical: 13.0),
                                   leading: Container(
                                       padding: EdgeInsets.only(right: 12.0),
-                                      decoration: new BoxDecoration(
-                                          border: new Border(
-                                              right: new BorderSide(
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              right: BorderSide(
                                                   width: 1.0,
                                                   color: Colors.white24))),
                                       child: CachedNetworkImage(
@@ -407,11 +404,11 @@ class _DashboardState extends State<Dashboard> {
                                                 .myStarredTrophy[index]
                                                 .trophyImage,
                                         placeholder: (context, url) =>
-                                            new CircularProgressIndicator(
+                                            CircularProgressIndicator(
                                           backgroundColor: primaryAccentColor,
                                         ),
                                         errorWidget: (context, url, error) =>
-                                            new Icon(Icons.error),
+                                            Icon(Icons.error),
                                       )),
                                   title: Text(
                                     '${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyName}',

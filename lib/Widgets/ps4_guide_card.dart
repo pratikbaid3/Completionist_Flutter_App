@@ -21,10 +21,10 @@ class PS4GuideCard extends StatefulWidget {
   bool isStarred;
 
   PS4GuideCard(
-      {@required this.index,
-      @required this.game,
-      @required this.isCompleted,
-      @required this.isStarred});
+      {required this.index,
+      required this.game,
+      required this.isCompleted,
+      required this.isStarred});
 
   @override
   _PS4GuideCardState createState() => _PS4GuideCardState();
@@ -206,18 +206,18 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
             contentPadding: EdgeInsets.symmetric(vertical: 13.0),
             leading: Container(
                 padding: EdgeInsets.only(right: 12.0),
-                decoration: new BoxDecoration(
-                    border: new Border(
+                decoration: BoxDecoration(
+                    border: Border(
                         right:
-                            new BorderSide(width: 1.0, color: Colors.white24))),
+                            BorderSide(width: 1.0, color: Colors.white24))),
                 child: CachedNetworkImage(
                   imageUrl: Provider.of<PS4GuideProvider>(context)
                       .guide[widget.index]
                       .trophyImage,
-                  placeholder: (context, url) => new CircularProgressIndicator(
+                  placeholder: (context, url) => CircularProgressIndicator(
                     backgroundColor: primaryAccentColor,
                   ),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 )),
             title: Text(
               '${Provider.of<PS4GuideProvider>(context).guide[widget.index].trophyName}',
@@ -250,7 +250,6 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               child: HtmlWidget(
                 '''${Provider.of<PS4GuideProvider>(context, listen: false).guide[widget.index].trophyGuide}''',
                 textStyle: TextStyle(fontSize: 15),
-                webView: true,
               ),
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             )

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -12,12 +11,7 @@ import 'package:provider/provider.dart';
 import 'Provider/ad_state_provider.dart';
 import 'Provider/ps4_game_provider.dart';
 import 'Provider/ps4_guide_provider.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart';
-
 void main() {
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    InAppPurchaseAndroidPlatformAddition.enablePendingPurchases();
-  }
   WidgetsFlutterBinding.ensureInitialized();
   final initFuture = MobileAds.instance.initialize();
   final adStateProvider = AdStateProvider(initialization: initFuture);
@@ -54,7 +48,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData.dark().copyWith(
               primaryColor: primaryColor,
               scaffoldBackgroundColor: primaryColor,
-              accentColor: primaryColor),
+              colorScheme: ColorScheme.dark().copyWith(secondary: primaryColor)),
           onGenerateRoute: router.generateRoute,
           initialRoute: splashScreenRoute,
         ),

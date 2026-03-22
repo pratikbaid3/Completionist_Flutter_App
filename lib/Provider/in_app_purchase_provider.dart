@@ -25,8 +25,9 @@ class InAppPurchaseProvider extends ChangeNotifier {
 
   //Initialize
   void initializeInAppPurchase(BuildContext context) {
-    StreamSubscription<List<PurchaseDetails>> _subscription;
-    final Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
+    late StreamSubscription<List<PurchaseDetails>> _subscription;
+    final Stream<List<PurchaseDetails>> purchaseUpdated =
+        InAppPurchase.instance.purchaseStream;
     _subscription = purchaseUpdated.listen((purchaseDetailsList) {
       _listenToPurchaseUpdated(purchaseDetailsList, context);
     }, onDone: () {
@@ -45,14 +46,14 @@ class InAppPurchaseProvider extends ChangeNotifier {
       if (purchaseDetails.status == PurchaseStatus.pending) {
         //The purchase is pending
         print("--PENDING--");
-        storeItemList[purchaseDetails.productID].status = 'Pending';
+        storeItemList[purchaseDetails.productID]?.status = 'Pending';
         isSpinning = false;
         notifyListeners();
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
           print('--STORE ERROR--');
-          print(purchaseDetails.error.details);
-          print(purchaseDetails.error.message);
+          print(purchaseDetails.error?.details);
+          print(purchaseDetails.error?.message);
           isSpinning = false;
           notifyListeners();
         } else if (purchaseDetails.status == PurchaseStatus.purchased) {
@@ -63,8 +64,8 @@ class InAppPurchaseProvider extends ChangeNotifier {
           await InAppPurchase.instance.completePurchase(purchaseDetails);
         } else if (purchaseDetails.status == PurchaseStatus.restored) {
           print('--PURCHASED PRODUCTS--');
-          storeItemList[purchaseDetails.productID].status = 'Purchased';
-          print(storeItemList[purchaseDetails.productID].name);
+          storeItemList[purchaseDetails.productID]?.status = 'Purchased';
+          print(storeItemList[purchaseDetails.productID]?.name);
           if (purchaseDetails.productID == 'premium_version') {
             //User owns premium version
             isPremiumVersionPurchased = true;
@@ -82,11 +83,13 @@ class InAppPurchaseProvider extends ChangeNotifier {
   }
 
   void deliverProduct(PurchaseDetails purchaseDetails, BuildContext context) {
-    StoreItemModel product = storeItemList[purchaseDetails.productID];
-    if (product.isConsumable) {
-      product.status = 'Buy';
-    } else {
-      product.status = 'Purchased';
+    StoreItemModel? product = storeItemList[purchaseDetails.productID];
+    if (product != null) {
+      if (product.isConsumable) {
+        product.status = 'Buy';
+      } else {
+        product.status = 'Purchased';
+      }
     }
     if (purchaseDetails.productID == 'premium_version') {
       isPremiumVersionPurchased = true;
@@ -99,7 +102,6 @@ class InAppPurchaseProvider extends ChangeNotifier {
     if (!available) {
       print('---STORE ERROR---');
       print('Store unavailable');
-      // Toasts.showFailToast(msg: 'Error', context: context);
       return [];
     } else {
       const Set<String> _kIds = <String>{'premium_version'};
@@ -108,13 +110,12 @@ class InAppPurchaseProvider extends ChangeNotifier {
       if (response.notFoundIDs.isNotEmpty) {
         print('---STORE ERROR NO ITEM---');
         print(response.error.toString());
-        print(response.error.details);
-        // Toasts.showFailToast(msg: 'Error', context: context);
+        print(response.error?.details);
       }
       List<ProductDetails> products = response.productDetails;
       print('--PRODUCTS--');
       for (ProductDetails product in products) {
-        print(storeItemList[product.id].name);
+        print(storeItemList[product.id]?.name);
       }
       return products;
     }
@@ -126,8 +127,8 @@ class InAppPurchaseProvider extends ChangeNotifier {
       notifyListeners();
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: productDetails);
-      StoreItemModel product = storeItemList[productDetails.id];
-      if (product.isConsumable) {
+      StoreItemModel? product = storeItemList[productDetails.id];
+      if (product != null && product.isConsumable) {
         InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
       } else {
         InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);

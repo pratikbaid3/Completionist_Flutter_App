@@ -14,18 +14,17 @@ import 'package:provider/provider.dart';
 class PS4GameCard extends StatefulWidget {
   GameModel game;
 
-  PS4GameCard({@required this.game});
+  PS4GameCard({required this.game});
 
   @override
   State<PS4GameCard> createState() => _PS4GameCardState();
 }
 
 class _PS4GameCardState extends State<PS4GameCard> {
-  InterstitialAd interstitialAd;
+  InterstitialAd? interstitialAd;
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     if (!Provider.of<InAppPurchaseProvider>(context)
         .isPremiumVersionPurchased) {
@@ -51,8 +50,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    if (interstitialAd != null) interstitialAd.dispose();
+    interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -64,7 +62,7 @@ class _PS4GameCardState extends State<PS4GameCard> {
         borderRadius: BorderRadius.circular(10),
       ),
       elevation: 0,
-      margin: new EdgeInsets.symmetric(vertical: 10.0),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
       child: GestureDetector(
         onTap: () {
           Provider.of<PS4GuideProvider>(context, listen: false)
@@ -75,24 +73,24 @@ class _PS4GameCardState extends State<PS4GameCard> {
             if (interstitialAd != null &&
                 !Provider.of<InAppPurchaseProvider>(context, listen: false)
                     .isPremiumVersionPurchased) {
-              interstitialAd.show();
+              interstitialAd!.show();
             }
           });
         },
         child: Container(
           decoration: BoxDecoration(
             color: secondaryColor,
-            borderRadius: new BorderRadius.all(const Radius.circular(10)),
+            borderRadius: BorderRadius.all(const Radius.circular(10)),
           ),
           child: ListTile(
             contentPadding:
                 EdgeInsets.symmetric(horizontal: 20.0, vertical: 13.0),
             leading: Container(
                 padding: EdgeInsets.only(right: 12.0),
-                decoration: new BoxDecoration(
-                    border: new Border(
+                decoration: BoxDecoration(
+                    border: Border(
                         right:
-                            new BorderSide(width: 1.0, color: Colors.white24))),
+                            BorderSide(width: 1.0, color: Colors.white24))),
                 child: Hero(
                   tag: '${widget.game.gameName}',
                   child: CachedNetworkImage(
@@ -100,10 +98,10 @@ class _PS4GameCardState extends State<PS4GameCard> {
                     height: 80,
                     imageUrl: widget.game.gameImageUrl,
                     placeholder: (context, url) =>
-                        new CircularProgressIndicator(
+                        CircularProgressIndicator(
                       backgroundColor: primaryAccentColor,
                     ),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 )),
             title: Text(

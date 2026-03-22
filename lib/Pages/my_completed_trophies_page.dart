@@ -145,7 +145,7 @@ class _MyCompletedTrophyPageState extends State<MyCompletedTrophyPage> {
                                   child: HtmlWidget(
                                     '''${Provider.of<InternalDbProvider>(context).myCompletedTrophy[index].trophyGuide}''',
                                     textStyle: TextStyle(fontSize: 15),
-                                    webView: true,
+                                    // webView: true,
                                   ),
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 30, vertical: 20),

@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Django/cf-api-v2"
+		}
+	],
+	"settings": {}
+}

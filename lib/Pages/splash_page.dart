@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flare_flutter/flare_actor.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void toDashboard() {
-    new Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 4), () {
       Navigator.of(context).popAndPushNamed(homePageRoute);
     });
   }
@@ -35,10 +35,21 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: primaryColor,
       body: Center(
-        child: FlareActor("assets/anim2.flr",
-            alignment: Alignment.center,
-            fit: BoxFit.scaleDown,
-            animation: "Alarm"),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.emoji_events,
+              size: 100,
+              color: primaryAccentColor,
+            ),
+            SizedBox(height: 30),
+            SpinKitFadingCircle(
+              color: primaryAccentColor,
+              size: 50.0,
+            ),
+          ],
+        ),
       ),
     );
   }

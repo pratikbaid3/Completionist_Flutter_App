@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class NavDrawerListTile extends StatelessWidget {
-  Function onTap;
-  IconData icon;
-  String title;
+  final VoidCallback onTap;
+  final IconData icon;
+  final String title;
   NavDrawerListTile(
-      {@required this.icon, @required this.onTap, @required this.title});
+      {required this.icon, required this.onTap, required this.title});
   @override
   Widget build(BuildContext context) {
     return ListTile(

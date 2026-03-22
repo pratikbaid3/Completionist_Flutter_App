@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:share/share.dart';
 
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
 
-  /// you can add more fields that meet your needs
-
-  const BaseAppBar({Key key, this.appBar}) : super(key: key);
+  const BaseAppBar({Key? key, required this.appBar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,5 +16,5 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => new Size.fromHeight(appBar.preferredSize.height);
+  Size get preferredSize => Size.fromHeight(appBar.preferredSize.height);
 }

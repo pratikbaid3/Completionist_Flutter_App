@@ -8,7 +8,7 @@ class PS4GameProvider extends ChangeNotifier {
   Future getGame(
       {int pageKey = 1,
       String search = '',
-      @required PagingController pagingController}) async {
+      required PagingController pagingController}) async {
     try {
       print('--GET GAMES--');
       print(baseUrl +
@@ -18,7 +18,7 @@ class PS4GameProvider extends ChangeNotifier {
           '&search=' +
           search);
       Response response;
-      Dio dio = new Dio();
+      Dio dio = Dio();
       response = await dio.get(baseUrl + gamesUrl,
           queryParameters: {"page": pageKey, "search": search});
       print(response.data);

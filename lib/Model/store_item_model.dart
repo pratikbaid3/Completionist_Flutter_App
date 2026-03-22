@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class StoreItemModel {
   String productId;
   String name;
@@ -8,10 +6,10 @@ class StoreItemModel {
   String status;
   bool isConsumable;
   StoreItemModel(
-      {@required this.productId,
-      @required this.image,
-      @required this.name,
-      @required this.subText,
-      @required this.status,
-      @required this.isConsumable});
+      {required this.productId,
+      required this.image,
+      required this.name,
+      required this.subText,
+      required this.status,
+      required this.isConsumable});
 }

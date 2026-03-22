@@ -19,7 +19,7 @@ import 'package:provider/provider.dart';
 class Ps4GuidePage extends StatefulWidget {
   GameModel game;
 
-  Ps4GuidePage({@required this.game});
+  Ps4GuidePage({required this.game});
 
   @override
   _Ps4GuidePageState createState() => _Ps4GuidePageState();
@@ -29,11 +29,10 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
   bool isExpanded = false;
   bool isGameAdded = false;
   GameGuideFilterEnum filter = GameGuideFilterEnum.All;
-  BannerAd bannerAd;
+  BannerAd? bannerAd;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initializeGameState();
   }
@@ -52,7 +51,6 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     final adState = Provider.of<AdStateProvider>(context);
     if (!Provider.of<InAppPurchaseProvider>(context)
@@ -72,8 +70,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    bannerAd.dispose();
+    bannerAd?.dispose();
     super.dispose();
   }
 
@@ -183,10 +180,12 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                               value: filterType,
                               child: Text(filterType.toString().split('.')[1]));
                         }).toList(),
-                        onChanged: (GameGuideFilterEnum value) {
-                          setState(() {
-                            filter = value;
-                          });
+                        onChanged: (GameGuideFilterEnum? value) {
+                          if (value != null) {
+                            setState(() {
+                              filter = value;
+                            });
+                          }
                         },
                       ),
                     ),
@@ -202,9 +201,9 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                         Container(width: double.infinity, height: 20),
                         Container(
                           alignment: Alignment.center,
-                          child: AdWidget(ad: bannerAd),
-                          width: bannerAd.size.width.toDouble(),
-                          height: bannerAd.size.height.toDouble(),
+                          child: AdWidget(ad: bannerAd!),
+                          width: bannerAd!.size.width.toDouble(),
+                          height: bannerAd!.size.height.toDouble(),
                         ),
                         Container(width: double.infinity, height: 10),
                       ],
@@ -259,7 +258,6 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                       //Applying the filter from the dropdown
                       if (filter == GameGuideFilterEnum.Completed &&
                           isCompleted) {
-                        //If the filter is set to Completed and the trophy has been marked as completed
                         return PS4GuideCard(
                           index: index,
                           game: widget.game,
@@ -268,7 +266,6 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                         );
                       } else if (filter == GameGuideFilterEnum.Incomplete &&
                           !isCompleted) {
-                        //If the filter is set to Incomplete and the trophy has been marked as incomplete
                         return PS4GuideCard(
                           index: index,
                           game: widget.game,
@@ -276,7 +273,6 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                           isCompleted: isCompleted,
                         );
                       } else if (filter == GameGuideFilterEnum.All) {
-                        //If the filter is set to all
                         return PS4GuideCard(
                           index: index,
                           game: widget.game,

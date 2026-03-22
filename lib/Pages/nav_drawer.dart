@@ -15,7 +15,7 @@ import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.d
 import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'my_games_page.dart';
 
@@ -27,7 +27,6 @@ class NavDrawerPage extends StatefulWidget {
 class _NavDrawerPageState extends State<NavDrawerPage> {
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     Provider.of<InAppPurchaseProvider>(context, listen: false)
         .initializeInAppPurchase(context);
     Future.delayed(const Duration(seconds: 1), () {
@@ -44,7 +43,6 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -80,6 +78,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
           case 6:
             screenCurrent = StorePage();
             break;
+          default:
+            screenCurrent = Dashboard();
+            break;
         }
 
         return Consumer<InAppPurchaseProvider>(
@@ -99,18 +100,18 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
               backgroundColor: secondaryColor,
               elevation: 1,
               actions: [
-                FutureBuilder(
+                FutureBuilder<List<ProductDetails>>(
                     future: model.getStoreProducts(context),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data.length != 0) {
-                        List<ProductDetails> products = snapshot.data;
+                      if (snapshot.hasData && snapshot.data!.length != 0) {
+                        List<ProductDetails> products = snapshot.data!;
                         return IconButton(
                           icon: Icon(
                             FontAwesomeIcons.ad,
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            if (model.storeItemList[products[0].id].status ==
+                            if (model.storeItemList[products[0].id]?.status ==
                                 'Buy') {
                               //The product is ready to be purchased
                               model.makePurchase(products[0]);
@@ -119,8 +120,9 @@ class _NavDrawerPageState extends State<NavDrawerPage> {
                               snackBar(
                                   context,
                                   'Already ' +
-                                      model
-                                          .storeItemList[products[0].id].status,
+                                      (model.storeItemList[products[0].id]
+                                              ?.status ??
+                                          ''),
                                   "Cannot purchase again",
                                   wp);
                             }
@@ -145,7 +147,7 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-  SimpleHiddenDrawerController controller;
+  late SimpleHiddenDrawerController controller;
 
   @override
   void didChangeDependencies() {
@@ -208,13 +210,6 @@ class _MenuState extends State<Menu> {
                   controller.toggle();
                 },
                 title: 'PS4'),
-            // NavDrawerListTile(
-            //     icon: FontAwesomeIcons.xbox,
-            //     onTap: () {
-            //       controller.position = 3;
-            //       controller.toggle();
-            //     },
-            //     title: 'Xbox'),
             NavDrawerListTile(
                 icon: Icons.check,
                 onTap: () {

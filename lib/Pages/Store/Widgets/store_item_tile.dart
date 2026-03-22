@@ -8,9 +8,9 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 class StoreItemTile extends StatefulWidget {
-  StoreItemModel item;
-  ProductDetails product;
-  StoreItemTile({@required this.item, @required this.product});
+  final StoreItemModel item;
+  final ProductDetails product;
+  StoreItemTile({required this.item, required this.product});
 
   @override
   _StoreItemTileState createState() => _StoreItemTileState();
@@ -27,11 +27,11 @@ class _StoreItemTileState extends State<StoreItemTile> {
           borderRadius: BorderRadius.circular(10),
         ),
         elevation: 0,
-        margin: new EdgeInsets.symmetric(vertical: 10.0),
+        margin: EdgeInsets.symmetric(vertical: 10.0),
         child: Container(
           decoration: BoxDecoration(
             color: secondaryColor,
-            borderRadius: new BorderRadius.all(const Radius.circular(10)),
+            borderRadius: BorderRadius.all(const Radius.circular(10)),
           ),
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 12),
           child: Row(
@@ -78,8 +78,7 @@ class _StoreItemTileState extends State<StoreItemTile> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    // model.changeSpinningState();
-                    if (model.storeItemList[widget.product.id].status ==
+                    if (model.storeItemList[widget.product.id]?.status ==
                         'Buy') {
                       //The product is ready to be purchased
                       model.makePurchase(widget.product);
@@ -88,20 +87,17 @@ class _StoreItemTileState extends State<StoreItemTile> {
                       snackBar(
                           context,
                           'Already ' +
-                              model.storeItemList[widget.product.id].status,
+                              (model.storeItemList[widget.product.id]?.status ??
+                                  ''),
                           "Cannot purchase again",
                           wp);
                     }
                   },
-                  // color: primaryAccentColor,
-                  // shape: RoundedRectangleBorder(
-                  //   borderRadius: BorderRadius.circular(8),
-                  // ),
                   child: Container(
                     child: Column(
                       children: [
                         Text(
-                          model.storeItemList[widget.product.id].status,
+                          model.storeItemList[widget.product.id]?.status ?? '',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,

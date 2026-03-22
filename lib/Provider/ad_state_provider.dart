@@ -5,7 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 class AdStateProvider {
   Future<InitializationStatus> initialization;
 
-  AdStateProvider({this.initialization});
+  AdStateProvider({required this.initialization});
 
   //Ad unit ID
   //Banner

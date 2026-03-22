@@ -145,7 +145,7 @@ class _MyStarredTrophyPageState extends State<MyStarredTrophyPage> {
                                   child: HtmlWidget(
                                     '''${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyGuide}''',
                                     textStyle: TextStyle(fontSize: 15),
-                                    webView: true,
+                                    // webView: true,
                                   ),
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 30, vertical: 20),
