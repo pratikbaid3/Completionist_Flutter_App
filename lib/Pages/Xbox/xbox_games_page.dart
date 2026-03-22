@@ -1,61 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class AllXboxGamesPage extends StatefulWidget {
-  @override
-  _AllXboxGamesPageState createState() => _AllXboxGamesPageState();
-}
-
-class _AllXboxGamesPageState extends State<AllXboxGamesPage> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
+class AllXboxGamesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
-    double wp = MediaQuery.of(context).size.width;
-    return KeyboardDismissOnTap(
-      child: Scaffold(
-        body: Container(
-          height: hp,
-          width: wp,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                FontAwesomeIcons.xbox,
-                size: wp * 0.25,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Coming ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: wp * 0.055,
-                    ),
-                  ),
-                  Text(
-                    'Soon!',
-                    style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w600,
-                        fontSize: wp * 0.055),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: neonGreen.withValues(alpha: 0.15),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: neonGreen.withValues(alpha: 0.1),
+                    blurRadius: 30,
+                    spreadRadius: -5,
                   ),
                 ],
               ),
-            ],
-          ),
+              child: Icon(
+                FontAwesomeIcons.xbox,
+                size: 56,
+                color: neonGreen,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms)
+                .scale(
+                  begin: Offset(0.8, 0.8),
+                  end: Offset(1.0, 1.0),
+                  duration: 600.ms,
+                  curve: Curves.easeOutBack,
+                ),
+            SizedBox(height: 32),
+            Text(
+              'COMING SOON',
+              style: GoogleFonts.orbitron(
+                color: textPrimary,
+                fontWeight: FontWeight.w700,
+                fontSize: 22,
+                letterSpacing: 4,
+              ),
+            )
+                .animate()
+                .fadeIn(delay: 300.ms, duration: 500.ms)
+                .slideY(begin: 0.3, end: 0, delay: 300.ms, duration: 500.ms),
+            SizedBox(height: 12),
+            Text(
+              'Xbox achievement guides are\non their way',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textSecondary,
+                fontSize: 15,
+                height: 1.5,
+              ),
+            )
+                .animate()
+                .fadeIn(delay: 500.ms, duration: 500.ms),
+          ],
         ),
       ),
     );

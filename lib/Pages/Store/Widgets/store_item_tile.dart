@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
 import 'package:game_trophy_manager/Model/store_item_model.dart';
 import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
@@ -19,110 +20,127 @@ class StoreItemTile extends StatefulWidget {
 class _StoreItemTileState extends State<StoreItemTile> {
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
     double wp = MediaQuery.of(context).size.width;
     return Consumer<InAppPurchaseProvider>(builder: (context, model, child) {
-      return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 0,
-        margin: EdgeInsets.symmetric(vertical: 10.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: secondaryColor,
-            borderRadius: BorderRadius.all(const Radius.circular(10)),
+      final status = model.storeItemList[widget.product.id]?.status ?? '';
+      final isPurchased = status == 'Purchased';
+
+      return Container(
+        margin: EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isPurchased
+                ? neonGreen.withValues(alpha: 0.3)
+                : primaryAccentColor.withValues(alpha: 0.1),
+            width: 1,
           ),
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.ad,
-                      size: 40,
+        ),
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              padding: EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isPurchased
+                    ? neonGreen.withValues(alpha: 0.1)
+                    : primaryAccentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                isPurchased ? Icons.check_circle_rounded : Icons.block_rounded,
+                size: 28,
+                color: isPurchased ? neonGreen : primaryAccentColor,
+              ),
+            ),
+            SizedBox(width: 16),
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.item.name,
+                    style: GoogleFonts.inter(
+                      color: textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
                     ),
-                    SizedBox(
-                      width: 15,
+                    overflow: TextOverflow.visible,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    widget.item.subText,
+                    style: TextStyle(
+                      color: textSecondary,
+                      fontSize: 13,
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.item.name,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                            overflow: TextOverflow.visible,
-                          ),
-                          Text(
-                            widget.item.subText,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 12),
+            // Purchase button
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                if (status == 'Buy') {
+                  model.makePurchase(widget.product);
+                } else {
+                  snackBar(
+                    context,
+                    'Already $status',
+                    "Cannot purchase again",
+                    wp,
+                  );
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: isPurchased ? null : accentGradient,
+                  color: isPurchased
+                      ? neonGreen.withValues(alpha: 0.15)
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: isPurchased
+                      ? []
+                      : [
+                          BoxShadow(
+                            color: primaryAccentColor.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: Offset(0, 4),
                           ),
                         ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      status,
+                      style: GoogleFonts.inter(
+                        color: isPurchased ? neonGreen : Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
+                    if (!isPurchased) ...[
+                      SizedBox(height: 2),
+                      Text(
+                        '${widget.product.currencyCode} ${widget.product.price}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (model.storeItemList[widget.product.id]?.status ==
-                        'Buy') {
-                      //The product is ready to be purchased
-                      model.makePurchase(widget.product);
-                    } else {
-                      //The product is either ending or already purchased
-                      snackBar(
-                          context,
-                          'Already ' +
-                              (model.storeItemList[widget.product.id]?.status ??
-                                  ''),
-                          "Cannot purchase again",
-                          wp);
-                    }
-                  },
-                  child: Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          model.storeItemList[widget.product.id]?.status ?? '',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900),
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        Text(
-                          widget.product.currencyCode +
-                              ' ' +
-                              widget.product.price,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900),
-                        ),
-                      ],
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     });

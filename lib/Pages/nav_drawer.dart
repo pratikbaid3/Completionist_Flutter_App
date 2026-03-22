@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:game_trophy_manager/Widgets/aurora_background.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Pages/PS4/ps4_games_page.dart';
-import 'package:game_trophy_manager/Pages/Xbox/xbox_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
-import 'package:game_trophy_manager/Pages/Store/store_page.dart';
 import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
-import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:game_trophy_manager/Widgets/nav_drawer_list_tile.dart';
-import 'package:game_trophy_manager/Widgets/snack_bar.dart';
-import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
-import 'package:hidden_drawer_menu/simple_hidden_drawer/simple_hidden_drawer.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'my_games_page.dart';
 
@@ -24,223 +18,295 @@ class NavDrawerPage extends StatefulWidget {
   _NavDrawerPageState createState() => _NavDrawerPageState();
 }
 
-class _NavDrawerPageState extends State<NavDrawerPage> {
+class _NavDrawerPageState extends State<NavDrawerPage>
+    with TickerProviderStateMixin {
+  int _currentIndex = 0;
+  late PageController _pageController;
+  late AnimationController _fabAnimController;
+  bool _didInit = false;
+
+  final List<_NavItem> _navItems = [
+    _NavItem(Icons.dashboard_rounded, 'Home'),
+    _NavItem(Icons.gamepad_rounded, 'My Games'),
+    _NavItem(FontAwesomeIcons.playstation, 'Browse'),
+    _NavItem(Icons.emoji_events_rounded, 'Trophies'),
+  ];
+
   @override
   void didChangeDependencies() {
-    Provider.of<InAppPurchaseProvider>(context, listen: false)
-        .initializeInAppPurchase(context);
-    Future.delayed(const Duration(seconds: 1), () {
+    if (!_didInit) {
+      _didInit = true;
       Provider.of<InAppPurchaseProvider>(context, listen: false)
-          .getPastPurchases();
-    });
+          .initializeInAppPurchase(context);
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Provider.of<InAppPurchaseProvider>(context, listen: false)
+              .getPastPurchases();
+        }
+      });
+    }
     super.didChangeDependencies();
   }
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
+    _fabAnimController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
   }
 
   @override
   void dispose() {
+    _pageController.dispose();
+    _fabAnimController.dispose();
     super.dispose();
+  }
+
+  void _onTabTapped(int index) {
+    HapticFeedback.lightImpact();
+    setState(() => _currentIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: Duration(milliseconds: 350),
+      curve: Curves.easeInOutCubic,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     double wp = MediaQuery.of(context).size.width;
-    return SimpleHiddenDrawer(
-      withShadow: true,
-      slidePercent: wp * 0.15,
-      contentCornerRadius: 40,
-      menu: Menu(),
-      screenSelectedBuilder: (position, controller) {
-        Widget screenCurrent;
-        switch (position) {
-          case 0:
-            screenCurrent = Dashboard();
-            break;
-          case 1:
-            screenCurrent = MyGamesPage();
-            break;
-          case 2:
-            screenCurrent = AllPS4GamesPage();
-            break;
-          case 3:
-            screenCurrent = AllXboxGamesPage();
-            break;
-          case 4:
-            screenCurrent = MyCompletedTrophyPage();
-            break;
-          case 5:
-            screenCurrent = MyStarredTrophyPage();
-            break;
-          case 6:
-            screenCurrent = StorePage();
-            break;
-          default:
-            screenCurrent = Dashboard();
-            break;
-        }
+    return Consumer<InAppPurchaseProvider>(builder: (context, model, child) {
+      return Scaffold(
+        backgroundColor: primaryColor,
+        extendBody: true,
+        appBar: _buildAppBar(model, wp),
+        body: AuroraBackground(
+          child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            HapticFeedback.selectionClick();
+            setState(() => _currentIndex = index);
+          },
+          children: [
+            Dashboard(),
+            MyGamesPage(),
+            AllPS4GamesPage(),
+            _TrophiesTabView(),
+          ],
+        ),
+        ),
+        bottomNavigationBar: _buildBottomNav(),
+      );
+    });
+  }
 
-        return Consumer<InAppPurchaseProvider>(
-            builder: (context, model, child) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(
-                  Icons.menu,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  controller.toggle();
-                },
-              ),
-              centerTitle: true,
-              backgroundColor: secondaryColor,
-              elevation: 1,
-              actions: [
-                FutureBuilder<List<ProductDetails>>(
-                    future: model.getStoreProducts(context),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data!.length != 0) {
-                        List<ProductDetails> products = snapshot.data!;
-                        return IconButton(
-                          icon: Icon(
-                            FontAwesomeIcons.ad,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            if (model.storeItemList[products[0].id]?.status ==
-                                'Buy') {
-                              //The product is ready to be purchased
-                              model.makePurchase(products[0]);
-                            } else {
-                              //The product is either ending or already purchased
-                              snackBar(
-                                  context,
-                                  'Already ' +
-                                      (model.storeItemList[products[0].id]
-                                              ?.status ??
-                                          ''),
-                                  "Cannot purchase again",
-                                  wp);
-                            }
-                          },
-                        );
-                      }
-                      return Container();
-                    })
+  PreferredSizeWidget _buildAppBar(InAppPurchaseProvider model, double wp) {
+    return AppBar(
+      backgroundColor: primaryColor,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+      centerTitle: false,
+      title: Row(
+        children: [
+          ClipOval(
+            child: Image.asset(
+              'images/app_icon.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 10),
+          Text(
+            'COMPLETIONIST',
+            style: GoogleFonts.orbitron(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: textPrimary,
+              letterSpacing: 2,
+            ),
+          ),
+        ],
+      ),
+      actions: [],
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1),
+        child: Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                primaryAccentColor.withValues(alpha: 0.3),
+                secondaryAccentColor.withValues(alpha: 0.3),
+                Colors.transparent,
               ],
             ),
-            body: screenCurrent,
-          );
-        });
-      },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: secondaryColor.withValues(alpha: 0.95),
+        border: Border(
+          top: BorderSide(
+            color: primaryAccentColor.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_navItems.length, (index) {
+              final isSelected = _currentIndex == index;
+              return _NavBarItem(
+                item: _navItems[index],
+                isSelected: isSelected,
+                onTap: () => _onTabTapped(index),
+              );
+            }),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class Menu extends StatefulWidget {
-  @override
-  _MenuState createState() => _MenuState();
-}
-
-class _MenuState extends State<Menu> {
-  late SimpleHiddenDrawerController controller;
-
-  @override
-  void didChangeDependencies() {
-    controller = SimpleHiddenDrawerController.of(context);
-    super.didChangeDependencies();
-  }
-
+class _TrophiesTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
-    double wp = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [primaryAccentColor, secondaryAccentColor],
-          ),
-        ),
-        width: double.maxFinite,
-        height: double.maxFinite,
-        padding: const EdgeInsets.only(top: 30.0, left: 5),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Image(
-                  width: wp * 0.4,
-                  height: wp * 0.4,
-                  image: AssetImage(
-                    'images/drawer_image.png',
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: glassDecoration(borderRadius: 12, opacity: 0.05),
+            child: TabBar(
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: accentGradient,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.white,
+              unselectedLabelColor: textSecondary,
+              labelStyle: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_rounded, size: 16),
+                      SizedBox(width: 6),
+                      Text('Completed'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.star_rounded, size: 16),
+                      SizedBox(width: 6),
+                      Text('Starred'),
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: hp * 0.01,
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                MyCompletedTrophyPage(),
+                MyStarredTrophyPage(),
+              ],
             ),
-            NavDrawerListTile(
-                icon: Icons.dashboard,
-                onTap: () {
-                  controller.position = 0;
-                  controller.toggle();
-                },
-                title: 'Dashboard'),
-            NavDrawerListTile(
-                icon: FontAwesomeIcons.gamepad,
-                onTap: () {
-                  controller.toggle();
-                  controller.position = 1;
-                },
-                title: 'My Games'),
-            NavDrawerListTile(
-                icon: FontAwesomeIcons.playstation,
-                onTap: () {
-                  controller.position = 2;
-                  controller.toggle();
-                },
-                title: 'PS4'),
-            NavDrawerListTile(
-                icon: Icons.check,
-                onTap: () {
-                  controller.position = 4;
-                  controller.toggle();
-                },
-                title: 'Completed'),
-            NavDrawerListTile(
-                icon: Icons.star,
-                onTap: () {
-                  controller.position = 5;
-                  controller.toggle();
-                },
-                title: 'Starred'),
-            NavDrawerListTile(
-                icon: Icons.share,
-                onTap: () {
-                  Share.share(
-                      'Completionist: PS4 & Xbox game guide\n Download for FREE and start gaming \nhttps://play.google.com/store/apps/details?id=co.turingcreatives.game_trophy_manager',
-                      subject: 'Completionist: PS4 & Xbox game guide');
-                },
-                title: 'Share'),
-            NavDrawerListTile(
-                icon: Icons.shop,
-                onTap: () {
-                  Navigator.of(context).pushNamed(storePageRoute);
-                },
-                title: 'Store'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem {
+  final IconData icon;
+  final String label;
+  _NavItem(this.icon, this.label);
+}
+
+class _NavBarItem extends StatelessWidget {
+  final _NavItem item;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavBarItem({
+    required this.item,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeInOutCubic,
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: isSelected
+              ? primaryAccentColor.withValues(alpha: 0.15)
+              : Colors.transparent,
+          border: Border.all(
+            color: isSelected
+                ? primaryAccentColor.withValues(alpha: 0.3)
+                : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.icon,
+              size: 20,
+              color: isSelected ? primaryAccentColor : textMuted,
+            ),
+            if (isSelected) ...[
+              SizedBox(width: 8),
+              Text(
+                item.label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: primaryAccentColor,
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 }
+
