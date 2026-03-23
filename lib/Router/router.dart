@@ -21,6 +21,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case homePageRoute:
       return _fadeRoute(NavDrawerPage(), settings);
     case guidePageRoute:
+      if (args is Map<String, dynamic>) {
+        return _slideRoute(
+          Ps4GuidePage(
+            game: args['game'] as GameModel,
+            guideEndpoint: args['guideEndpoint'] as String? ?? 'ps4/guide/',
+          ),
+          settings,
+        );
+      }
       return _slideRoute(
         Ps4GuidePage(game: args as GameModel),
         settings,

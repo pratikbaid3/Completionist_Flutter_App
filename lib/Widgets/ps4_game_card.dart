@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
+import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,8 @@ import 'package:shimmer/shimmer.dart';
 // ignore: must_be_immutable
 class PS4GameCard extends StatelessWidget {
   GameModel game;
-  PS4GameCard({required this.game});
+  final String guideEndpoint;
+  PS4GameCard({required this.game, this.guideEndpoint = ps4GuideUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,10 @@ class PS4GameCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: () {
             Provider.of<PS4GuideProvider>(context, listen: false).clearGuideList();
-            Navigator.of(context).pushNamed(guidePageRoute, arguments: game);
+            Navigator.of(context).pushNamed(guidePageRoute, arguments: {
+              'game': game,
+              'guideEndpoint': guideEndpoint,
+            });
           },
           child: Container(
             decoration: BoxDecoration(

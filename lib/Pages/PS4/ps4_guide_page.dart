@@ -18,7 +18,8 @@ import 'package:shimmer/shimmer.dart';
 // ignore: must_be_immutable
 class Ps4GuidePage extends StatefulWidget {
   GameModel game;
-  Ps4GuidePage({required this.game});
+  final String guideEndpoint;
+  Ps4GuidePage({required this.game, this.guideEndpoint = 'ps4/guide/'});
 
   @override
   _Ps4GuidePageState createState() => _Ps4GuidePageState();
@@ -262,7 +263,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
   Widget _buildTrophyList(double wp) {
     return SliverToBoxAdapter(
       child: FutureBuilder(
-        future: Provider.of<PS4GuideProvider>(context).getGuide(gameName: widget.game.gameName),
+        future: Provider.of<PS4GuideProvider>(context).getGuide(gameName: widget.game.gameName, endpoint: widget.guideEndpoint),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (Provider.of<PS4GuideProvider>(context).guide.isEmpty) {
             return Container(

@@ -7,6 +7,7 @@ import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
 import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
+import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -93,7 +94,7 @@ class _NavDrawerPageState extends State<NavDrawerPage>
           children: [
             Dashboard(),
             MyGamesPage(),
-            AllPS4GamesPage(),
+            _BrowseTabView(),
             _TrophiesTabView(),
           ],
         ),
@@ -178,6 +179,73 @@ class _NavDrawerPageState extends State<NavDrawerPage>
             }),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BrowseTabView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: glassDecoration(borderRadius: 12, opacity: 0.05),
+            child: TabBar(
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: accentGradient,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.white,
+              unselectedLabelColor: textSecondary,
+              labelStyle: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(FontAwesomeIcons.playstation, size: 14),
+                      SizedBox(width: 6),
+                      Text('PS4'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(FontAwesomeIcons.playstation, size: 14),
+                      SizedBox(width: 6),
+                      Text('PS5'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                AllPS4GamesPage(
+                  gamesEndpoint: ps4GamesUrl,
+                  guideEndpoint: ps4GuideUrl,
+                ),
+                AllPS4GamesPage(
+                  gamesEndpoint: ps5GamesUrl,
+                  guideEndpoint: ps5GuideUrl,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

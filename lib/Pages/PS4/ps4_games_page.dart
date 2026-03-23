@@ -4,12 +4,22 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Widgets/ps4_game_card.dart';
 import 'package:game_trophy_manager/Provider/ps4_game_provider.dart';
+import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
 class AllPS4GamesPage extends StatefulWidget {
+  final String gamesEndpoint;
+  final String guideEndpoint;
+
+  const AllPS4GamesPage({
+    Key? key,
+    this.gamesEndpoint = ps4GamesUrl,
+    this.guideEndpoint = ps4GuideUrl,
+  }) : super(key: key);
+
   @override
   _AllPS4GamesPageState createState() => _AllPS4GamesPageState();
 }
@@ -36,7 +46,8 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
       Provider.of<PS4GameProvider>(context, listen: false).getGame(
           pagingController: _pagingController,
           pageKey: pageKey,
-          search: searchKeyword);
+          search: searchKeyword,
+          endpoint: widget.gamesEndpoint);
     });
   }
 
@@ -78,7 +89,7 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<GameModel>(
                     itemBuilder: (context, item, index) =>
-                        PS4GameCard(game: item),
+                        PS4GameCard(game: item, guideEndpoint: widget.guideEndpoint),
                     firstPageProgressIndicatorBuilder: (_) => Center(
                       child: Padding(
                         padding: EdgeInsets.only(top: 60),
