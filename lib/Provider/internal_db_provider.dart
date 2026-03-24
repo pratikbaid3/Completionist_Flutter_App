@@ -51,16 +51,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void addGameToDb(GameModel game, BuildContext context) async {
     try {
-      String gameName = game.gameName;
-      String gameImgUrl = game.gameImageUrl;
-      DateTime now = DateTime.now();
-      String gold = game.gold;
-      String silver = game.silver;
-      String bronze = game.bronze;
-      var dbClient = await db; //This calls the getter function
+      var dbClient = await db;
       var result = await dbClient.rawInsert(
           'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn,$goldColumn,$silverColumn,$bronzeColumn) '
-          'VALUES("$gameName","$gameImgUrl","$now","$gold","$silver","$bronze")');
+          'VALUES(?, ?, ?, ?, ?, ?)',
+          [game.gameName, game.gameImageUrl, DateTime.now().toString(), game.gold, game.silver, game.bronze]);
       myGames.add(game);
       notifyListeners();
       print(result);
@@ -71,16 +66,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void removeGameFromDb(GameModel game, BuildContext context) async {
     try {
-      String gameName = game.gameName;
       var dbClient = await db;
       var result = await dbClient.rawDelete(
-          'DELETE FROM $myGamesTable WHERE $gameNameColumn = "${game.gameName}"');
-      myGames.removeWhere((element) {
-        if (element.gameName == gameName) {
-          return true;
-        }
-        return false;
-      });
+          'DELETE FROM $myGamesTable WHERE $gameNameColumn = ?',
+          [game.gameName]);
+      myGames.removeWhere((element) => element.gameName == game.gameName);
       notifyListeners();
       print(result);
     } catch (e) {
@@ -111,18 +101,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void addTrophyToComplete(GuideModel guide) async {
     try {
-      String gameName = guide.gameName;
-      String gameImgUrl = guide.gameImgUrl;
-      String trophyName = guide.trophyName;
-      String trophyImgUrl = guide.trophyImage;
-      String trophyType = guide.trophyType;
-      String trophyDescription = guide.trophyDescription;
-      String trophyGuide = guide.trophyGuide;
-      DateTime now = DateTime.now();
-      var dbClient = await db; //This calls the getter function
+      var dbClient = await db;
       var result = await dbClient.rawInsert(
           'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
-          'VALUES("$gameName","$gameImgUrl","$trophyName","$trophyImgUrl","$trophyType","$trophyDescription","$trophyGuide","COMPLETED","$now")');
+          'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [guide.gameName, guide.gameImgUrl, guide.trophyName, guide.trophyImage, guide.trophyType, guide.trophyDescription, guide.trophyGuide, 'COMPLETED', DateTime.now().toString()]);
       myCompletedTrophy.add(guide);
       notifyListeners();
       print(result);
@@ -133,18 +116,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void addTrophyToStarred(GuideModel guide) async {
     try {
-      String gameName = guide.gameName;
-      String gameImgUrl = guide.gameImgUrl;
-      String trophyName = guide.trophyName;
-      String trophyImgUrl = guide.trophyImage;
-      String trophyType = guide.trophyType;
-      String trophyDescription = guide.trophyDescription;
-      String trophyGuide = guide.trophyGuide;
-      DateTime now = DateTime.now();
-      var dbClient = await db; //This calls the getter function
+      var dbClient = await db;
       var result = await dbClient.rawInsert(
           'INSERT INTO $myTrophyTable($gameNameColumn, $gameImgUrlColumn,$trophyNameColumn,$trophyImageUrlColumn,$trophyTypeColumn,$trophyDescriptionColumn,$trophyGuideColumn,$trophyActionColumn,$dateTimeColumn) '
-          'VALUES("$gameName","$gameImgUrl","$trophyName","$trophyImgUrl","$trophyType","$trophyDescription","$trophyGuide","STARRED","$now")');
+          'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [guide.gameName, guide.gameImgUrl, guide.trophyName, guide.trophyImage, guide.trophyType, guide.trophyDescription, guide.trophyGuide, 'STARRED', DateTime.now().toString()]);
       myStarredTrophy.add(guide);
       notifyListeners();
       print(result);
@@ -155,16 +131,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void removeTrophyFromComplete(GuideModel guide) async {
     try {
-      String trophyName = guide.trophyName;
-      var dbClient = await db; //This calls the getter function
+      var dbClient = await db;
       var result = await dbClient.rawDelete(
-          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = "${guide.trophyName}" AND $trophyActionColumn = "COMPLETED"');
-      myCompletedTrophy.removeWhere((element) {
-        if (element.trophyName == trophyName) {
-          return true;
-        }
-        return false;
-      });
+          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = ? AND $trophyActionColumn = ?',
+          [guide.trophyName, 'COMPLETED']);
+      myCompletedTrophy.removeWhere((element) => element.trophyName == guide.trophyName);
       notifyListeners();
       print(result);
     } catch (e) {
@@ -174,16 +145,11 @@ class InternalDbProvider extends ChangeNotifier {
 
   void removeTrophyFromStarred(GuideModel guide) async {
     try {
-      String trophyName = guide.trophyName;
-      var dbClient = await db; //This calls the getter function
+      var dbClient = await db;
       var result = await dbClient.rawDelete(
-          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = "${guide.trophyName}" AND $trophyActionColumn = "STARRED"');
-      myStarredTrophy.removeWhere((element) {
-        if (element.trophyName == trophyName) {
-          return true;
-        }
-        return false;
-      });
+          'DELETE FROM $myTrophyTable WHERE $trophyNameColumn = ? AND $trophyActionColumn = ?',
+          [guide.trophyName, 'STARRED']);
+      myStarredTrophy.removeWhere((element) => element.trophyName == guide.trophyName);
       notifyListeners();
       print(result);
     } catch (e) {
