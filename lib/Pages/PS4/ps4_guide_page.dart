@@ -7,9 +7,11 @@ import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/aurora_background.dart';
 import 'package:game_trophy_manager/Widgets/ps4_guide_card.dart';
+import 'package:game_trophy_manager/Widgets/review_dialog.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +34,11 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
   @override
   void initState() {
     super.initState();
+    Analytics.logScreenView('game_detail');
+    Analytics.logViewGame(
+      widget.game.gameName,
+      widget.guideEndpoint.contains('ps5') ? 'PS5' : 'PS4',
+    );
     initializeGameState();
   }
 
@@ -100,15 +107,22 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
             onSelected: (value) {
               HapticFeedback.mediumImpact();
               if (value == 'Add Game') {
-                Provider.of<InternalDbProvider>(context, listen: false)
-                    .addGameToDb(widget.game, context);
+                final dbProvider = Provider.of<InternalDbProvider>(context, listen: false);
+                dbProvider.addGameToDb(widget.game, context);
                 setState(() => isGameAdded = true);
+                Analytics.logAddGame(widget.game.gameName);
                 snackBar(context, 'Added', "${widget.game.gameName} has been added", wp);
+                maybeShowReview(
+                  context,
+                  ReviewTrigger.gameMilestone,
+                  totalGames: dbProvider.myGames.length,
+                );
               }
               if (value == 'Remove Game') {
                 Provider.of<InternalDbProvider>(context, listen: false)
                     .removeGameFromDb(widget.game, context);
                 setState(() => isGameAdded = false);
+                Analytics.logRemoveGame(widget.game.gameName);
                 snackBar(context, 'Removed', "${widget.game.gameName} has been removed", wp);
               }
             },
@@ -249,6 +263,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
                 onChanged: (value) {
                   if (value != null) {
                     HapticFeedback.selectionClick();
+                    Analytics.logFilter(value.toString().split('.')[1], widget.game.gameName);
                     setState(() => filter = value);
                   }
                 },

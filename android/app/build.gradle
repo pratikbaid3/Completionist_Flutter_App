@@ -52,9 +52,9 @@ android {
     defaultConfig {
         applicationId "co.turingcreatives.game_trophy_manager"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34
-        versionCode 21
-        versionName '6.2.3'
+        targetSdkVersion 35
+        versionCode 53
+        versionName '7.0.3'
         multiDexEnabled true
     }
     signingConfigs {

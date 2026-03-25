@@ -1,14 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:game_trophy_manager/Widgets/review_dialog.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -85,9 +87,11 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               if (widget.isStarred) {
                 Provider.of<InternalDbProvider>(context, listen: false)
                     .removeTrophyFromStarred(g);
+                Analytics.logUnstarTrophy(g.trophyName, widget.game.gameName);
               } else {
                 Provider.of<InternalDbProvider>(context, listen: false)
                     .addTrophyToStarred(g);
+                Analytics.logStarTrophy(g.trophyName, widget.game.gameName);
               }
               setState(() => widget.isStarred = !widget.isStarred);
               snackBar(
@@ -120,12 +124,13 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                       .guide[widget.index];
               g.gameName = widget.game.gameName;
               g.gameImgUrl = widget.game.gameImageUrl;
+              final dbProvider = Provider.of<InternalDbProvider>(context, listen: false);
               if (widget.isCompleted) {
-                Provider.of<InternalDbProvider>(context, listen: false)
-                    .removeTrophyFromComplete(g);
+                dbProvider.removeTrophyFromComplete(g);
+                Analytics.logUncompleteTrophy(g.trophyName, widget.game.gameName);
               } else {
-                Provider.of<InternalDbProvider>(context, listen: false)
-                    .addTrophyToComplete(g);
+                dbProvider.addTrophyToComplete(g);
+                Analytics.logCompleteTrophy(g.trophyName, widget.game.gameName);
               }
               setState(() => widget.isCompleted = !widget.isCompleted);
               snackBar(
@@ -134,6 +139,14 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                 "${g.trophyName} has been ${widget.isCompleted ? 'completed' : 'un-completed'}",
                 wp,
               );
+              // Trigger review check on trophy completion milestone
+              if (widget.isCompleted) {
+                maybeShowReview(
+                  context,
+                  ReviewTrigger.trophyMilestone,
+                  totalCompleted: dbProvider.myCompletedTrophy.length,
+                );
+              }
             },
           ),
         ],
@@ -157,6 +170,9 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               childrenPadding: EdgeInsets.zero,
               onExpansionChanged: (value) {
                 setState(() => isExpanded = value);
+                if (value) {
+                  Analytics.logExpandGuide(guide.trophyName, widget.game.gameName);
+                }
               },
               leading: Stack(
                 children: [

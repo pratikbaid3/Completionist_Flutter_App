@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Pages/PS4/ps4_games_page.dart';
-import 'package:game_trophy_manager/Pages/Store/store_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/PS4/ps4_guide_page.dart';
 import 'package:game_trophy_manager/Pages/nav_drawer.dart';
@@ -46,8 +45,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings,
       );
-    case storePageRoute:
-      return _slideUpRoute(StorePage(), settings);
     default:
       return _fadeRoute(NavDrawerPage(), settings);
   }
@@ -94,41 +91,6 @@ PageRouteBuilder _slideRoute(Widget page, RouteSettings settings) {
       ).animate(CurvedAnimation(
         parent: animation,
         curve: Interval(0.0, 0.5, curve: Curves.easeIn),
-      ));
-
-      return SlideTransition(
-        position: offsetAnimation,
-        child: FadeTransition(
-          opacity: fadeAnimation,
-          child: child,
-        ),
-      );
-    },
-  );
-}
-
-// Slide up transition (for modals like store)
-PageRouteBuilder _slideUpRoute(Widget page, RouteSettings settings) {
-  return PageRouteBuilder(
-    settings: settings,
-    pageBuilder: (context, animation, secondaryAnimation) => page,
-    transitionDuration: Duration(milliseconds: 400),
-    reverseTransitionDuration: Duration(milliseconds: 300),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final offsetAnimation = Tween<Offset>(
-        begin: Offset(0.0, 0.3),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutCubic,
-      ));
-
-      final fadeAnimation = Tween<double>(
-        begin: 0.0,
-        end: 1.0,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Interval(0.0, 0.6, curve: Curves.easeIn),
       ));
 
       return SlideTransition(

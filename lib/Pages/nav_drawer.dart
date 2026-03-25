@@ -6,12 +6,10 @@ import 'package:game_trophy_manager/Pages/PS4/ps4_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
-import 'package:game_trophy_manager/Provider/in_app_purchase_provider.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-
 import 'my_games_page.dart';
 
 class NavDrawerPage extends StatefulWidget {
@@ -24,30 +22,12 @@ class _NavDrawerPageState extends State<NavDrawerPage>
   int _currentIndex = 0;
   late PageController _pageController;
   late AnimationController _fabAnimController;
-  bool _didInit = false;
-
   final List<_NavItem> _navItems = [
     _NavItem(Icons.dashboard_rounded, 'Home'),
     _NavItem(Icons.gamepad_rounded, 'My Games'),
     _NavItem(FontAwesomeIcons.playstation, 'Browse'),
     _NavItem(Icons.emoji_events_rounded, 'Trophies'),
   ];
-
-  @override
-  void didChangeDependencies() {
-    if (!_didInit) {
-      _didInit = true;
-      Provider.of<InAppPurchaseProvider>(context, listen: false)
-          .initializeInAppPurchase(context);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          Provider.of<InAppPurchaseProvider>(context, listen: false)
-              .getPastPurchases();
-        }
-      });
-    }
-    super.didChangeDependencies();
-  }
 
   @override
   void initState() {
@@ -66,8 +46,11 @@ class _NavDrawerPageState extends State<NavDrawerPage>
     super.dispose();
   }
 
+  static const _tabNames = ['Home', 'My Games', 'Browse', 'Trophies'];
+
   void _onTabTapped(int index) {
     HapticFeedback.lightImpact();
+    Analytics.logTabSwitch(_tabNames[index]);
     setState(() => _currentIndex = index);
     _pageController.animateToPage(
       index,
@@ -79,32 +62,31 @@ class _NavDrawerPageState extends State<NavDrawerPage>
   @override
   Widget build(BuildContext context) {
     double wp = MediaQuery.of(context).size.width;
-    return Consumer<InAppPurchaseProvider>(builder: (context, model, child) {
-      return Scaffold(
-        backgroundColor: primaryColor,
-        extendBody: true,
-        appBar: _buildAppBar(model, wp),
-        body: AuroraBackground(
-          child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            HapticFeedback.selectionClick();
-            setState(() => _currentIndex = index);
-          },
-          children: [
-            Dashboard(),
-            MyGamesPage(),
-            _BrowseTabView(),
-            _TrophiesTabView(),
-          ],
-        ),
-        ),
-        bottomNavigationBar: _buildBottomNav(),
-      );
-    });
+    return Scaffold(
+      backgroundColor: primaryColor,
+      extendBody: true,
+      appBar: _buildAppBar(wp),
+      body: AuroraBackground(
+        child: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          HapticFeedback.selectionClick();
+          Analytics.logTabSwitch(_tabNames[index]);
+          setState(() => _currentIndex = index);
+        },
+        children: [
+          Dashboard(),
+          MyGamesPage(),
+          _BrowseTabView(),
+          _TrophiesTabView(),
+        ],
+      ),
+      ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
   }
 
-  PreferredSizeWidget _buildAppBar(InAppPurchaseProvider model, double wp) {
+  PreferredSizeWidget _buildAppBar(double wp) {
     return AppBar(
       backgroundColor: primaryColor,
       elevation: 0,

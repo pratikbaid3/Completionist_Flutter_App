@@ -9,6 +9,8 @@ import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/ps4_guide_card_dashboard.dart';
 import 'package:game_trophy_manager/Widgets/review_dialog.dart';
+
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -20,16 +22,15 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   bool isExpanded = false;
-  bool _reviewChecked = false;
+  static bool _reviewChecked = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     if (!_reviewChecked) {
       _reviewChecked = true;
-      // Wait for everything to settle, then check review
       Future.delayed(Duration(seconds: 2), () {
-        if (mounted) checkAndShowReview(context);
+        if (mounted) maybeShowReview(context, ReviewTrigger.appOpenFallback);
       });
     }
   }
@@ -240,6 +241,7 @@ class _DashboardState extends State<Dashboard> {
           SizedBox(height: 24),
           _GlowButton(
             onPressed: () {
+              Analytics.logBrowseGames();
               Navigator.of(context).pushNamed(ps4GamePageRoute);
             },
             child: Row(

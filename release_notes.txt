@@ -1,0 +1,10 @@
+What's New in v7.0.1
+
+• Complete UI redesign with modern dark theme and smooth animations
+• PS5 game and trophy support added
+• Removed ads and in-app purchases — everything is now free
+• Revamped navigation with bottom nav bar
+• Redesigned game cards, trophy lists, and guide pages
+• New splash screen with updated branding
+• Improved trophy tracking and game guide filtering
+• Bug fixes and performance improvements

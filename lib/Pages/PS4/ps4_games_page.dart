@@ -4,6 +4,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Widgets/ps4_game_card.dart';
 import 'package:game_trophy_manager/Provider/ps4_game_provider.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,8 +52,13 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
     });
   }
 
+  String get _platform => widget.gamesEndpoint == ps5GamesUrl ? 'PS5' : 'PS4';
+
   void _performSearch() {
     _searchFocus.unfocus();
+    if (searchController.text.isNotEmpty) {
+      Analytics.logSearch(searchController.text, _platform);
+    }
     setState(() {
       searchKeyword = searchController.text;
       isSearchIcon = searchController.text.isEmpty;

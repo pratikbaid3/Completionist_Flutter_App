@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +25,10 @@ class PS4GameCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
           onTap: () {
+            Analytics.logViewGame(
+              game.gameName,
+              guideEndpoint.contains('ps5') ? 'PS5' : 'PS4',
+            );
             Provider.of<PS4GuideProvider>(context, listen: false).clearGuideList();
             Navigator.of(context).pushNamed(guidePageRoute, arguments: {
               'game': game,
