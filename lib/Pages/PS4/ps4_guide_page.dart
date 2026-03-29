@@ -107,6 +107,7 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
             onSelected: (value) {
               HapticFeedback.mediumImpact();
               if (value == 'Add Game') {
+                widget.game.guideEndpoint = widget.guideEndpoint;
                 final dbProvider = Provider.of<InternalDbProvider>(context, listen: false);
                 dbProvider.addGameToDb(widget.game, context);
                 setState(() => isGameAdded = true);

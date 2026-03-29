@@ -21,6 +21,7 @@ class InternalDbProvider extends ChangeNotifier {
   final String goldColumn = 'GOLD';
   final String silverColumn = 'SILVER';
   final String bronzeColumn = 'BRONZE';
+  final String guideEndpointColumn = 'GuideEndpoint';
 
   List<GameModel> myGames = <GameModel>[];
   List<GuideModel> myCompletedTrophy = <GuideModel>[];
@@ -38,24 +39,31 @@ class InternalDbProvider extends ChangeNotifier {
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, dbName);
     print(path);
-    var db = await openDatabase(path, version: 1, onCreate: _onCreate);
+    var db = await openDatabase(path, version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return db;
   }
 
   void _onCreate(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME,$goldColumn TEXT, $silverColumn TEXT, $bronzeColumn TEXT)');
+        'CREATE TABLE $myGamesTable($gameNameColumn TEXT PRIMARY KEY UNIQUE, $gameImgUrlColumn TEXT,$dateTimeColumn DATETIME,$goldColumn TEXT, $silverColumn TEXT, $bronzeColumn TEXT, $guideEndpointColumn TEXT DEFAULT "ps4/guide/")');
     await db.execute(
         'CREATE TABLE $myTrophyTable($gameNameColumn TEXT, $gameImgUrlColumn TEXT,$trophyNameColumn TEXT,$trophyImageUrlColumn TEXT,$trophyTypeColumn TEXT,$trophyDescriptionColumn TEXT,$trophyGuideColumn TEXT,$trophyActionColumn TEXT,$dateTimeColumn DATETIME)');
+  }
+
+  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+          'ALTER TABLE $myGamesTable ADD COLUMN $guideEndpointColumn TEXT DEFAULT "ps4/guide/"');
+    }
   }
 
   void addGameToDb(GameModel game, BuildContext context) async {
     try {
       var dbClient = await db;
       var result = await dbClient.rawInsert(
-          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn,$goldColumn,$silverColumn,$bronzeColumn) '
-          'VALUES(?, ?, ?, ?, ?, ?)',
-          [game.gameName, game.gameImageUrl, DateTime.now().toString(), game.gold, game.silver, game.bronze]);
+          'INSERT INTO $myGamesTable($gameNameColumn, $gameImgUrlColumn,$dateTimeColumn,$goldColumn,$silverColumn,$bronzeColumn,$guideEndpointColumn) '
+          'VALUES(?, ?, ?, ?, ?, ?, ?)',
+          [game.gameName, game.gameImageUrl, DateTime.now().toString(), game.gold, game.silver, game.bronze, game.guideEndpoint]);
       myGames.add(game);
       notifyListeners();
       print(result);
@@ -89,7 +97,8 @@ class InternalDbProvider extends ChangeNotifier {
               gameImageUrl: i['$gameImgUrlColumn'],
               gold: i['$goldColumn'] != null ? i['$goldColumn'] : '3',
               bronze: i['$bronzeColumn'] != null ? i['$bronzeColumn'] : '3',
-              silver: i['$silverColumn'] != null ? i['$silverColumn'] : '3');
+              silver: i['$silverColumn'] != null ? i['$silverColumn'] : '3',
+              guideEndpoint: i['$guideEndpointColumn'] ?? 'ps4/guide/');
           myGames.add(game);
         }
         notifyListeners();

@@ -130,8 +130,11 @@ class _DashboardState extends State<Dashboard> {
                   onTap: () {
                     Provider.of<PS4GuideProvider>(context, listen: false)
                         .clearGuideList();
-                    Navigator.of(context)
-                        .pushNamed(guidePageRoute, arguments: game);
+                    Navigator.of(context).pushNamed(guidePageRoute,
+                        arguments: {
+                          'game': game,
+                          'guideEndpoint': game.guideEndpoint,
+                        });
                   },
                   child: Container(
                     width: 150,

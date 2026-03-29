@@ -51,7 +51,10 @@ class _MyGamesPageState extends State<MyGamesPage> {
                                       .clearGuideList();
                                   Navigator.of(context).pushNamed(
                                     guidePageRoute,
-                                    arguments: game,
+                                    arguments: {
+                                      'game': game,
+                                      'guideEndpoint': game.guideEndpoint,
+                                    },
                                   );
                                 },
                                 child: Container(

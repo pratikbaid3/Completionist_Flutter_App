@@ -25,6 +25,7 @@ class PS4GameCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
           onTap: () {
+            game.guideEndpoint = guideEndpoint;
             Analytics.logViewGame(
               game.gameName,
               guideEndpoint.contains('ps5') ? 'PS5' : 'PS4',
