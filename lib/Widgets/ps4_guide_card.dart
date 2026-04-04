@@ -13,6 +13,7 @@ import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/review_dialog.dart';
 import 'package:game_trophy_manager/Widgets/snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:game_trophy_manager/Utilities/html_widget_helpers.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -40,8 +41,7 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
   @override
   Widget build(BuildContext context) {
     double wp = MediaQuery.of(context).size.width;
-    final guide =
-        Provider.of<PS4GuideProvider>(context).guide[widget.index];
+    final guide = Provider.of<PS4GuideProvider>(context).guide[widget.index];
     final tColor = trophyColor(guide.trophyType);
 
     return Container(
@@ -74,7 +74,9 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               ),
             ),
             trailingIcon: Icon(
-              widget.isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
+              widget.isStarred
+                  ? Icons.star_rounded
+                  : Icons.star_outline_rounded,
               color: widget.isStarred ? neonPink : goldenColor,
             ),
             onPressed: () {
@@ -124,10 +126,12 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                       .guide[widget.index];
               g.gameName = widget.game.gameName;
               g.gameImgUrl = widget.game.gameImageUrl;
-              final dbProvider = Provider.of<InternalDbProvider>(context, listen: false);
+              final dbProvider =
+                  Provider.of<InternalDbProvider>(context, listen: false);
               if (widget.isCompleted) {
                 dbProvider.removeTrophyFromComplete(g);
-                Analytics.logUncompleteTrophy(g.trophyName, widget.game.gameName);
+                Analytics.logUncompleteTrophy(
+                    g.trophyName, widget.game.gameName);
               } else {
                 dbProvider.addTrophyToComplete(g);
                 Analytics.logCompleteTrophy(g.trophyName, widget.game.gameName);
@@ -171,7 +175,8 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
               onExpansionChanged: (value) {
                 setState(() => isExpanded = value);
                 if (value) {
-                  Analytics.logExpandGuide(guide.trophyName, widget.game.gameName);
+                  Analytics.logExpandGuide(
+                      guide.trophyName, widget.game.gameName);
                 }
               },
               leading: Stack(
@@ -197,8 +202,10 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                           highlightColor: cardColor,
                           child: Container(color: surfaceColor),
                         ),
-                        errorWidget: (context, url, error) =>
-                            Icon(Icons.error_outline, color: textMuted, size: 20),
+                        errorWidget: (context, url, error) => Icon(
+                            Icons.error_outline,
+                            color: textMuted,
+                            size: 20),
                       ),
                     ),
                   ),
@@ -278,6 +285,8 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
                       SizedBox(height: 12),
                       HtmlWidget(
                         guide.trophyGuide,
+                        customWidgetBuilder: buildHtmlVideoWidget,
+                        onTapUrl: (url) async => await launchHtmlUrl(url),
                         textStyle: TextStyle(
                           fontSize: 14,
                           color: textSecondary,

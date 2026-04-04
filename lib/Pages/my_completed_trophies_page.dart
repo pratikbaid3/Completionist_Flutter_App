@@ -5,6 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:game_trophy_manager/Utilities/html_widget_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -19,8 +20,9 @@ class _MyCompletedTrophyPageState extends State<MyCompletedTrophyPage> {
   Widget build(BuildContext context) {
     final dbProvider = Provider.of<InternalDbProvider>(context);
     final hasTrophies = dbProvider.myCompletedTrophy.isNotEmpty;
-    final count =
-        dbProvider.myCompletedTrophy.length > 5 ? 5 : dbProvider.myCompletedTrophy.length;
+    final count = dbProvider.myCompletedTrophy.length > 5
+        ? 5
+        : dbProvider.myCompletedTrophy.length;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -90,10 +92,8 @@ class _MyCompletedTrophyPageState extends State<MyCompletedTrophyPage> {
             style: TextStyle(color: textMuted, fontSize: 14, height: 1.5),
           ),
         ],
-      )
-          .animate()
-          .fadeIn(duration: 400.ms)
-          .scale(begin: Offset(0.9, 0.9), end: Offset(1.0, 1.0), duration: 400.ms),
+      ).animate().fadeIn(duration: 400.ms).scale(
+          begin: Offset(0.9, 0.9), end: Offset(1.0, 1.0), duration: 400.ms),
     );
   }
 }
@@ -189,6 +189,8 @@ class _TrophyExpansionCard extends StatelessWidget {
                   SizedBox(height: 12),
                   HtmlWidget(
                     trophy.trophyGuide,
+                    customWidgetBuilder: buildHtmlVideoWidget,
+                    onTapUrl: (url) async => await launchHtmlUrl(url),
                     textStyle: TextStyle(
                       fontSize: 14,
                       color: textSecondary,

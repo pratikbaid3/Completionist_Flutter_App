@@ -7,6 +7,7 @@ import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:game_trophy_manager/Utilities/html_widget_helpers.dart';
 
 class PS4GuideCardDashboard extends StatelessWidget {
   const PS4GuideCardDashboard({
@@ -125,6 +126,8 @@ class PS4GuideCardDashboard extends StatelessWidget {
                   SizedBox(height: 12),
                   HtmlWidget(
                     trophy.trophyGuide,
+                    customWidgetBuilder: buildHtmlVideoWidget,
+                    onTapUrl: (url) async => await launchHtmlUrl(url),
                     textStyle: TextStyle(
                       fontSize: 14,
                       color: textSecondary,

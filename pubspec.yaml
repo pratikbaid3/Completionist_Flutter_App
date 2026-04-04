@@ -40,6 +40,7 @@ dependencies:
     flutter_widget_from_html_core: ^0.17.0
     another_flushbar: ^1.12.30
     share_plus: ^11.0.0
+    url_launcher: ^6.1.10
     focused_menu: ^1.0.5
     infinite_scroll_pagination: ^4.0.0
     modal_progress_hud_nsn: ^0.5.1
