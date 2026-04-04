@@ -6,14 +6,14 @@ import 'package:game_trophy_manager/Utilities/api.dart';
 class PS4GuideProvider extends ChangeNotifier {
   List<GuideModel> guide = <GuideModel>[];
 
-  Future getGuide({String gameName = ''}) async {
+  Future getGuide({String gameName = '', String endpoint = ps4GuideUrl}) async {
     try {
       Response response;
       Dio dio = new Dio();
       if (guide.length == 0) {
         print('--GET GUIDE--');
-        print(baseUrl + guideUrl + gameName);
-        response = await dio.get(baseUrl + guideUrl + gameName);
+        print(baseUrl + endpoint + gameName);
+        response = await dio.get(baseUrl + endpoint + gameName);
         List<dynamic> data = response.data['result'];
         guide = data.map((data) => GuideModel.fromJson(data)).toList();
       }

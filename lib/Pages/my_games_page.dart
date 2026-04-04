@@ -1,12 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MyGamesPage extends StatefulWidget {
   @override
@@ -14,198 +17,240 @@ class MyGamesPage extends StatefulWidget {
 }
 
 class _MyGamesPageState extends State<MyGamesPage> {
-  TextEditingController searchController = new TextEditingController();
-  String searchKeyword = '';
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    double hp = MediaQuery.of(context).size.height;
-    double wp = MediaQuery.of(context).size.width;
+    final dbProvider = Provider.of<InternalDbProvider>(context);
+    final hasGames = dbProvider.myGames.isNotEmpty;
+
     return KeyboardDismissOnTap(
       child: Scaffold(
-        body: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: wp * 0.03, vertical: hp * 0.03),
-          child: (Provider.of<InternalDbProvider>(context).myGames.length != 0)
-              ? Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        primary: false,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(top: 10, left: 2, right: 2),
-                        itemCount: Provider.of<InternalDbProvider>(context)
-                            .myGames
-                            .length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            color: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 0,
-                            margin: new EdgeInsets.symmetric(vertical: 10.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Provider.of<PS4GuideProvider>(context,
-                                        listen: false)
-                                    .clearGuideList();
-                                Navigator.of(context)
-                                    .pushNamed(guidePageRoute,
-                                        arguments:
-                                            Provider.of<InternalDbProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .myGames[index])
-                                    .then((value) {});
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: secondaryColor,
-                                  borderRadius: new BorderRadius.all(
-                                      const Radius.circular(10)),
-                                ),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 13.0),
-                                  leading: Container(
-                                    padding: EdgeInsets.only(right: 12.0),
-                                    decoration: new BoxDecoration(
-                                        border: new Border(
-                                            right: new BorderSide(
-                                                width: 1.0,
-                                                color: Colors.white24))),
-                                    child: Hero(
-                                      tag:
-                                          '${Provider.of<InternalDbProvider>(context).myGames[index].gameName}',
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            Provider.of<InternalDbProvider>(
-                                                    context)
-                                                .myGames[index]
-                                                .gameImageUrl,
-                                        placeholder: (context, url) =>
-                                            new CircularProgressIndicator(
-                                          backgroundColor: primaryAccentColor,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            new Icon(Icons.error),
-                                      ),
+        backgroundColor: Colors.transparent,
+        body: hasGames
+            ? AnimationLimiter(
+                child: ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  itemCount: dbProvider.myGames.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final game = dbProvider.myGames[index];
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                        verticalOffset: 30.0,
+                        child: FadeInAnimation(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 6),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () {
+                                  Provider.of<PS4GuideProvider>(context,
+                                          listen: false)
+                                      .clearGuideList();
+                                  Navigator.of(context).pushNamed(
+                                    guidePageRoute,
+                                    arguments: {
+                                      'game': game,
+                                      'guideEndpoint': game.guideEndpoint,
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: surfaceColor,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: primaryAccentColor
+                                          .withValues(alpha: 0.08),
+                                      width: 1,
                                     ),
                                   ),
-                                  title: Text(
-                                    '${Provider.of<InternalDbProvider>(context).myGames[index].gameName}',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  trailing: Icon(Icons.keyboard_arrow_right,
-                                      color: Colors.white, size: 30.0),
-                                  subtitle: Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(12),
                                     child: Row(
                                       children: [
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: goldenColor,
-                                              size: 25,
+                                        Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: cardColor,
+                                            border: Border.all(
+                                              color: primaryAccentColor
+                                                  .withValues(alpha: 0.15),
+                                              width: 1,
                                             ),
-                                            Text(
-                                              Provider.of<InternalDbProvider>(
-                                                      context)
-                                                  .myGames[index]
-                                                  .gold,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: CachedNetworkImage(
+                                              imageUrl: game.gameImageUrl,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  Shimmer.fromColors(
+                                                baseColor: surfaceColor,
+                                                highlightColor: cardColor,
+                                                child: Container(
+                                                    color: surfaceColor),
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: silverColor,
-                                              size: 25,
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(
+                                                Icons.error_outline,
+                                                color: textMuted,
+                                              ),
                                             ),
-                                            Text(
-                                              Provider.of<InternalDbProvider>(
-                                                      context)
-                                                  .myGames[index]
-                                                  .silver,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
+                                          ),
                                         ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              LineAwesomeIcons.trophy,
-                                              color: bronzeColor,
-                                              size: 25,
-                                            ),
-                                            Text(
-                                              Provider.of<InternalDbProvider>(
-                                                      context)
-                                                  .myGames[index]
-                                                  .bronze,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
+                                        SizedBox(width: 14),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                game.gameName,
+                                                style: GoogleFonts.inter(
+                                                  color: textPrimary,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 15,
+                                                ),
+                                                maxLines: 2,
+                                                overflow:
+                                                    TextOverflow.ellipsis,
                                               ),
-                                            )
-                                          ],
-                                        )
+                                              SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                  _TrophyBadge(
+                                                      count: game.gold,
+                                                      color: goldenColor),
+                                                  SizedBox(width: 8),
+                                                  _TrophyBadge(
+                                                      count: game.silver,
+                                                      color: silverColor),
+                                                  SizedBox(width: 8),
+                                                  _TrophyBadge(
+                                                      count: game.bronze,
+                                                      color: bronzeColor),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: primaryAccentColor
+                                                .withValues(alpha: 0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            Icons
+                                                .arrow_forward_ios_rounded,
+                                            color: primaryAccentColor,
+                                            size: 14,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: surfaceColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: primaryAccentColor.withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.gamepad_outlined,
+                        size: 48,
+                        color: textMuted,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'No games yet',
+                      style: GoogleFonts.inter(
+                        color: textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Browse games and add them\nto your library',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textMuted,
+                        fontSize: 14,
+                        height: 1.5,
                       ),
                     ),
                   ],
                 )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image(
-                        width: wp * 0.7,
-                        image: AssetImage(
-                          'images/no_data_1.png',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-        ),
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .scale(
+                      begin: Offset(0.9, 0.9),
+                      end: Offset(1.0, 1.0),
+                      duration: 400.ms,
+                    ),
+              ),
+      ),
+    );
+  }
+}
+
+class _TrophyBadge extends StatelessWidget {
+  final String count;
+  final Color color;
+  const _TrophyBadge({required this.count, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.emoji_events_rounded, color: color, size: 14),
+          SizedBox(width: 4),
+          Text(
+            count,
+            style: GoogleFonts.inter(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

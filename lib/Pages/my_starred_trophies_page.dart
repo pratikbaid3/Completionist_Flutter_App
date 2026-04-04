@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:game_trophy_manager/Utilities/html_widget_helpers.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MyStarredTrophyPage extends StatefulWidget {
   @override
@@ -14,163 +16,191 @@ class MyStarredTrophyPage extends StatefulWidget {
 }
 
 class _MyStarredTrophyPageState extends State<MyStarredTrophyPage> {
-  TextEditingController searchController = new TextEditingController();
-  String searchKeyword = '';
-
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  Widget build(BuildContext context) {
+    final dbProvider = Provider.of<InternalDbProvider>(context);
+    final hasTrophies = dbProvider.myStarredTrophy.isNotEmpty;
+    final count = dbProvider.myStarredTrophy.length > 5
+        ? 5
+        : dbProvider.myStarredTrophy.length;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: hasTrophies
+          ? AnimationLimiter(
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
+                itemCount: count,
+                itemBuilder: (BuildContext context, int index) {
+                  final trophy = dbProvider.myStarredTrophy[index];
+                  final tColor = trophyColor(trophy.trophyType);
+
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      verticalOffset: 30.0,
+                      child: FadeInAnimation(
+                        child: _TrophyExpansionCard(
+                          trophy: trophy,
+                          tColor: tColor,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          : _buildEmptyState(),
+    );
   }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: goldenColor.withValues(alpha: 0.15),
+              ),
+            ),
+            child: Icon(
+              Icons.star_outline_rounded,
+              size: 48,
+              color: textMuted,
+            ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'No starred trophies',
+            style: GoogleFonts.inter(
+              color: textSecondary,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Star trophies to keep track\nof your goals',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: textMuted, fontSize: 14, height: 1.5),
+          ),
+        ],
+      ).animate().fadeIn(duration: 400.ms).scale(
+          begin: Offset(0.9, 0.9), end: Offset(1.0, 1.0), duration: 400.ms),
+    );
+  }
+}
+
+class _TrophyExpansionCard extends StatelessWidget {
+  final dynamic trophy;
+  final Color tColor;
+
+  const _TrophyExpansionCard({required this.trophy, required this.tColor});
 
   @override
   Widget build(BuildContext context) {
-    bool isExpanded = false;
-    double hp = MediaQuery.of(context).size.height;
-    double wp = MediaQuery.of(context).size.width;
-    return KeyboardDismissOnTap(
-      child: Scaffold(
-        body: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: wp * 0.03, vertical: hp * 0.03),
-          child: (Provider.of<InternalDbProvider>(context)
-                      .myStarredTrophy
-                      .length !=
-                  0)
-              ? Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        primary: false,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(top: 10, left: 2, right: 2),
-                        itemCount: (Provider.of<InternalDbProvider>(context)
-                                    .myStarredTrophy
-                                    .length >
-                                5)
-                            ? 5
-                            : Provider.of<InternalDbProvider>(context)
-                                .myStarredTrophy
-                                .length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: ExpansionTileCard(
-                              initialElevation: 0,
-                              elevation: 0,
-                              baseColor: secondaryColor,
-                              expandedColor: secondaryColor,
-                              onExpansionChanged: (value) {
-                                setState(() {
-                                  isExpanded = value;
-                                });
-                              },
-                              trailing: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(
-                                    LineAwesomeIcons.trophy,
-                                    size: 30,
-                                    color: (Provider.of<InternalDbProvider>(
-                                                    context)
-                                                .myStarredTrophy[index]
-                                                .trophyType ==
-                                            'BRONZE')
-                                        ? bronzeColor
-                                        : ((Provider.of<InternalDbProvider>(
-                                                        context)
-                                                    .myStarredTrophy[index]
-                                                    .trophyType ==
-                                                'SILVER')
-                                            ? silverColor
-                                            : goldenColor),
-                                  ),
-                                  (!isExpanded)
-                                      ? Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          color: Colors.white,
-                                        )
-                                      : Icon(
-                                          Icons.keyboard_arrow_up_rounded,
-                                          color: Colors.white,
-                                        ),
-                                ],
-                              ),
-                              title: ListTile(
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 13.0),
-                                leading: Container(
-                                    padding: EdgeInsets.only(right: 12.0),
-                                    decoration: new BoxDecoration(
-                                        border: new Border(
-                                            right: new BorderSide(
-                                                width: 1.0,
-                                                color: Colors.white24))),
-                                    child: CachedNetworkImage(
-                                      imageUrl: Provider.of<InternalDbProvider>(
-                                              context)
-                                          .myStarredTrophy[index]
-                                          .trophyImage,
-                                      placeholder: (context, url) =>
-                                          new CircularProgressIndicator(
-                                        backgroundColor: primaryAccentColor,
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          new Icon(Icons.error),
-                                    )),
-                                title: Text(
-                                  '${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyName}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Padding(
-                                  padding: EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    Provider.of<InternalDbProvider>(context)
-                                        .myStarredTrophy[index]
-                                        .trophyDescription,
-                                    style: TextStyle(
-                                      color: Colors.white60,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(0),
-                                  ),
-                                  child: HtmlWidget(
-                                    '''${Provider.of<InternalDbProvider>(context).myStarredTrophy[index].trophyGuide}''',
-                                    textStyle: TextStyle(fontSize: 15),
-                                    webView: true,
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 20),
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image(
-                        width: wp * 0.7,
-                        image: AssetImage(
-                          'images/no_data_1.png',
-                        ),
-                      ),
-                    ],
-                  ),
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: tColor.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: EdgeInsets.zero,
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: cardColor,
+              border: Border.all(
+                color: tColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: trophy.trophyImage,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Shimmer.fromColors(
+                  baseColor: surfaceColor,
+                  highlightColor: cardColor,
+                  child: Container(color: surfaceColor),
                 ),
+                errorWidget: (context, url, error) =>
+                    Icon(Icons.error_outline, color: textMuted, size: 20),
+              ),
+            ),
+          ),
+          title: Text(
+            trophy.trophyName,
+            style: GoogleFonts.inter(
+              color: textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Text(
+              trophy.trophyDescription,
+              style: TextStyle(color: textSecondary, fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          trailing: Container(
+            padding: EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: tColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.emoji_events_rounded,
+              size: 20,
+              color: tColor,
+            ),
+          ),
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(color: tColor.withValues(alpha: 0.1), height: 1),
+                  SizedBox(height: 12),
+                  HtmlWidget(
+                    trophy.trophyGuide,
+                    customWidgetBuilder: buildHtmlVideoWidget,
+                    onTapUrl: (url) async => await launchHtmlUrl(url),
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      color: textSecondary,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "Bash(flutter devices:*)",
+      "Bash(flutter pub:*)",
+      "Bash(pod install:*)",
+      "Bash(flutter run:*)",
+      "Bash(flutter build:*)",
+      "Bash(grep -n \"accentColor\" ~/.pub-cache/git/Flutter-Neumorphic-*/lib/src/widget/app.dart)",
+      "Bash(ls ~/.pub-cache/git/Flutter-Neumorphic-*/lib/src/widget/app.dart)",
+      "Bash(tee /tmp/android_build.log)",
+      "Bash(pod update:*)",
+      "Bash(flutter clean:*)",
+      "WebFetch(domain:abhyaasa.com)",
+      "WebFetch(domain:apps.apple.com)",
+      "Bash(flutter analyze:*)"
+    ]
+  }
+}

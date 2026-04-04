@@ -2,12 +2,11 @@
     package="co.turingcreatives.game_trophy_manager">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="com.android.vending.BILLING"/>
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <application
         android:name="${applicationName}"
         android:label="Completionist"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:extractNativeLibs="false">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -26,8 +25,5 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9881507895831818~1753117528"/>
     </application>
 </manifest>
