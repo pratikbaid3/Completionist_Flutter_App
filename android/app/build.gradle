@@ -53,9 +53,12 @@ android {
         applicationId "co.turingcreatives.game_trophy_manager"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
-        versionCode 54
-        versionName '7.0.4'
+        versionCode 57
+        versionName '7.0.7'
         multiDexEnabled true
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
     }
     signingConfigs {
         release {
@@ -71,10 +74,25 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    packagingOptions {
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+    }
 }
 
 flutter {
     source '../..'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.browser:browser:1.5.0'
+        force 'androidx.core:core:1.12.0'
+        force 'androidx.core:core-ktx:1.12.0'
+    }
 }
 
 dependencies {

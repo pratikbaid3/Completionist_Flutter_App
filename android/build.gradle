@@ -3,6 +3,12 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    gradle.projectsEvaluated {
+        tasks.withType(org.gradle.api.tasks.bundling.Jar) {
+            duplicatesStrategy = 'include'
+        }
+    }
 }
 
 rootProject.buildDir = '../build'
