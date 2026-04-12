@@ -204,21 +204,25 @@ class _MergedGameTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 10),
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             _TrophyBadge(
-                              count: game.gold,
+                              count: item.totalGold,
                               color: goldenColor,
                             ),
-                            SizedBox(width: 10),
                             _TrophyBadge(
-                              count: game.silver,
+                              count: item.totalSilver,
                               color: silverColor,
                             ),
-                            SizedBox(width: 10),
                             _TrophyBadge(
-                              count: game.bronze,
+                              count: item.totalBronze,
                               color: bronzeColor,
+                            ),
+                            _TrophyBadge(
+                              count: item.totalPlatinum,
+                              color: platinumColor,
                             ),
                           ],
                         ),
@@ -283,10 +287,13 @@ class _Tag extends StatelessWidget {
 }
 
 class _TrophyBadge extends StatelessWidget {
-  final String count;
+  final int count;
   final Color color;
 
-  const _TrophyBadge({required this.count, required this.color});
+  const _TrophyBadge({
+    required this.count,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +310,7 @@ class _TrophyBadge extends StatelessWidget {
           Icon(Icons.emoji_events_rounded, color: color, size: 14),
           SizedBox(width: 4),
           Text(
-            count,
+            '$count',
             style: GoogleFonts.inter(
               color: color,
               fontWeight: FontWeight.w700,

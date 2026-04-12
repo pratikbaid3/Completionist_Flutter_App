@@ -124,6 +124,10 @@ class _DashboardState extends State<Dashboard> {
     final summaryText = isConnected
         ? '${dbProvider.myPsnGames.length} titles • ${psnProvider.lastSyncLabel()}'
         : 'Sync your PSN games';
+    final displaySummary =
+        psnProvider.isBusy && psnProvider.busyMessage.trim().isNotEmpty
+            ? psnProvider.busyMessage.trim()
+            : summaryText;
 
     return Container(
       margin: EdgeInsets.fromLTRB(20, 4, 20, 16),
@@ -154,7 +158,7 @@ class _DashboardState extends State<Dashboard> {
                     Text('PSN Sync', style: titleStyle),
                     SizedBox(height: 2),
                     Text(
-                      summaryText,
+                      displaySummary,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -394,88 +398,104 @@ class _DashboardState extends State<Dashboard> {
                       width: 1,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(16)),
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: item.imageUrl,
-                                    fit: BoxFit.contain,
-                                    placeholder: (ctx, url) =>
-                                        Shimmer.fromColors(
-                                      baseColor: surfaceColor,
-                                      highlightColor: cardColor,
-                                      child: Container(color: surfaceColor),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: item.imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (ctx, url) => Shimmer.fromColors(
+                            baseColor: surfaceColor,
+                            highlightColor: cardColor,
+                            child: Container(color: surfaceColor),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            color: surfaceColor,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.hide_image_outlined,
+                              color: textMuted,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.18),
+                                Colors.black.withValues(alpha: 0.28),
+                                surfaceColor.withValues(alpha: 0.96),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 10,
+                          left: 10,
+                          child: _StatusPill(
+                            label: item.platform.toUpperCase(),
+                            color: item.platform == 'ps5'
+                                ? secondaryAccentColor
+                                : primaryAccentColor,
+                          ),
+                        ),
+                        Positioned(
+                          left: 10,
+                          right: 10,
+                          bottom: 10,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                item.gameName,
+                                style: GoogleFonts.inter(
+                                  color: textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  shadows: [
+                                    Shadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.45),
+                                      blurRadius: 8,
                                     ),
-                                    errorWidget: (_, __, ___) => Icon(
-                                      Icons.hide_image_outlined,
-                                      color: textMuted,
-                                    ),
+                                  ],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  _MiniTrophy(
+                                    count: item.totalGold,
+                                    color: goldenColor,
                                   ),
-                                ),
+                                  _MiniTrophy(
+                                    count: item.totalSilver,
+                                    color: silverColor,
+                                  ),
+                                  _MiniTrophy(
+                                    count: item.totalBronze,
+                                    color: bronzeColor,
+                                  ),
+                                  _MiniTrophy(
+                                    count: item.totalPlatinum,
+                                    color: platinumColor,
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                _StatusPill(
-                                  label: item.platform.toUpperCase(),
-                                  color: item.platform == 'ps5'
-                                      ? secondaryAccentColor
-                                      : primaryAccentColor,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              item.gameName,
-                              style: GoogleFonts.inter(
-                                color: textPrimary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                _MiniTrophy(
-                                  count: game.gold,
-                                  color: goldenColor,
-                                ),
-                                SizedBox(width: 6),
-                                _MiniTrophy(
-                                  count: game.silver,
-                                  color: silverColor,
-                                ),
-                                SizedBox(width: 6),
-                                _MiniTrophy(
-                                  count: game.bronze,
-                                  color: bronzeColor,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -791,10 +811,13 @@ class _PsnActionButton extends StatelessWidget {
 }
 
 class _MiniTrophy extends StatelessWidget {
-  final String count;
+  final int count;
   final Color color;
 
-  const _MiniTrophy({required this.count, required this.color});
+  const _MiniTrophy({
+    required this.count,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -811,7 +834,7 @@ class _MiniTrophy extends StatelessWidget {
           Icon(Icons.emoji_events_rounded, size: 12, color: color),
           SizedBox(width: 3),
           Text(
-            count,
+            '$count',
             style: GoogleFonts.inter(
               color: color,
               fontWeight: FontWeight.w700,

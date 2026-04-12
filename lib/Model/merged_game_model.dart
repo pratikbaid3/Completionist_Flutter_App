@@ -41,6 +41,26 @@ class MergedGameModel {
 
   int get completionPercent => psnGame?.completionPercent ?? 0;
 
+  int get bronzeCompletionPercent => _typeCompletionPercent(
+        psnGame?.earnedBronze ?? 0,
+        psnGame?.totalBronze ?? 0,
+      );
+
+  int get silverCompletionPercent => _typeCompletionPercent(
+        psnGame?.earnedSilver ?? 0,
+        psnGame?.totalSilver ?? 0,
+      );
+
+  int get goldCompletionPercent => _typeCompletionPercent(
+        psnGame?.earnedGold ?? 0,
+        psnGame?.totalGold ?? 0,
+      );
+
+  int get platinumCompletionPercent => _typeCompletionPercent(
+        psnGame?.earnedPlatinum ?? 0,
+        psnGame?.totalPlatinum ?? 0,
+      );
+
   int get trophyTotal =>
       (psnGame?.totalBronze ?? 0) +
       (psnGame?.totalSilver ?? 0) +
@@ -53,8 +73,30 @@ class MergedGameModel {
       (psnGame?.earnedGold ?? 0) +
       (psnGame?.earnedPlatinum ?? 0);
 
+  int get totalBronze =>
+      _resolvedTotal(localGame?.bronze, psnGame?.totalBronze ?? 0);
+
+  int get totalSilver =>
+      _resolvedTotal(localGame?.silver, psnGame?.totalSilver ?? 0);
+
+  int get totalGold => _resolvedTotal(localGame?.gold, psnGame?.totalGold ?? 0);
+
+  int get totalPlatinum =>
+      _resolvedTotal(localGame?.platinum, psnGame?.totalPlatinum ?? 0);
+
   String get guideEndpoint =>
       localGame?.guideEndpoint ?? psnGame?.guideEndpoint ?? 'ps4/guide/';
+
+  int _typeCompletionPercent(int earned, int total) {
+    if (total <= 0) return 0;
+    return ((earned / total) * 100).round();
+  }
+
+  int _resolvedTotal(String? localValue, int psnValue) {
+    final localTotal = int.tryParse((localValue ?? '').trim()) ?? 0;
+    if (localTotal > 0) return localTotal;
+    return psnValue;
+  }
 
   GameModel toGameModel() {
     if (localGame != null) {

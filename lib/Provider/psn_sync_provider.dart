@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,11 +30,28 @@ class PsnSyncProvider extends ChangeNotifier {
   String syncStatus = 'idle';
   String syncError = '';
   bool isBusy = false;
+  String busyTitle = '';
+  String busyMessage = '';
+  List<String> busyImageUrls = <String>[];
+  DateTime? busyStartedAt;
   bool _initialized = false;
+  Timer? _busyHintTimer;
+  List<String> _busyHints = const <String>[];
+  int _busyHintIndex = 0;
+  bool _busyCatalogImagesRequested = false;
 
   bool get isConnected => profile != null;
   bool get hasCachedLibrary => true;
   static const bool _enablePsnSyncDebugLogs = true;
+
+  String busyElapsedLabel() {
+    if (!isBusy || busyStartedAt == null) return '';
+    final diff = DateTime.now().difference(busyStartedAt!);
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s';
+    final minutes = diff.inMinutes;
+    final seconds = diff.inSeconds % 60;
+    return '${minutes}m ${seconds}s';
+  }
 
   Future<void> initialize(InternalDbProvider dbProvider) async {
     if (_initialized) return;
@@ -64,8 +83,20 @@ class PsnSyncProvider extends ChangeNotifier {
       return false;
     }
 
-    isBusy = true;
     syncError = '';
+    _beginBusy(
+      title: 'Connecting to PSN',
+      hints: const <String>[
+        'Validating your PlayStation session...',
+        'Preparing your first sync...',
+      ],
+      initialMessage: 'Validating your PlayStation session...',
+    );
+    _setBusyImageUrls(
+      _collectCachedPreviewImages(dbProvider),
+      notify: false,
+    );
+    _primeBusyCatalogImages();
     notifyListeners();
 
     try {
@@ -80,7 +111,8 @@ class PsnSyncProvider extends ChangeNotifier {
       await _secureStorage.write(key: _npssoKey, value: npsso.trim());
       await _persistState();
       notifyListeners();
-      return await syncNow(dbProvider, force: true);
+      _setBusyMessage('Session verified. Starting initial sync...');
+      return await syncNow(dbProvider, force: true, manageBusy: false);
     } on DioException catch (error) {
       syncStatus = 'error';
       syncError = _errorFromResponse(error);
@@ -88,14 +120,14 @@ class PsnSyncProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } finally {
-      isBusy = false;
-      notifyListeners();
+      _endBusy();
     }
   }
 
   Future<bool> syncNow(
     InternalDbProvider dbProvider, {
     bool force = false,
+    bool manageBusy = true,
   }) async {
     final npsso = await _secureStorage.read(key: _npssoKey);
     if (npsso == null || npsso.isEmpty) {
@@ -105,7 +137,26 @@ class PsnSyncProvider extends ChangeNotifier {
       return false;
     }
 
-    isBusy = true;
+    if (manageBusy) {
+      _beginBusy(
+        title: 'Syncing your PSN data',
+        hints: const <String>[
+          'Fetching your PSN library...',
+          'Matching titles with your local catalog...',
+          'Importing completed trophies...',
+          'Saving synced data on this device...',
+        ],
+        initialMessage: 'Fetching your PSN library...',
+      );
+      _setBusyImageUrls(
+        _collectCachedPreviewImages(dbProvider),
+        notify: false,
+      );
+      _primeBusyCatalogImages();
+    } else {
+      _setBusyMessage('Fetching your PSN library...');
+    }
+
     syncError = '';
     syncStatus = 'syncing';
     notifyListeners();
@@ -119,7 +170,25 @@ class PsnSyncProvider extends ChangeNotifier {
           (response.data['profile'] as Map).cast<String, dynamic>();
       profile = PsnProfileCache.fromJson(profileJson);
 
+      _setBusyMessage('Matching titles with your local catalog...');
       final List<dynamic> rawLibrary = response.data['library'] ?? <dynamic>[];
+      final responsePreviewImages = <String>[];
+      for (final item in rawLibrary) {
+        final data = (item as Map).cast<String, dynamic>();
+        responsePreviewImages.add((data['image_url'] ?? '').toString());
+        final catalogMatch = data['catalog_match'];
+        if (catalogMatch is Map) {
+          responsePreviewImages
+              .add((catalogMatch['game_image_link'] ?? '').toString());
+        }
+      }
+      _setBusyImageUrls(
+        <String>[
+          ...responsePreviewImages,
+          ...busyImageUrls,
+        ],
+      );
+
       final List<GameModel> matchedGames = <GameModel>[];
       final List<PsnGameSnapshot> psnGames = <PsnGameSnapshot>[];
       final List<GuideModel> completedTrophies = <GuideModel>[];
@@ -177,6 +246,7 @@ class PsnSyncProvider extends ChangeNotifier {
         matchedGames: matchedGames,
       );
 
+      _setBusyMessage('Saving synced data on this device...');
       await dbProvider.upsertGamesFromSync(matchedGames);
       await dbProvider.replacePsnGamesSnapshot(dedupedPsnGames);
       await dbProvider.replacePsnCompletedTrophies(completedTrophies);
@@ -187,17 +257,20 @@ class PsnSyncProvider extends ChangeNotifier {
       syncStatus = response.data['sync_meta']?['status'] ?? 'success';
       syncError = response.data['sync_meta']?['error'] ?? '';
       await _persistState();
+      _setBusyMessage('Sync complete. Finalizing...');
       notifyListeners();
       return true;
     } on DioException catch (error) {
       syncStatus = 'error';
       syncError = _errorFromResponse(error);
+      _setBusyMessage('Sync failed. Please try again.');
       await _persistState();
       notifyListeners();
       return false;
     } finally {
-      isBusy = false;
-      notifyListeners();
+      if (manageBusy) {
+        _endBusy();
+      }
     }
   }
 
@@ -228,6 +301,12 @@ class PsnSyncProvider extends ChangeNotifier {
     await dbProvider.clearPsnGamesSnapshot();
     await dbProvider.clearPsnCompletedTrophies();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _busyHintTimer?.cancel();
+    super.dispose();
   }
 
   List<MergedGameModel> mergeGames(
@@ -540,5 +619,241 @@ class PsnSyncProvider extends ChangeNotifier {
       return data['sync_meta']['error'].toString();
     }
     return error.message ?? 'Unable to reach PSN sync right now.';
+  }
+
+  void _beginBusy({
+    required String title,
+    required List<String> hints,
+    String? initialMessage,
+  }) {
+    _busyHintTimer?.cancel();
+    _busyHints = hints.where((hint) => hint.trim().isNotEmpty).toList();
+    _busyHintIndex = 0;
+    _busyCatalogImagesRequested = false;
+    isBusy = true;
+    busyStartedAt = DateTime.now();
+    busyTitle = title;
+    busyMessage = initialMessage?.trim().isNotEmpty == true
+        ? initialMessage!.trim()
+        : (_busyHints.isNotEmpty ? _busyHints.first : '');
+    notifyListeners();
+
+    if (_busyHints.length <= 1) return;
+    _busyHintTimer = Timer.periodic(Duration(seconds: 3), (_) {
+      if (!isBusy || _busyHints.isEmpty) return;
+      _busyHintIndex = (_busyHintIndex + 1) % _busyHints.length;
+      busyMessage = _busyHints[_busyHintIndex];
+      notifyListeners();
+    });
+  }
+
+  void _setBusyMessage(String message) {
+    if (!isBusy) return;
+    final normalized = message.trim();
+    if (normalized.isEmpty || normalized == busyMessage) return;
+    busyMessage = normalized;
+    notifyListeners();
+  }
+
+  void _endBusy() {
+    _busyHintTimer?.cancel();
+    _busyHintTimer = null;
+    isBusy = false;
+    busyTitle = '';
+    busyMessage = '';
+    busyImageUrls = <String>[];
+    busyStartedAt = null;
+    _busyHints = const <String>[];
+    _busyHintIndex = 0;
+    _busyCatalogImagesRequested = false;
+    notifyListeners();
+  }
+
+  void _primeBusyCatalogImages() {
+    if (_busyCatalogImagesRequested || !isBusy) return;
+    _busyCatalogImagesRequested = true;
+    _fetchShowcaseCatalogImageUrls().then((urls) {
+      if (!isBusy || urls.isEmpty) return;
+      _setBusyImageUrls(
+        <String>[
+          ...busyImageUrls,
+          ...urls,
+        ],
+      );
+    }).catchError((_) {});
+  }
+
+  List<String> _collectCachedPreviewImages(InternalDbProvider dbProvider) {
+    final urls = <String>[];
+    for (final game in dbProvider.myPsnGames) {
+      urls.add(game.imageUrl);
+    }
+    for (final game in dbProvider.myGames) {
+      urls.add(game.gameImageUrl);
+    }
+    for (final trophy in dbProvider.myCompletedTrophy) {
+      urls.add(trophy.gameImgUrl);
+    }
+    return urls;
+  }
+
+  Future<List<String>> _fetchShowcaseCatalogImageUrls() async {
+    final candidates = <Map<String, dynamic>>[];
+    final franchiseQueries = <String, List<String>>{
+      'gta': <String>['Grand Theft Auto'],
+      'cod': <String>['Call of Duty'],
+      'gow': <String>['God of War'],
+      'spiderman': <String>['Spider-Man', 'Spider Man'],
+      'witcher': <String>['Witcher'],
+      'tlou': <String>['The Last of Us', 'Last of Us'],
+    };
+    final franchiseRows = <String, List<Map<String, dynamic>>>{};
+    final random = Random();
+
+    Future<void> fetchSearch({
+      required String endpoint,
+      required String query,
+      required String franchiseKey,
+    }) async {
+      try {
+        final response = await _dio.get(
+          '$baseUrl$endpoint/',
+          queryParameters: {
+            'page': 1,
+            'search': query,
+          },
+        );
+        final data = response.data;
+        if (data is! Map) return;
+        final results = data['results'];
+        if (results is! List) return;
+        for (final row in results) {
+          if (row is Map) {
+            franchiseRows.putIfAbsent(
+              franchiseKey,
+              () => <Map<String, dynamic>>[],
+            );
+            franchiseRows[franchiseKey]!.add(row.cast<String, dynamic>());
+          }
+        }
+      } catch (_) {}
+    }
+
+    Future<void> fetchEndpoint(String endpoint) async {
+      try {
+        final response = await _dio.get(
+          '$baseUrl$endpoint/',
+          queryParameters: {
+            'page': 1,
+            'search': '',
+          },
+        );
+        final data = response.data;
+        if (data is! Map) return;
+        final results = data['results'];
+        if (results is! List) return;
+        for (final row in results) {
+          if (row is Map) {
+            candidates.add(row.cast<String, dynamic>());
+          }
+        }
+      } catch (_) {}
+    }
+
+    for (final entry in franchiseQueries.entries) {
+      final franchiseKey = entry.key;
+      for (final query in entry.value) {
+        await Future.wait([
+          fetchSearch(
+            endpoint: ps4GamesUrl,
+            query: query,
+            franchiseKey: franchiseKey,
+          ),
+          fetchSearch(
+            endpoint: ps5GamesUrl,
+            query: query,
+            franchiseKey: franchiseKey,
+          ),
+        ]);
+      }
+    }
+
+    await Future.wait([
+      fetchEndpoint(ps4GamesUrl),
+      fetchEndpoint(ps5GamesUrl),
+    ]);
+
+    final urls = <String>[];
+    final seen = <String>{};
+
+    // Take a balanced mix from showcase franchises first.
+    for (final key in franchiseQueries.keys) {
+      final rows = List<Map<String, dynamic>>.from(
+        franchiseRows[key] ?? const <Map<String, dynamic>>[],
+      );
+      rows.shuffle(random);
+      var addedForKey = 0;
+      for (final row in rows) {
+        final imageUrl = (row['game_image_link'] ?? '').toString().trim();
+        if (imageUrl.isEmpty) continue;
+        if (!seen.add(imageUrl)) continue;
+        urls.add(imageUrl);
+        addedForKey += 1;
+        if (addedForKey >= 3) break;
+        if (urls.length >= 18) break;
+      }
+      if (urls.length >= 18) break;
+    }
+
+    if (candidates.isEmpty) return urls;
+
+    final randomRows = List<Map<String, dynamic>>.from(candidates);
+    randomRows.shuffle(random);
+    if (urls.length < 20) {
+      for (final row in randomRows) {
+        final imageUrl = (row['game_image_link'] ?? '').toString().trim();
+        if (imageUrl.isEmpty) continue;
+        if (!seen.add(imageUrl)) continue;
+        urls.add(imageUrl);
+        if (urls.length >= 20) break;
+      }
+    }
+    return urls;
+  }
+
+  void _setBusyImageUrls(
+    List<String> rawUrls, {
+    bool notify = true,
+  }) {
+    final deduped = <String>[];
+    final seen = <String>{};
+
+    for (final raw in rawUrls) {
+      var url = raw.trim();
+      if (url.isEmpty) continue;
+      if (url.startsWith('//')) {
+        url = 'https:$url';
+      }
+      if (!(url.startsWith('https://') || url.startsWith('http://'))) {
+        continue;
+      }
+      if (seen.add(url)) {
+        deduped.add(url);
+      }
+      if (deduped.length >= 20) break;
+    }
+
+    final current = busyImageUrls;
+    final isSame = current.length == deduped.length &&
+        current
+            .asMap()
+            .entries
+            .every((entry) => deduped[entry.key] == entry.value);
+    if (isSame) return;
+
+    busyImageUrls = deduped;
+    if (notify) {
+      notifyListeners();
+    }
   }
 }

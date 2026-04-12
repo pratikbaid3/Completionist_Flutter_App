@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -87,27 +89,43 @@ class _NavDrawerPageState extends State<NavDrawerPage>
     double wp = MediaQuery.of(context).size.width;
     final dbProvider = Provider.of<InternalDbProvider>(context);
     final psnProvider = Provider.of<PsnSyncProvider>(context);
+    final syncPreviewImages =
+        _collectSyncPreviewImages(dbProvider, psnProvider);
     return Scaffold(
       backgroundColor: primaryColor,
       extendBody: true,
       appBar: _buildAppBar(wp, psnProvider, dbProvider),
       body: AuroraBackground(
-        child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            HapticFeedback.selectionClick();
-            Analytics.logTabSwitch(_tabNames[index]);
-            setState(() => _currentIndex = index);
-          },
+        child: Stack(
           children: [
-            Dashboard(),
-            MyGamesPage(),
-            _BrowseTabView(),
-            _TrophiesTabView(),
+            PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                HapticFeedback.selectionClick();
+                Analytics.logTabSwitch(_tabNames[index]);
+                setState(() => _currentIndex = index);
+              },
+              children: [
+                Dashboard(),
+                MyGamesPage(),
+                _BrowseTabView(),
+                _TrophiesTabView(),
+              ],
+            ),
+            if (psnProvider.isBusy)
+              Positioned.fill(
+                child: _PsnSyncLoadingBottomSheet(
+                  psnProvider: psnProvider,
+                  imageUrls: syncPreviewImages,
+                ),
+              ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: AbsorbPointer(
+        absorbing: psnProvider.isBusy,
+        child: _buildBottomNav(),
+      ),
     );
   }
 
@@ -153,7 +171,9 @@ class _NavDrawerPageState extends State<NavDrawerPage>
             padding: EdgeInsets.only(right: 12),
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () => _showPsnAccountSheet(psnProvider, dbProvider),
+              onTap: psnProvider.isBusy
+                  ? null
+                  : () => _showPsnAccountSheet(psnProvider, dbProvider),
               child: Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -392,6 +412,37 @@ class _NavDrawerPageState extends State<NavDrawerPage>
       ),
     );
   }
+
+  List<String> _collectSyncPreviewImages(
+    InternalDbProvider dbProvider,
+    PsnSyncProvider psnProvider,
+  ) {
+    final seen = <String>{};
+    final urls = <String>[];
+
+    void append(String raw) {
+      final url = raw.trim();
+      if (url.isEmpty) return;
+      if (seen.add(url)) {
+        urls.add(url);
+      }
+    }
+
+    for (final url in psnProvider.busyImageUrls) {
+      append(url);
+    }
+    for (final game in dbProvider.myPsnGames) {
+      append(game.imageUrl);
+    }
+    for (final game in dbProvider.myGames) {
+      append(game.gameImageUrl);
+    }
+
+    if (urls.length > 20) {
+      return urls.sublist(0, 20);
+    }
+    return urls;
+  }
 }
 
 class _BrowseTabView extends StatelessWidget {
@@ -518,6 +569,474 @@ class _TrophiesTabView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PsnSyncLoadingBottomSheet extends StatefulWidget {
+  final PsnSyncProvider psnProvider;
+  final List<String> imageUrls;
+
+  const _PsnSyncLoadingBottomSheet({
+    required this.psnProvider,
+    required this.imageUrls,
+  });
+
+  @override
+  State<_PsnSyncLoadingBottomSheet> createState() =>
+      _PsnSyncLoadingBottomSheetState();
+}
+
+class _PsnSyncLoadingBottomSheetState extends State<_PsnSyncLoadingBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _glowController;
+  late final PageController _pageController;
+  Timer? _carouselTimer;
+  int _activePage = 0;
+  bool _isVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _pageController = PageController(viewportFraction: 0.58);
+    _restartCarouselTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _isVisible = true);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _PsnSyncLoadingBottomSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrls.length != widget.imageUrls.length) {
+      if (_activePage >= widget.imageUrls.length) {
+        _activePage = 0;
+      }
+      _restartCarouselTimer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _carouselTimer?.cancel();
+    _pageController.dispose();
+    _glowController.dispose();
+    super.dispose();
+  }
+
+  void _restartCarouselTimer() {
+    _carouselTimer?.cancel();
+    if (widget.imageUrls.length <= 1) return;
+
+    _carouselTimer = Timer.periodic(Duration(seconds: 6), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      final itemCount = widget.imageUrls.length;
+      if (itemCount <= 1) return;
+      _activePage = (_activePage + 1) % itemCount;
+      _pageController.animateToPage(
+        _activePage,
+        duration: Duration(milliseconds: 900),
+        curve: Curves.easeInOutCubic,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = widget.psnProvider.busyTitle.isNotEmpty
+        ? widget.psnProvider.busyTitle
+        : 'Syncing your PSN data';
+    final message = widget.psnProvider.busyMessage.isNotEmpty
+        ? widget.psnProvider.busyMessage
+        : 'Please wait while we import your latest library.';
+    final elapsed = widget.psnProvider.busyElapsedLabel();
+
+    return Stack(
+      children: [
+        ModalBarrier(
+          dismissible: false,
+          color: Colors.black.withValues(alpha: 0.38),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SafeArea(
+            top: false,
+            child: AnimatedSlide(
+              offset: _isVisible ? Offset.zero : Offset(0, 0.2),
+              duration: Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(12, 0, 12, 6),
+                child: AnimatedBuilder(
+                  animation: _glowController,
+                  builder: (context, child) {
+                    final glow = 0.16 + (_glowController.value * 0.18);
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(26),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(16, 12, 16, 18),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(26),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                secondaryColor.withValues(alpha: 0.9),
+                                primaryColor.withValues(alpha: 0.88),
+                              ],
+                            ),
+                            border: Border.all(
+                              color: primaryAccentColor.withValues(alpha: glow),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primaryAccentColor.withValues(
+                                  alpha: glow * 0.45,
+                                ),
+                                blurRadius: 18,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 42,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: textMuted.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: primaryAccentColor.withValues(
+                                        alpha: 0.15 +
+                                            (_glowController.value * 0.1),
+                                      ),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          primaryAccentColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      title,
+                                      style: GoogleFonts.inter(
+                                        color: textPrimary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  if (elapsed.isNotEmpty)
+                                    Text(
+                                      elapsed,
+                                      style: TextStyle(
+                                        color: textMuted,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              AnimatedSwitcher(
+                                duration: Duration(milliseconds: 300),
+                                child: Text(
+                                  message,
+                                  key: ValueKey<String>(message),
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 12.5,
+                                    height: 1.45,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              _buildCarousel(),
+                              SizedBox(height: 12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(999),
+                                child: LinearProgressIndicator(
+                                  minHeight: 5,
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.08),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    primaryAccentColor.withValues(alpha: 0.88),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Sync in progress. Please keep the app open.',
+                                style: TextStyle(
+                                  color: textMuted,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCarousel() {
+    if (widget.imageUrls.isEmpty) {
+      return SizedBox(
+        height: 138,
+        child: Row(
+          children: List.generate(
+            3,
+            (index) => Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      primaryAccentColor.withValues(alpha: 0.16),
+                      secondaryAccentColor.withValues(alpha: 0.14),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.09),
+                  ),
+                ),
+                child: Icon(
+                  Icons.emoji_events_rounded,
+                  color: textMuted.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final edgeMaskColor = secondaryColor.withValues(alpha: 0.94);
+    final orbitAngle = _glowController.value * math.pi * 2;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 142,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const scanLensSize = 46.0;
+              final centerX = (constraints.maxWidth - scanLensSize) / 2;
+              final centerY = (142 - scanLensSize) / 2;
+              final orbitRadiusX =
+                  math.min(constraints.maxWidth * 0.18, 54).toDouble();
+              const orbitRadiusY = 18.0;
+              final scanLeft = centerX + (math.cos(orbitAngle) * orbitRadiusX);
+              final scanTop = centerY + (math.sin(orbitAngle) * orbitRadiusY);
+
+              return Stack(
+                children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: widget.imageUrls.length,
+                    onPageChanged: (index) =>
+                        setState(() => _activePage = index),
+                    itemBuilder: (context, index) {
+                      final imageUrl = widget.imageUrls[index];
+                      return Container(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.16),
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                              filterQuality: FilterQuality.high,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: surfaceColor,
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: textMuted,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.08),
+                                    Colors.black.withValues(alpha: 0.22),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 46,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              edgeMaskColor,
+                              edgeMaskColor.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 46,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerRight,
+                            end: Alignment.centerLeft,
+                            colors: [
+                              edgeMaskColor,
+                              edgeMaskColor.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: centerX - 10,
+                    top: centerY - 10,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: scanLensSize + 20,
+                        height: scanLensSize + 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: primaryAccentColor.withValues(alpha: 0.22),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: scanLeft,
+                    top: scanTop,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: scanLensSize,
+                        height: scanLensSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.1),
+                          border: Border.all(
+                            color: primaryAccentColor.withValues(alpha: 0.68),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryAccentColor.withValues(alpha: 0.2),
+                              blurRadius: 12,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.search_rounded,
+                          color: textPrimary.withValues(alpha: 0.9),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        if (widget.imageUrls.length > 1) ...[
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(widget.imageUrls.length, (index) {
+              final isActive = index == _activePage;
+              return AnimatedContainer(
+                duration: Duration(milliseconds: 220),
+                margin: EdgeInsets.symmetric(horizontal: 2),
+                width: isActive ? 14 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  color: isActive
+                      ? primaryAccentColor
+                      : textMuted.withValues(alpha: 0.4),
+                ),
+              );
+            }),
+          ),
+        ],
+      ],
     );
   }
 }
