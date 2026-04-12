@@ -144,7 +144,7 @@ class InternalDbProvider extends ChangeNotifier {
         [
           game.gameName,
           game.gameImageUrl,
-          DateTime.now().toString(),
+          DateTime.now().toIso8601String(),
           game.gold,
           game.silver,
           game.bronze,
@@ -219,7 +219,7 @@ class InternalDbProvider extends ChangeNotifier {
           guide.trophyGuide,
           'COMPLETED',
           source,
-          DateTime.now().toString(),
+          DateTime.now().toIso8601String(),
         ],
       );
       myCompletedTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
@@ -253,7 +253,7 @@ class InternalDbProvider extends ChangeNotifier {
           guide.trophyGuide,
           'STARRED',
           'local',
-          DateTime.now().toString(),
+          DateTime.now().toIso8601String(),
         ],
       );
       myStarredTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
@@ -290,7 +290,7 @@ class InternalDbProvider extends ChangeNotifier {
     try {
       final dbClient = await db;
       final List<Map<String, dynamic>> result = await dbClient.rawQuery(
-        'SELECT * FROM $myTrophyTable ORDER BY $dateTimeColumn DESC',
+        'SELECT * FROM $myTrophyTable ORDER BY rowid DESC',
       );
       myCompletedTrophy = <GuideModel>[];
       myStarredTrophy = <GuideModel>[];
@@ -441,15 +441,33 @@ class InternalDbProvider extends ChangeNotifier {
 
   bool hasCompletedTrophy(String gameName, String trophyName) {
     final targetKey = _guideKey(gameName, trophyName);
-    return myCompletedTrophy.any(
+    final exactMatch = myCompletedTrophy.any(
       (guide) => _guideKey(guide.gameName, guide.trophyName) == targetKey,
+    );
+    if (exactMatch) return true;
+
+    final targetGameIdentity = _gameIdentityKey(gameName);
+    final targetTrophy = _normalizeText(trophyName);
+    return myCompletedTrophy.any(
+      (guide) =>
+          _gameIdentityKey(guide.gameName) == targetGameIdentity &&
+          _normalizeText(guide.trophyName) == targetTrophy,
     );
   }
 
   bool hasStarredTrophy(String gameName, String trophyName) {
     final targetKey = _guideKey(gameName, trophyName);
-    return myStarredTrophy.any(
+    final exactMatch = myStarredTrophy.any(
       (guide) => _guideKey(guide.gameName, guide.trophyName) == targetKey,
+    );
+    if (exactMatch) return true;
+
+    final targetGameIdentity = _gameIdentityKey(gameName);
+    final targetTrophy = _normalizeText(trophyName);
+    return myStarredTrophy.any(
+      (guide) =>
+          _gameIdentityKey(guide.gameName) == targetGameIdentity &&
+          _normalizeText(guide.trophyName) == targetTrophy,
     );
   }
 
@@ -468,6 +486,48 @@ class InternalDbProvider extends ChangeNotifier {
     final normalizedGame = _normalizeText(gameName);
     final normalizedTrophy = _normalizeText(trophyName);
     return '$normalizedGame::$normalizedTrophy';
+  }
+
+  String _gameIdentityKey(dynamic gameName) {
+    var normalized = (gameName ?? '').toString().toLowerCase();
+    normalized = normalized
+        .replaceAll(RegExp(r'\(.*?playstation\s*5.*?\)'), ' ')
+        .replaceAll(RegExp(r'\(.*?playstation\s*4.*?\)'), ' ')
+        .replaceAll(RegExp(r'\(.*?ps5.*?\)'), ' ')
+        .replaceAll(RegExp(r'\(.*?ps4.*?\)'), ' ')
+        .replaceAll(RegExp(r'\(.*?\)'), ' ')
+        .replaceAll(' for ps5', ' ')
+        .replaceAll(' for ps4', ' ')
+        .replaceAll('playstation 5', ' ')
+        .replaceAll('playstation5', ' ')
+        .replaceAll('playstation 4', ' ')
+        .replaceAll('playstation4', ' ')
+        .replaceAll('playstation', ' ')
+        .replaceAll('ps5', ' ')
+        .replaceAll('ps4', ' ')
+        .replaceAll('edition', ' ')
+        .replaceAll('digital', ' ')
+        .replaceAll('bundle', ' ')
+        .replaceAll('crossgen', ' ')
+        .replaceAll('cross-gen', ' ')
+        .replaceAll('cross gen', ' ');
+
+    const Map<String, String> romanToNumber = <String, String>{
+      ' viii ': ' 8 ',
+      ' vii ': ' 7 ',
+      ' vi ': ' 6 ',
+      ' v ': ' 5 ',
+      ' iv ': ' 4 ',
+      ' iii ': ' 3 ',
+      ' ii ': ' 2 ',
+      ' i ': ' 1 ',
+    };
+    var padded = ' $normalized ';
+    romanToNumber.forEach((roman, number) {
+      padded = padded.replaceAll(roman, number);
+    });
+
+    return padded.replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
 
   String _normalizeText(dynamic value) {

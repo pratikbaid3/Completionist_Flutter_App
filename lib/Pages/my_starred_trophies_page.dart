@@ -20,9 +20,6 @@ class _MyStarredTrophyPageState extends State<MyStarredTrophyPage> {
   Widget build(BuildContext context) {
     final dbProvider = Provider.of<InternalDbProvider>(context);
     final hasTrophies = dbProvider.myStarredTrophy.isNotEmpty;
-    final count = dbProvider.myStarredTrophy.length > 5
-        ? 5
-        : dbProvider.myStarredTrophy.length;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -31,7 +28,7 @@ class _MyStarredTrophyPageState extends State<MyStarredTrophyPage> {
               child: ListView.builder(
                 physics: BouncingScrollPhysics(),
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
-                itemCount: count,
+                itemCount: dbProvider.myStarredTrophy.length,
                 itemBuilder: (BuildContext context, int index) {
                   final trophy = dbProvider.myStarredTrophy[index];
                   final tColor = trophyColor(trophy.trophyType);
