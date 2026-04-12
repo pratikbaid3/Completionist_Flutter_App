@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
+import 'package:game_trophy_manager/Provider/psn_sync_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/aurora_background.dart';
@@ -57,10 +58,13 @@ class _SplashScreenState extends State<SplashScreen>
     initializeData();
   }
 
-  void initializeData() {
-    Provider.of<InternalDbProvider>(context, listen: false).getAllGamesFromDb();
-    Provider.of<InternalDbProvider>(context, listen: false)
-        .getAllTrophiesFromDb();
+  Future<void> initializeData() async {
+    final dbProvider = Provider.of<InternalDbProvider>(context, listen: false);
+    await dbProvider.getAllGamesFromDb();
+    await dbProvider.getAllTrophiesFromDb();
+    await dbProvider.getAllPsnGamesFromDb();
+    await Provider.of<PsnSyncProvider>(context, listen: false)
+        .initialize(dbProvider);
   }
 
   @override

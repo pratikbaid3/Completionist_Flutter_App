@@ -12,15 +12,30 @@ class PS4GameProvider extends ChangeNotifier {
       required PagingController pagingController}) async {
     try {
       print('--GET GAMES--');
-      print(baseUrl + endpoint + '?page=' + pageKey.toString() + '&search=' + search);
+      print(baseUrl +
+          endpoint +
+          '?page=' +
+          pageKey.toString() +
+          '&search=' +
+          search);
       Response response;
       Dio dio = Dio();
       response = await dio.get(baseUrl + endpoint,
           queryParameters: {"page": pageKey, "search": search});
       print(response.data);
       List<dynamic> data = response.data['results'];
-      List<GameModel> newGames =
-          data.map((data) => GameModel.fromJson(data)).toList();
+      final String guideEndpoint =
+          endpoint == ps5GamesUrl ? ps5GuideUrl : ps4GuideUrl;
+      final String platform = endpoint == ps5GamesUrl ? 'ps5' : 'ps4';
+      List<GameModel> newGames = data
+          .map(
+            (data) => GameModel.fromJson(
+              data,
+              guideEndpoint: guideEndpoint,
+              platform: platform,
+            ),
+          )
+          .toList();
       bool isLastPage = newGames.length < 30;
       if (isLastPage) {
         pagingController.appendLastPage(newGames);

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:game_trophy_manager/Model/Enum/game_guide_filter_enum.dart';
-import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
@@ -303,16 +302,13 @@ class _Ps4GuidePageState extends State<Ps4GuidePage> {
               padding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               itemCount: Provider.of<PS4GuideProvider>(context).guide.length,
               itemBuilder: (BuildContext context, int index) {
-                bool isCompleted = false;
-                bool isStarred = false;
-                String trophyName = Provider.of<PS4GuideProvider>(context).guide[index].trophyName;
-
-                for (GuideModel guide in Provider.of<InternalDbProvider>(context).myCompletedTrophy) {
-                  if (guide.trophyName == trophyName) isCompleted = true;
-                }
-                for (GuideModel guide in Provider.of<InternalDbProvider>(context).myStarredTrophy) {
-                  if (guide.trophyName == trophyName) isStarred = true;
-                }
+                final dbProvider = Provider.of<InternalDbProvider>(context);
+                final trophyName =
+                    Provider.of<PS4GuideProvider>(context).guide[index].trophyName;
+                final isCompleted =
+                    dbProvider.hasCompletedTrophy(widget.game.gameName, trophyName);
+                final isStarred =
+                    dbProvider.hasStarredTrophy(widget.game.gameName, trophyName);
 
                 if (filter == GameGuideFilterEnum.Completed && !isCompleted) return SizedBox.shrink();
                 if (filter == GameGuideFilterEnum.Incomplete && isCompleted) return SizedBox.shrink();

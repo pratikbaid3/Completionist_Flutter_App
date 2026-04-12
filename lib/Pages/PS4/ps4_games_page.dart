@@ -94,18 +94,20 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
                 child: PagedListView<int, GameModel>(
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<GameModel>(
-                    itemBuilder: (context, item, index) =>
-                        PS4GameCard(game: item, guideEndpoint: widget.guideEndpoint),
+                    itemBuilder: (context, item, index) => PS4GameCard(
+                        game: item, guideEndpoint: widget.guideEndpoint),
                     firstPageProgressIndicatorBuilder: (_) => Center(
                       child: Padding(
                         padding: EdgeInsets.only(top: 60),
-                        child: CircularProgressIndicator(color: primaryAccentColor, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                            color: primaryAccentColor, strokeWidth: 2),
                       ),
                     ),
                     newPageProgressIndicatorBuilder: (_) => Center(
                       child: Padding(
                         padding: EdgeInsets.all(16),
-                        child: CircularProgressIndicator(color: primaryAccentColor, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                            color: primaryAccentColor, strokeWidth: 2),
                       ),
                     ),
                     noItemsFoundIndicatorBuilder: (_) => _buildNoResults(),
@@ -131,7 +133,10 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
           width: 1,
         ),
         boxShadow: [
-          BoxShadow(color: primaryAccentColor.withValues(alpha: 0.05), blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(
+              color: primaryAccentColor.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: Offset(0, 4)),
         ],
       ),
       clipBehavior: Clip.antiAlias,
@@ -144,8 +149,13 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.search_rounded, color: textMuted, size: 22),
           suffixIcon: isSearchIcon
-              ? IconButton(onPressed: _performSearch, icon: Icon(Icons.arrow_forward_rounded, color: primaryAccentColor, size: 22))
-              : IconButton(onPressed: _clearSearch, icon: Icon(Icons.close_rounded, color: textMuted, size: 22)),
+              ? IconButton(
+                  onPressed: _performSearch,
+                  icon: Icon(Icons.arrow_forward_rounded,
+                      color: primaryAccentColor, size: 22))
+              : IconButton(
+                  onPressed: _clearSearch,
+                  icon: Icon(Icons.close_rounded, color: textMuted, size: 22)),
           border: InputBorder.none,
           hintText: 'Search games...',
           hintStyle: TextStyle(color: textMuted, fontSize: 15),
@@ -163,9 +173,14 @@ class _AllPS4GamesPageState extends State<AllPS4GamesPage> {
           children: [
             Icon(Icons.search_off_rounded, size: 48, color: textMuted),
             SizedBox(height: 16),
-            Text('No games found', style: GoogleFonts.inter(color: textSecondary, fontWeight: FontWeight.w600, fontSize: 16)),
+            Text('No games found',
+                style: GoogleFonts.inter(
+                    color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16)),
             SizedBox(height: 4),
-            Text('Try a different search term', style: TextStyle(color: textMuted, fontSize: 13)),
+            Text('Try a different search term',
+                style: TextStyle(color: textMuted, fontSize: 13)),
           ],
         ),
       ),

@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'Provider/ps4_game_provider.dart';
 import 'Provider/ps4_guide_provider.dart';
+import 'Provider/psn_sync_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider<InternalDbProvider>(
             create: (context) => InternalDbProvider(),
+          ),
+          ChangeNotifierProvider<PsnSyncProvider>(
+            create: (context) => PsnSyncProvider(),
           ),
         ],
         child: MaterialApp(
@@ -104,7 +108,8 @@ class MyApp extends StatelessWidget {
                 borderSide: BorderSide.none,
               ),
               hintStyle: TextStyle(color: textMuted),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
             progressIndicatorTheme: ProgressIndicatorThemeData(
               color: primaryAccentColor,

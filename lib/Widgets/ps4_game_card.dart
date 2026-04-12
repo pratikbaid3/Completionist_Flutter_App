@@ -26,11 +26,13 @@ class PS4GameCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: () {
             game.guideEndpoint = guideEndpoint;
+            game.platform = guideEndpoint.contains('ps5') ? 'ps5' : 'ps4';
             Analytics.logViewGame(
               game.gameName,
               guideEndpoint.contains('ps5') ? 'PS5' : 'PS4',
             );
-            Provider.of<PS4GuideProvider>(context, listen: false).clearGuideList();
+            Provider.of<PS4GuideProvider>(context, listen: false)
+                .clearGuideList();
             Navigator.of(context).pushNamed(guidePageRoute, arguments: {
               'game': game,
               'guideEndpoint': guideEndpoint,
@@ -40,7 +42,8 @@ class PS4GameCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: surfaceColor,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: primaryAccentColor.withValues(alpha: 0.08), width: 1),
+              border: Border.all(
+                  color: primaryAccentColor.withValues(alpha: 0.08), width: 1),
             ),
             child: Padding(
               padding: EdgeInsets.all(12),
@@ -52,7 +55,9 @@ class PS4GameCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: cardColor,
-                      border: Border.all(color: primaryAccentColor.withValues(alpha: 0.15), width: 1),
+                      border: Border.all(
+                          color: primaryAccentColor.withValues(alpha: 0.15),
+                          width: 1),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -64,7 +69,8 @@ class PS4GameCard extends StatelessWidget {
                           highlightColor: cardColor,
                           child: Container(color: surfaceColor),
                         ),
-                        errorWidget: (context, url, error) => Icon(Icons.error_outline, color: textMuted),
+                        errorWidget: (context, url, error) =>
+                            Icon(Icons.error_outline, color: textMuted),
                       ),
                     ),
                   ),
@@ -75,7 +81,10 @@ class PS4GameCard extends StatelessWidget {
                       children: [
                         Text(
                           game.gameName,
-                          style: GoogleFonts.inter(color: textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
+                          style: GoogleFonts.inter(
+                              color: textPrimary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -84,9 +93,11 @@ class PS4GameCard extends StatelessWidget {
                           children: [
                             _TrophyBadge(count: game.gold, color: goldenColor),
                             SizedBox(width: 10),
-                            _TrophyBadge(count: game.silver, color: silverColor),
+                            _TrophyBadge(
+                                count: game.silver, color: silverColor),
                             SizedBox(width: 10),
-                            _TrophyBadge(count: game.bronze, color: bronzeColor),
+                            _TrophyBadge(
+                                count: game.bronze, color: bronzeColor),
                           ],
                         ),
                       ],
@@ -98,7 +109,8 @@ class PS4GameCard extends StatelessWidget {
                       color: primaryAccentColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.arrow_forward_ios_rounded, color: primaryAccentColor, size: 14),
+                    child: Icon(Icons.arrow_forward_ios_rounded,
+                        color: primaryAccentColor, size: 14),
                   ),
                 ],
               ),
@@ -129,7 +141,9 @@ class _TrophyBadge extends StatelessWidget {
         children: [
           Icon(Icons.emoji_events_rounded, color: color, size: 14),
           SizedBox(width: 4),
-          Text(count, style: GoogleFonts.inter(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+          Text(count,
+              style: GoogleFonts.inter(
+                  color: color, fontWeight: FontWeight.w700, fontSize: 12)),
         ],
       ),
     );
