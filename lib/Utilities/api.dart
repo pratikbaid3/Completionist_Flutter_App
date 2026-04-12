@@ -1,5 +1,5 @@
-const String baseUrl = 'http://127.0.0.1:8000/api/';
-// const String baseUrl = 'https://pratikbaid3.pythonanywhere.com/api/';
+// const String baseUrl = 'http://127.0.0.1:8000/api/';
+const String baseUrl = 'https://completionist-django-backend.onrender.com/api/';
 const bool isTestEnv = false;
 const String psnHelpUrl =
     'https://psnawp.readthedocs.io/en/stable/additional_resources/README.html';

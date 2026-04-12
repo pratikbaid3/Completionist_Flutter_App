@@ -21,8 +21,7 @@ class PsnLoginPage extends StatefulWidget {
 class _PsnLoginPageState extends State<PsnLoginPage>
     with WidgetsBindingObserver {
   static const String _demoToken = 'completionist-demo-psn';
-  final TextEditingController _tokenController = TextEditingController(
-      text: "MiVsWN7gh8AltqrANMzUGPIxsX40YAcW1SCuoJRgwkMkOvIZnid8cM2w5pbN0v8h");
+  final TextEditingController _tokenController = TextEditingController();
 
   String _status = 'Open login, then import your token.';
   bool _isCheckingClipboard = false;
