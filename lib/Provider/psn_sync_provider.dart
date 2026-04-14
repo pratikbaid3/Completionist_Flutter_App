@@ -13,6 +13,7 @@ import 'package:game_trophy_manager/Model/psn_game_snapshot.dart';
 import 'package:game_trophy_manager/Model/psn_profile_cache.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PsnSyncProvider extends ChangeNotifier {
@@ -79,11 +80,15 @@ class PsnSyncProvider extends ChangeNotifier {
   ) async {
     if (npsso.trim().isEmpty) {
       syncError = 'Could not detect a valid PSN session token yet.';
+      _logAnalytics(
+        Analytics.logPsnConnectFailed(reason: 'missing_npsso_token'),
+      );
       notifyListeners();
       return false;
     }
 
     syncError = '';
+    _logAnalytics(Analytics.logPsnConnectStarted(method: 'npsso'));
     _beginBusy(
       title: 'Connecting to PSN',
       hints: const <String>[
@@ -112,10 +117,28 @@ class PsnSyncProvider extends ChangeNotifier {
       await _persistState();
       notifyListeners();
       _setBusyMessage('Session verified. Starting initial sync...');
-      return await syncNow(dbProvider, force: true, manageBusy: false);
+      final syncResult = await syncNow(
+        dbProvider,
+        force: true,
+        manageBusy: false,
+        trigger: 'initial_connect',
+      );
+      if (syncResult) {
+        _logAnalytics(
+          Analytics.logPsnConnectSuccess(syncStatus: syncStatus),
+        );
+      } else {
+        _logAnalytics(
+          Analytics.logPsnConnectFailed(reason: 'initial_sync_failed'),
+        );
+      }
+      return syncResult;
     } on DioException catch (error) {
       syncStatus = 'error';
       syncError = _errorFromResponse(error);
+      _logAnalytics(
+        Analytics.logPsnConnectFailed(reason: syncError),
+      );
       await _persistState();
       notifyListeners();
       return false;
@@ -128,11 +151,15 @@ class PsnSyncProvider extends ChangeNotifier {
     InternalDbProvider dbProvider, {
     bool force = false,
     bool manageBusy = true,
+    String trigger = 'manual',
   }) async {
     final npsso = await _secureStorage.read(key: _npssoKey);
     if (npsso == null || npsso.isEmpty) {
       syncStatus = 'error';
       syncError = 'Reconnect your PSN account to refresh.';
+      _logAnalytics(
+        Analytics.logPsnSyncBlockedNoSession(trigger: trigger),
+      );
       notifyListeners();
       return false;
     }
@@ -159,6 +186,13 @@ class PsnSyncProvider extends ChangeNotifier {
 
     syncError = '';
     syncStatus = 'syncing';
+    _logAnalytics(
+      Analytics.logPsnSyncStarted(
+        trigger: trigger,
+        forceSync: force,
+        manageBusy: manageBusy,
+      ),
+    );
     notifyListeners();
 
     try {
@@ -256,6 +290,16 @@ class PsnSyncProvider extends ChangeNotifier {
           syncedAt != null ? DateTime.tryParse(syncedAt) : DateTime.now();
       syncStatus = response.data['sync_meta']?['status'] ?? 'success';
       syncError = response.data['sync_meta']?['error'] ?? '';
+      _logAnalytics(
+        Analytics.logPsnSyncSuccess(
+          trigger: trigger,
+          forceSync: force,
+          libraryCount: rawLibrary.length,
+          matchedGames: matchedGames.length,
+          dedupedGames: dedupedPsnGames.length,
+          completedTrophies: completedTrophies.length,
+        ),
+      );
       await _persistState();
       _setBusyMessage('Sync complete. Finalizing...');
       notifyListeners();
@@ -264,6 +308,13 @@ class PsnSyncProvider extends ChangeNotifier {
       syncStatus = 'error';
       syncError = _errorFromResponse(error);
       _setBusyMessage('Sync failed. Please try again.');
+      _logAnalytics(
+        Analytics.logPsnSyncFailed(
+          trigger: trigger,
+          forceSync: force,
+          reason: syncError,
+        ),
+      );
       await _persistState();
       notifyListeners();
       return false;
@@ -284,10 +335,18 @@ class PsnSyncProvider extends ChangeNotifier {
         lastSyncAt == null ||
         DateTime.now().difference(lastSyncAt!) >= maxAge;
     if (!shouldRefresh) return;
-    await syncNow(dbProvider, force: force);
+    await syncNow(
+      dbProvider,
+      force: force,
+      trigger: force ? 'auto_forced' : 'auto_stale',
+    );
   }
 
   Future<void> disconnect(InternalDbProvider dbProvider) async {
+    final hadProfile = profile != null;
+    final hadLastSync = lastSyncAt != null;
+    final cachedGames = dbProvider.myPsnGames.length;
+
     await _secureStorage.delete(key: _npssoKey);
     profile = null;
     lastSyncAt = null;
@@ -300,6 +359,13 @@ class PsnSyncProvider extends ChangeNotifier {
     await prefs.remove(_lastSyncErrorKey);
     await dbProvider.clearPsnGamesSnapshot();
     await dbProvider.clearPsnCompletedTrophies();
+    _logAnalytics(
+      Analytics.logPsnDisconnect(
+        hadProfile: hadProfile,
+        hadLastSync: hadLastSync,
+        cachedGames: cachedGames,
+      ),
+    );
     notifyListeners();
   }
 
@@ -619,6 +685,10 @@ class PsnSyncProvider extends ChangeNotifier {
       return data['sync_meta']['error'].toString();
     }
     return error.message ?? 'Unable to reach PSN sync right now.';
+  }
+
+  void _logAnalytics(Future<void> event) {
+    event.catchError((_) {});
   }
 
   void _beginBusy({

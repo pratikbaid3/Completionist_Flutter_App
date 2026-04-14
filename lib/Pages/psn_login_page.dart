@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:game_trophy_manager/Provider/psn_sync_provider.dart';
 import 'package:game_trophy_manager/Widgets/aurora_background.dart';
 import 'package:game_trophy_manager/Utilities/api.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,8 @@ class _PsnLoginPageState extends State<PsnLoginPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _pullTokenFromClipboard(showFeedback: false);
+    _logAnalytics(Analytics.logPsnLoginOpened());
+    _pullTokenFromClipboard(showFeedback: false, source: 'auto_init');
   }
 
   @override
@@ -46,18 +48,22 @@ class _PsnLoginPageState extends State<PsnLoginPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _pullTokenFromClipboard(showFeedback: false);
+      _pullTokenFromClipboard(showFeedback: false, source: 'auto_resume');
     }
   }
 
-  Future<void> _openExternal(String url) async {
+  Future<void> _openExternal(String url, String step) async {
+    _logAnalytics(Analytics.logPsnLoginStepOpened(step));
     await launchUrl(
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     );
   }
 
-  Future<void> _pullTokenFromClipboard({required bool showFeedback}) async {
+  Future<void> _pullTokenFromClipboard({
+    required bool showFeedback,
+    required String source,
+  }) async {
     if (_isCheckingClipboard) return;
     _isCheckingClipboard = true;
     try {
@@ -65,9 +71,19 @@ class _PsnLoginPageState extends State<PsnLoginPage>
       final raw = clipboard?.text?.trim() ?? '';
       final token = _extractNpsso(raw);
       if (!mounted) return;
+      final hasToken = token != null && token.isNotEmpty;
 
-      if (token != null && token.isNotEmpty) {
-        _tokenController.text = token;
+      if (showFeedback) {
+        _logAnalytics(
+          Analytics.logPsnTokenImportAttempt(
+            source: source,
+            foundToken: hasToken,
+          ),
+        );
+      }
+
+      if (hasToken) {
+        _tokenController.text = token!;
         setState(() {
           _status =
               'PSN session token detected from clipboard. Continue below.';
@@ -119,14 +135,18 @@ class _PsnLoginPageState extends State<PsnLoginPage>
       });
       return;
     }
+    final source = token == _demoToken ? 'demo' : 'npsso';
+    _logAnalytics(Analytics.logPsnConnectSubmitted(source: source));
     Navigator.of(context).pop(token);
   }
 
   void _connectDemoData() {
+    _logAnalytics(Analytics.logPsnConnectSubmitted(source: 'demo_button'));
     Navigator.of(context).pop(_demoToken);
   }
 
   Future<void> _showPsnInfoSheet(BuildContext context, bool isConnected) {
+    _logAnalytics(Analytics.logPsnLoginInfoOpened(isConnected: isConnected));
     return showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -393,7 +413,7 @@ class _PsnLoginPageState extends State<PsnLoginPage>
                 description:
                     'Open PlayStation in your browser and sign in to your account.',
                 actionLabel: 'Open Login',
-                onPressed: () => _openExternal(psnLoginUrl),
+                onPressed: () => _openExternal(psnLoginUrl, 'open_login'),
                 icon: Icons.open_in_browser_rounded,
                 accent: primaryAccentColor,
               ),
@@ -404,7 +424,8 @@ class _PsnLoginPageState extends State<PsnLoginPage>
                 description:
                     'Use the same browser session. You should see JSON containing the NPSSO token.',
                 actionLabel: 'Open NPSSO Page',
-                onPressed: () => _openExternal(psnSsoCookieUrl),
+                onPressed: () =>
+                    _openExternal(psnSsoCookieUrl, 'open_npsso_page'),
                 icon: Icons.security_rounded,
                 accent: secondaryAccentColor,
               ),
@@ -415,7 +436,10 @@ class _PsnLoginPageState extends State<PsnLoginPage>
                 description:
                     'Copy the JSON/token in browser, then import it here to auto-fill the field.',
                 actionLabel: 'Import From Clipboard',
-                onPressed: () => _pullTokenFromClipboard(showFeedback: true),
+                onPressed: () => _pullTokenFromClipboard(
+                  showFeedback: true,
+                  source: 'manual_button',
+                ),
                 icon: Icons.content_paste_go_rounded,
                 accent: neonGreen,
               ),
@@ -500,6 +524,10 @@ class _PsnLoginPageState extends State<PsnLoginPage>
         ),
       ),
     );
+  }
+
+  void _logAnalytics(Future<void> event) {
+    event.catchError((_) {});
   }
 }
 
