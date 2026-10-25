@@ -72,7 +72,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            // release keystore when key.properties exists, else debug (not Play-uploadable)
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
         }
     }
 
