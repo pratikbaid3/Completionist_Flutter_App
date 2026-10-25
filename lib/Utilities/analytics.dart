@@ -232,6 +232,40 @@ class Analytics {
     );
   }
 
+  // Paywall baseline (see docs/ANALYTICS.md). Only cap_hit is wired today.
+  static Future<void> logCapHit({
+    required String kind,
+    required String gameName,
+    required int count,
+  }) {
+    return _analytics.logEvent(
+      name: 'cap_hit',
+      parameters: {'kind': kind, 'game_name': gameName, 'count': count},
+    );
+  }
+
+  static Future<void> logPaywallViewed({required String source}) {
+    return _analytics.logEvent(
+      name: 'paywall_viewed',
+      parameters: {'source': source},
+    );
+  }
+
+  static Future<void> logTrialStarted({required String plan}) {
+    return _analytics.logEvent(name: 'trial_started', parameters: {'plan': plan});
+  }
+
+  static Future<void> logPurchaseSuccess({required String plan}) {
+    return _analytics.logEvent(name: 'purchase_success', parameters: {'plan': plan});
+  }
+
+  static Future<void> logPurchaseFail({required String plan, required String reason}) {
+    return _analytics.logEvent(
+      name: 'purchase_fail',
+      parameters: {'plan': plan, 'reason': _sanitizeReason(reason)},
+    );
+  }
+
   static int _flag(bool value) => value ? 1 : 0;
 
   static String _sanitizeReason(String reason) {

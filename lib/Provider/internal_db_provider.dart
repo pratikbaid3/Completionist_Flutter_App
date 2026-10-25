@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Model/psn_game_snapshot.dart';
+import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -191,6 +192,11 @@ class InternalDbProvider extends ChangeNotifier {
     } catch (_) {}
   }
 
+  // Virtual paywall baseline: nothing is blocked, we only record who would hit a 5 cap.
+  void _logCapHit(String kind, String gameName, int count) {
+    if (count >= 5) Analytics.logCapHit(kind: kind, gameName: gameName, count: count);
+  }
+
   Future<void> addTrophyToComplete(
     GuideModel guide, {
     String source = 'local',
@@ -224,6 +230,7 @@ class InternalDbProvider extends ChangeNotifier {
       );
       myCompletedTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
       myCompletedTrophy.add(guide);
+      _logCapHit('completed', guide.gameName, myCompletedTrophy.length);
       notifyListeners();
     } catch (_) {}
   }
@@ -258,6 +265,7 @@ class InternalDbProvider extends ChangeNotifier {
       );
       myStarredTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
       myStarredTrophy.add(guide);
+      _logCapHit('starred', guide.gameName, myStarredTrophy.length);
       notifyListeners();
     } catch (_) {}
   }
