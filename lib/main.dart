@@ -7,11 +7,14 @@ import 'package:game_trophy_manager/Router/router.dart' as router;
 import 'package:game_trophy_manager/Router/router_constant.dart';
 import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
+import 'package:game_trophy_manager/Widgets/aurora_background.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'Provider/ps4_game_provider.dart';
 import 'Provider/ps4_guide_provider.dart';
 import 'Provider/psn_sync_provider.dart';
+
+const double _maxContentWidth = 900;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,6 +123,34 @@ class MyApp extends StatelessWidget {
             ),
           ),
           navigatorObservers: [Analytics.observer],
+          // Wide screens (tablets, Android 16 ignores the portrait lock): cap content
+          // at 900dp, top-centered. MediaQuery width is clamped too, since widgets size from it.
+          builder: (context, child) {
+            final mq = MediaQuery.of(context);
+            if (child == null || mq.size.width <= _maxContentWidth) {
+              return child ?? const SizedBox.shrink();
+            }
+            return Stack(
+              children: [
+                const Positioned.fill(
+                  child: AuroraBackground(child: SizedBox.shrink()),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    width: _maxContentWidth,
+                    height: mq.size.height,
+                    child: MediaQuery(
+                      data: mq.copyWith(
+                        size: Size(_maxContentWidth, mq.size.height),
+                      ),
+                      child: AuroraScope(child: child),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
           onGenerateRoute: router.generateRoute,
           initialRoute: splashScreenRoute,
         ),

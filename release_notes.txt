@@ -1,3 +1,7 @@
+What's New in v7.2.1
+
+• Better layout on tablets and large screens: content is now centered at a comfortable width
+
 What's New in v7.2.0
 
 • Anonymous usage analytics improvements to help us plan future features

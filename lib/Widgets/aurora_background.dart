@@ -2,6 +2,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 
+/// Marks that a full-screen AuroraBackground already sits behind the app
+/// (see the width clamp in main.dart), so pages skip their own.
+class AuroraScope extends InheritedWidget {
+  const AuroraScope({required Widget child, Key? key}) : super(key: key, child: child);
+
+  static bool isActive(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<AuroraScope>() != null;
+
+  @override
+  bool updateShouldNotify(AuroraScope oldWidget) => false;
+}
+
 class AuroraBackground extends StatefulWidget {
   final Widget child;
   const AuroraBackground({required this.child, Key? key}) : super(key: key);
@@ -31,6 +43,7 @@ class _AuroraBackgroundState extends State<AuroraBackground>
 
   @override
   Widget build(BuildContext context) {
+    if (AuroraScope.isActive(context)) return widget.child;
     final size = MediaQuery.of(context).size;
 
     return AnimatedBuilder(
