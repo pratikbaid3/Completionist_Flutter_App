@@ -57,6 +57,7 @@ dependencies:
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
     cupertino_icons: ^1.0.5
+    purchases_flutter: ^12.0.0
 
 dependency_overrides:
     win32: ^5.6.0

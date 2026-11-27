@@ -232,15 +232,11 @@ class Analytics {
     );
   }
 
-  // Paywall baseline (see docs/ANALYTICS.md). Only cap_hit is wired today.
-  static Future<void> logCapHit({
-    required String kind,
-    required String gameName,
-    required int count,
-  }) {
+  // Paywall funnel (see docs/ANALYTICS.md).
+  static Future<void> logCapHit({required String type, required int count}) {
     return _analytics.logEvent(
       name: 'cap_hit',
-      parameters: {'kind': kind, 'game_name': gameName, 'count': count},
+      parameters: {'type': type, 'count': count},
     );
   }
 
@@ -255,14 +251,31 @@ class Analytics {
     return _analytics.logEvent(name: 'trial_started', parameters: {'plan': plan});
   }
 
-  static Future<void> logPurchaseSuccess({required String plan}) {
-    return _analytics.logEvent(name: 'purchase_success', parameters: {'plan': plan});
+  static Future<void> logPurchaseSuccess({
+    required String plan,
+    required String price,
+    required String country,
+  }) {
+    return _analytics.logEvent(
+      name: 'purchase_success',
+      parameters: {'plan': plan, 'price': price, 'country': country},
+    );
   }
 
-  static Future<void> logPurchaseFail({required String plan, required String reason}) {
+  static Future<void> logPurchaseFail({
+    required String plan,
+    required String price,
+    required String country,
+    required String reason,
+  }) {
     return _analytics.logEvent(
       name: 'purchase_fail',
-      parameters: {'plan': plan, 'reason': _sanitizeReason(reason)},
+      parameters: {
+        'plan': plan,
+        'price': price,
+        'country': country,
+        'reason': _sanitizeReason(reason),
+      },
     );
   }
 

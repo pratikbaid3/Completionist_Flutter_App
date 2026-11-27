@@ -3,3 +3,4 @@ const String dashboardRoute = '/dashboard';
 const String homePageRoute = '/homePage';
 const String guidePageRoute = '/guidePage';
 const String ps4GamePageRoute = '/ps4GamePageRoute';
+const String paywallRoute = '/paywall';

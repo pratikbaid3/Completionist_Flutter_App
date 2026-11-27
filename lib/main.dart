@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'Provider/ps4_game_provider.dart';
 import 'Provider/ps4_guide_provider.dart';
+import 'Provider/premium_provider.dart';
 import 'Provider/psn_sync_provider.dart';
 
 const double _maxContentWidth = 900;
@@ -49,6 +50,10 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider<PsnSyncProvider>(
             create: (context) => PsnSyncProvider(),
+          ),
+          ChangeNotifierProvider<PremiumProvider>(
+            create: (context) => PremiumProvider(),
+            lazy: false,
           ),
         ],
         child: MaterialApp(
