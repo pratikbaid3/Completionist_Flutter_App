@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +12,7 @@ import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/aurora_background.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart' show getDatabasesPath;
 import 'Provider/ps4_game_provider.dart';
 import 'Provider/ps4_guide_provider.dart';
 import 'Provider/premium_provider.dart';
@@ -20,6 +23,9 @@ const double _maxContentWidth = 900;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // Legacy-grace marker: the local DB exists before this build first opens it.
+  final existingInstall =
+      await File('${await getDatabasesPath()}/Games.db').exists();
 
   // Set system UI overlay style for immersive dark theme
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -30,10 +36,13 @@ void main() async {
   ));
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+  runApp(MyApp(existingInstall: existingInstall));
 }
 
 class MyApp extends StatelessWidget {
+  final bool existingInstall;
+  MyApp({this.existingInstall = false});
+
   @override
   Widget build(BuildContext context) {
     return KeyboardDismissOnTap(
@@ -52,7 +61,8 @@ class MyApp extends StatelessWidget {
             create: (context) => PsnSyncProvider(),
           ),
           ChangeNotifierProvider<PremiumProvider>(
-            create: (context) => PremiumProvider(),
+            create: (context) =>
+                PremiumProvider(existingInstall: existingInstall),
             lazy: false,
           ),
         ],

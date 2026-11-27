@@ -10,6 +10,7 @@ import 'package:game_trophy_manager/Pages/PS4/ps4_games_page.dart';
 import 'package:game_trophy_manager/Pages/dashboard.dart';
 import 'package:game_trophy_manager/Pages/my_completed_trophies_page.dart';
 import 'package:game_trophy_manager/Pages/my_starred_trophies_page.dart';
+import 'package:game_trophy_manager/Pages/paywall_page.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
 import 'package:game_trophy_manager/Provider/psn_sync_provider.dart';
 import 'package:game_trophy_manager/Utilities/analytics.dart';
@@ -166,6 +167,11 @@ class _NavDrawerPageState extends State<NavDrawerPage>
         ],
       ),
       actions: [
+        IconButton(
+          tooltip: 'Completionist Premium',
+          icon: Icon(Icons.workspace_premium_rounded, color: goldenColor),
+          onPressed: () => openPremiumSettings(context),
+        ),
         if (isConnected)
           Padding(
             padding: EdgeInsets.only(right: 12),

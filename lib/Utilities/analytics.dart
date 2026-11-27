@@ -232,52 +232,68 @@ class Analytics {
     );
   }
 
-  // Paywall funnel (see docs/ANALYTICS.md).
-  static Future<void> logCapHit({required String type, required int count}) {
-    return _analytics.logEvent(
-      name: 'cap_hit',
-      parameters: {'type': type, 'count': count},
-    );
-  }
+  // Paywall funnel, per hive paywall-v1-spec (see docs/ANALYTICS.md).
+  static Future<void> setTier(String tier) =>
+      _analytics.setUserProperty(name: 'tier', value: tier);
 
-  static Future<void> logPaywallViewed({required String source}) {
-    return _analytics.logEvent(
-      name: 'paywall_viewed',
-      parameters: {'source': source},
-    );
-  }
+  static Future<void> _log(String name, [Map<String, Object>? params]) =>
+      _analytics.logEvent(name: name, parameters: params);
 
-  static Future<void> logTrialStarted({required String plan}) {
-    return _analytics.logEvent(name: 'trial_started', parameters: {'plan': plan});
-  }
+  /// [type] = 'star' | 'complete'
+  static Future<void> logCapHit({required String type, required int count}) =>
+      _log('cap_hit', {'type': type, 'count': count});
+
+  static Future<void> logPaywallViewed({required String source}) =>
+      _log('paywall_viewed', {'source': source});
+
+  static Future<void> logPaywallClosed(
+          {required String source, required bool purchased}) =>
+      _log('paywall_closed', {'source': source, 'purchased': _flag(purchased)});
+
+  static Future<void> logPlanSelected({required String plan}) =>
+      _log('plan_selected', {'plan': plan});
+
+  static Future<void> logPurchaseStarted(
+          {required String plan, required bool trial}) =>
+      _log('purchase_started', {'plan': plan, 'trial': _flag(trial)});
+
+  static Future<void> logTrialStarted({required String plan}) =>
+      _log('trial_started', {'plan': plan});
 
   static Future<void> logPurchaseSuccess({
     required String plan,
-    required String price,
+    required double price,
+    required String currency,
     required String country,
-  }) {
-    return _analytics.logEvent(
-      name: 'purchase_success',
-      parameters: {'plan': plan, 'price': price, 'country': country},
-    );
-  }
-
-  static Future<void> logPurchaseFail({
-    required String plan,
-    required String price,
-    required String country,
-    required String reason,
-  }) {
-    return _analytics.logEvent(
-      name: 'purchase_fail',
-      parameters: {
+    required bool trial,
+  }) =>
+      _log('purchase_success', {
         'plan': plan,
         'price': price,
+        'currency': currency,
         'country': country,
-        'reason': _sanitizeReason(reason),
-      },
-    );
-  }
+        'trial': _flag(trial),
+      });
+
+  static Future<void> logPurchaseFailed({
+    required String plan,
+    required String errorCode,
+    required bool userCancelled,
+  }) =>
+      _log('purchase_failed', {
+        'plan': plan,
+        'error_code': _sanitizeReason(errorCode),
+        'user_cancelled': _flag(userCancelled),
+      });
+
+  static Future<void> logRestoreTapped() => _log('restore_tapped');
+
+  /// [result] = 'restored' | 'none' | 'error'
+  static Future<void> logRestoreResult({required String result}) =>
+      _log('restore_result', {'result': result});
+
+  static Future<void> logLegacyGraceStarted() => _log('legacy_grace_started');
+  static Future<void> logLegacyGraceEnded() => _log('legacy_grace_ended');
 
   static int _flag(bool value) => value ? 1 : 0;
 

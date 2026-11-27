@@ -224,6 +224,7 @@ class InternalDbProvider extends ChangeNotifier {
       );
       myCompletedTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
       myCompletedTrophy.add(guide);
+      await _refreshManualCounts();
       notifyListeners();
     } catch (_) {}
   }
@@ -258,6 +259,7 @@ class InternalDbProvider extends ChangeNotifier {
       );
       myStarredTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
       myStarredTrophy.add(guide);
+      await _refreshManualCounts();
       notifyListeners();
     } catch (_) {}
   }
@@ -270,6 +272,7 @@ class InternalDbProvider extends ChangeNotifier {
         [guide.gameName, guide.trophyName, 'COMPLETED'],
       );
       myCompletedTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
+      await _refreshManualCounts();
       notifyListeners();
     } catch (_) {}
   }
@@ -282,22 +285,28 @@ class InternalDbProvider extends ChangeNotifier {
         [guide.gameName, guide.trophyName, 'STARRED'],
       );
       myStarredTrophy.removeWhere((element) => _sameGuideIdentity(element, guide));
+      await _refreshManualCounts();
       notifyListeners();
     } catch (_) {}
   }
 
-  /// Manually added trophies for [action] ('STARRED' | 'COMPLETED'); PSN-synced
-  /// rows do not count toward the free cap.
-  Future<int> manualTrophyCount(String action) async {
-    try {
-      final dbClient = await db;
-      final rows = await dbClient.rawQuery(
-        'SELECT COUNT(*) AS c FROM $myTrophyTable WHERE $trophyActionColumn = ? AND $trophySourceColumn = ?',
-        [action, 'local'],
-      );
-      return (rows.first['c'] as int?) ?? 0;
-    } catch (_) {
-      return 0;
+  /// Manually added (source='local') counts; PSN-synced rows never count
+  /// toward the free cap.
+  int manualStarred = 0;
+  int manualCompleted = 0;
+
+  Future<void> _refreshManualCounts() async {
+    final dbClient = await db;
+    final rows = await dbClient.rawQuery(
+      'SELECT $trophyActionColumn AS a, COUNT(*) AS c FROM $myTrophyTable '
+      'WHERE $trophySourceColumn = ? GROUP BY $trophyActionColumn',
+      ['local'],
+    );
+    manualStarred = 0;
+    manualCompleted = 0;
+    for (final r in rows) {
+      if (r['a'] == 'STARRED') manualStarred = r['c'] as int;
+      if (r['a'] == 'COMPLETED') manualCompleted = r['c'] as int;
     }
   }
 
@@ -327,6 +336,7 @@ class InternalDbProvider extends ChangeNotifier {
           myStarredTrophy.add(guide);
         }
       }
+      await _refreshManualCounts();
       notifyListeners();
     } catch (_) {}
   }

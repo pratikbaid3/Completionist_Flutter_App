@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_trophy_manager/Model/merged_game_model.dart';
+import 'package:game_trophy_manager/Pages/paywall_page.dart';
 import 'package:game_trophy_manager/Pages/psn_login_page.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
+import 'package:game_trophy_manager/Provider/premium_provider.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/psn_sync_provider.dart';
 import 'package:game_trophy_manager/Router/router_constant.dart';
@@ -31,7 +33,8 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     if (!_reviewChecked) {
       _reviewChecked = true;
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 2), () async {
+        if (mounted) await maybeShowLegacyPrompt(context);
         if (mounted) maybeShowReview(context, ReviewTrigger.appOpenFallback);
       });
     }
@@ -71,6 +74,7 @@ class _DashboardState extends State<Dashboard> {
               'Recently Completed',
               Icons.check_circle_rounded,
               neonGreen,
+              capCount: dbProvider.manualCompleted,
             ),
             dbProvider.myCompletedTrophy.isNotEmpty
                 ? _buildGuideList(dbProvider.myCompletedTrophy.length, false)
@@ -83,6 +87,7 @@ class _DashboardState extends State<Dashboard> {
               'Recently Starred',
               Icons.star_rounded,
               goldenColor,
+              capCount: dbProvider.manualStarred,
             ),
             dbProvider.myStarredTrophy.isNotEmpty
                 ? _buildGuideList(dbProvider.myStarredTrophy.length, true)
@@ -554,7 +559,12 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon, Color color) {
+  /// [capCount] shows a tappable "n/5" nudge for free users (source=counter).
+  Widget _buildSectionHeader(String title, IconData icon, Color color,
+      {int? capCount}) {
+    final premium = context.watch<PremiumProvider>();
+    final showCap =
+        capCount != null && !premium.isPremium && premium.paywallEnabled;
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 18, 20, 8),
       child: Row(
@@ -576,6 +586,16 @@ class _DashboardState extends State<Dashboard> {
               fontSize: 16,
             ),
           ),
+          if (showCap) ...[
+            Spacer(),
+            TextButton(
+              onPressed: () => openPaywall(context, 'counter'),
+              child: Text(
+                '${capCount! > freeCap ? freeCap : capCount}/$freeCap',
+                style: TextStyle(color: capCount >= freeCap ? neonPink : textSecondary),
+              ),
+            ),
+          ],
         ],
       ),
     );

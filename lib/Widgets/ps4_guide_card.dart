@@ -8,8 +8,7 @@ import 'package:game_trophy_manager/Model/game_guide_model.dart';
 import 'package:game_trophy_manager/Model/game_model.dart';
 import 'package:game_trophy_manager/Provider/ps4_guide_provider.dart';
 import 'package:game_trophy_manager/Provider/internal_db_provider.dart';
-import 'package:game_trophy_manager/Provider/premium_provider.dart';
-import 'package:game_trophy_manager/Router/router_constant.dart';
+import 'package:game_trophy_manager/Pages/paywall_page.dart';
 import 'package:game_trophy_manager/Utilities/analytics.dart';
 import 'package:game_trophy_manager/Utilities/colors.dart';
 import 'package:game_trophy_manager/Widgets/review_dialog.dart';
@@ -39,22 +38,6 @@ class PS4GuideCard extends StatefulWidget {
 
 class _PS4GuideCardState extends State<PS4GuideCard> {
   bool isExpanded = false;
-
-  /// Free-tier gate for adding a STARRED/COMPLETED trophy. At the cap it logs
-  /// cap_hit, opens the paywall, and allows the add only if Premium unlocked.
-  Future<bool> _underCap(String action) async {
-    final premium = context.read<PremiumProvider>();
-    if (premium.isPremium) return true;
-    final count =
-        await context.read<InternalDbProvider>().manualTrophyCount(action);
-    if (premium.canAdd(count)) return true;
-    final type = action == 'STARRED' ? 'starred' : 'completed';
-    Analytics.logCapHit(type: type, count: count);
-    if (!mounted) return false;
-    final unlocked = await Navigator.of(context)
-        .pushNamed(paywallRoute, arguments: 'cap_$type');
-    return unlocked == true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +82,11 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
             ),
             onPressed: () async {
               HapticFeedback.mediumImpact();
-              if (!widget.isStarred && !await _underCap('STARRED')) return;
+              if (!widget.isStarred &&
+                  !await premiumGate(context, 'star',
+                      context.read<InternalDbProvider>().manualStarred)) {
+                return;
+              }
               if (!context.mounted) return;
               GuideModel g =
                   Provider.of<PS4GuideProvider>(context, listen: false)
@@ -141,7 +128,11 @@ class _PS4GuideCardState extends State<PS4GuideCard> {
             ),
             onPressed: () async {
               HapticFeedback.mediumImpact();
-              if (!widget.isCompleted && !await _underCap('COMPLETED')) return;
+              if (!widget.isCompleted &&
+                  !await premiumGate(context, 'complete',
+                      context.read<InternalDbProvider>().manualCompleted)) {
+                return;
+              }
               if (!context.mounted) return;
               GuideModel g =
                   Provider.of<PS4GuideProvider>(context, listen: false)
